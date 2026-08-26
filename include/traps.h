@@ -1,0 +1,98 @@
+#ifndef TRAPS_H
+#define TRAPS_H
+
+#include <stdint.h>
+
+#include "fixed.h"
+#include "level.h"
+
+struct Player;
+struct Camera;
+
+#define TRAPS_MAX_TRAPS 48
+#define TRAPS_MAX_ENTITIES 16
+#define TRAPS_MAX_DYNAMIC_COLLIDERS 8
+
+typedef enum TrapKind {
+    TRAP_INVISIBLE_BLOCK = 0,
+    TRAP_FALLING_FLOOR,
+    TRAP_BUMP_SHOOTER,
+    TRAP_QUESTION_BLOCK,
+    TRAP_EVASIVE_BLOCK,
+    TRAP_STAGE_SPAWNER,
+    TRAP_ENTER_PIPE,
+    TRAP_SIDE_PIPE,
+    TRAP_CHECKPOINT,
+    TRAP_GOAL,
+} TrapKind;
+
+typedef enum TrapState {
+    TRAP_IDLE = 0,
+    TRAP_ACTIVE,
+    TRAP_SPENT,
+} TrapState;
+
+typedef enum TrapEntityKind {
+    TRAP_ENTITY_NONE = 0,
+    TRAP_ENTITY_FALLING_TILE,
+    TRAP_ENTITY_PROJECTILE,
+    TRAP_ENTITY_COIN_POPUP,
+    TRAP_ENTITY_GOOD_ITEM,
+    TRAP_ENTITY_BAD_ITEM,
+    TRAP_ENTITY_STAR_ITEM,
+    TRAP_ENTITY_BRICK_FRAGMENT,
+} TrapEntityKind;
+
+typedef struct Trap {
+    TrapKind kind;
+    TrapState state;
+    uint16_t source_x;
+    uint16_t source_y;
+    fix16_t x;
+    fix16_t y;
+    fix16_t w;
+    fix16_t h;
+    fix16_t vy;
+    uint8_t timer;
+    uint8_t subtype;
+} Trap;
+
+typedef struct TrapEntity {
+    TrapEntityKind kind;
+    uint8_t active;
+    fix16_t x;
+    fix16_t y;
+    fix16_t vx;
+    fix16_t vy;
+    uint8_t w;
+    uint8_t h;
+    uint8_t timer;
+    uint8_t frame;
+} TrapEntity;
+
+typedef struct TrapManager {
+    Trap traps[TRAPS_MAX_TRAPS];
+    TrapEntity entities[TRAPS_MAX_ENTITIES];
+    uint8_t dynamic_colliders[TRAPS_MAX_DYNAMIC_COLLIDERS];
+    uint8_t cell_collision[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
+    uint8_t cell_hidden[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
+    uint8_t trap_count;
+    uint8_t dynamic_collider_count;
+    uint8_t stage_clear_requested;
+} TrapManager;
+
+extern TrapManager traps_current;
+
+void traps_init_video(void);
+void traps_load_1_1(TrapManager *manager, Level *level);
+void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
+void traps_update(TrapManager *manager, Level *level, struct Player *player);
+void traps_draw(TrapManager *manager, const struct Camera *camera);
+uint8_t traps_hides_collision_at(const TrapManager *manager, int world_x_px, int world_y_px);
+LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, int world_y_px);
+uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px, int world_y_px);
+void traps_break_brick(TrapManager *manager, Level *level, uint16_t source_x, uint16_t source_y);
+uint8_t traps_stage_clear_requested(const TrapManager *manager);
+void traps_ack_stage_clear(TrapManager *manager);
+
+#endif
