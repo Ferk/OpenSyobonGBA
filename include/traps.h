@@ -10,7 +10,7 @@ struct Player;
 struct Camera;
 
 #define TRAPS_MAX_TRAPS 48
-#define TRAPS_MAX_ENTITIES 16
+#define TRAPS_MAX_ENTITIES 32
 #define TRAPS_MAX_DYNAMIC_COLLIDERS 8
 
 typedef enum TrapKind {

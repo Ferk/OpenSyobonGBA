@@ -44,10 +44,10 @@
 #define PROJECTILE_GRAVITY REF_ACCEL_TO_FIX(50)
 #define EVASIVE_BLOCK_HOME_X CELL_WORLD_X(8)
 #define EVASIVE_BLOCK_HOME_Y CELL_WORLD_Y(9)
-#define EVASIVE_BLOCK_STEP FIX16_ONE
-#define EVASIVE_BLOCK_HOLD_FRAMES 32
+#define EVASIVE_BLOCK_VERTICAL 0
+#define EVASIVE_BLOCK_HORIZONTAL 1
 #define EVASIVE_BLOCK_PLAYER_OFFSET REF_POS_TO_FIX(4200)
-#define EVASIVE_BLOCK_MIN_Y (EVASIVE_BLOCK_HOME_Y - FIX16_FROM_INT(40))
+#define EVASIVE_BLOCK_HORIZONTAL_DODGE REF_POS_TO_FIX(3000)
 #define PIPE_SHAKE_START_FRAME 44
 #define PIPE_RISE_START_FRAME 110
 #define PIPE_KILL_FRAME 160
@@ -65,7 +65,9 @@
 #define QUESTION_HIDDEN_POISON 114
 #define QUESTION_GENERATOR_ACTIVE 200
 #define QUESTION_COIN_LIMIT 20
+#define QUESTION_COIN_INTERVAL 3
 #define QUESTION_GENERATOR_INTERVAL 16
+#define QUESTION_COIN_POPUP_LIFETIME 16
 #define QUESTION_GENERATOR_DESPAWN_LEFT 128
 #define QUESTION_GENERATOR_DESPAWN_RIGHT 384
 #define ITEM_EMERGE_FRAMES 16
@@ -235,6 +237,42 @@ static Trap *add_question_block_visual(TrapManager *manager, Level *level,
     }
 
     return trap;
+}
+
+static uint8_t has_cell_trap(const TrapManager *manager, uint16_t source_x,
+                             uint16_t source_y)
+{
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        const Trap *trap = &manager->traps[i];
+
+        if (trap->source_x == source_x && trap->source_y == source_y &&
+            (trap->kind == TRAP_QUESTION_BLOCK ||
+             trap->kind == TRAP_INVISIBLE_BLOCK ||
+             trap->kind == TRAP_EVASIVE_BLOCK)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static void register_source_coin_blocks(TrapManager *manager, Level *level)
+{
+    for (uint16_t y = 0; y < level->height; ++y) {
+        for (uint16_t x = 0; x < level->width; ++x) {
+            uint8_t source = level->source[y][x];
+
+            if (has_cell_trap(manager, x, y)) {
+                continue;
+            }
+
+            if (source == 2) {
+                add_question_block_visual(manager, level, x, y, 0, METATILE_QUESTION);
+            } else if (source == 7) {
+                add_question_block_visual(manager, level, x, y, 0, METATILE_EMPTY);
+            }
+        }
+    }
 }
 
 static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
@@ -428,10 +466,14 @@ static void spend_question_block(TrapManager *manager, Trap *trap, Level *level)
 
 static void spawn_coin_popup(TrapManager *manager, Trap *trap)
 {
-    spawn_entity(manager, TRAP_ENTITY_COIN_POPUP,
-                 trap->x + FIX16_FROM_INT(4),
-                 trap->y - FIX16_FROM_INT(2),
-                 0, -REF_VEL_TO_FIX(800), 8, 8);
+    TrapEntity *coin = spawn_entity(manager, TRAP_ENTITY_COIN_POPUP,
+                                    trap->x + FIX16_FROM_INT(4),
+                                    trap->y - FIX16_FROM_INT(2),
+                                    0, -REF_VEL_TO_FIX(800), 8, 8);
+
+    if (coin) {
+        coin->timer = QUESTION_COIN_POPUP_LIFETIME;
+    }
 }
 
 static void spawn_block_item(TrapManager *manager, Trap *trap,
@@ -495,8 +537,11 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         break;
     case QUESTION_COIN_GENERATOR:
         trap->state = TRAP_ACTIVE;
-        trap->timer = 1;
-        spawn_coin_popup(manager, trap);
+        trap->timer = QUESTION_COIN_INTERVAL;
+        trap->vy = 0;
+        level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_SOLID);
+        set_cell_collision(manager, trap->source_x, trap->source_y,
+                           LEVEL_COLLISION_SOLID, 0);
         break;
     default:
         spawn_coin_popup(manager, trap);
@@ -566,6 +611,10 @@ static void trigger_goal(Trap *trap, Player *player)
 
 static void update_evasive_block(Trap *trap, const struct Player *player)
 {
+    if (trap->subtype == EVASIVE_BLOCK_HORIZONTAL) {
+        return;
+    }
+
     int player_x = FIX16_TO_INT(player->x);
     int player_y = FIX16_TO_INT(player->y);
     int trap_x = FIX16_TO_INT(trap->x);
@@ -581,16 +630,24 @@ static void update_evasive_block(Trap *trap, const struct Player *player)
     if (player_rising_under_block) {
         fix16_t target_y = player->y - EVASIVE_BLOCK_PLAYER_OFFSET;
 
-        trap->timer = EVASIVE_BLOCK_HOLD_FRAMES;
-        if (target_y < EVASIVE_BLOCK_MIN_Y) {
-            target_y = EVASIVE_BLOCK_MIN_Y;
-        }
-
         if (target_y < trap->y) {
             trap->y = target_y;
         }
-    } else if (trap->timer > 0) {
-        trap->timer--;
+    }
+}
+
+static void bump_evasive_block(Trap *trap, int hit_x, int hit_y)
+{
+    if (trap->subtype == EVASIVE_BLOCK_HORIZONTAL) {
+        int trap_mid_x = FIX16_TO_INT(trap->x) + LEVEL_METATILE_SIZE / 2;
+
+        if (hit_x < trap_mid_x) {
+            trap->x += EVASIVE_BLOCK_HORIZONTAL_DODGE;
+        } else {
+            trap->x -= EVASIVE_BLOCK_HORIZONTAL_DODGE;
+        }
+    } else if (trap->y > FIX16_FROM_INT(hit_y) - EVASIVE_BLOCK_PLAYER_OFFSET) {
+        trap->y = FIX16_FROM_INT(hit_y) - EVASIVE_BLOCK_PLAYER_OFFSET;
     }
 }
 
@@ -741,6 +798,7 @@ void traps_load_1_1(TrapManager *manager, Level *level)
 
     Trap *evasive = add_trap(manager, TRAP_EVASIVE_BLOCK, 8, 9, 1, 1);
     if (evasive) {
+        evasive->subtype = EVASIVE_BLOCK_VERTICAL;
         evasive->x = EVASIVE_BLOCK_HOME_X;
         evasive->y = EVASIVE_BLOCK_HOME_Y;
         level_set_metatile_cell(level, 8, 9, METATILE_EMPTY);
@@ -759,6 +817,8 @@ void traps_load_1_1(TrapManager *manager, Level *level)
                               METATILE_QUESTION);
     add_question_block_visual(manager, level, 67, 9, QUESTION_STAR,
                               METATILE_BRICK);
+
+    register_source_coin_blocks(manager, level);
 
     for (uint8_t i = 0;
          i < sizeof(level_1_1_stage_objects) / sizeof(level_1_1_stage_objects[0]);
@@ -806,6 +866,8 @@ void traps_load_1_2(TrapManager *manager, Level *level)
 
     add_question_block_visual(manager, level, 13, 8, QUESTION_HIDDEN_POISON,
                               METATILE_EMPTY);
+
+    register_source_coin_blocks(manager, level);
 
     Trap *entry_pipe = add_world_trap(manager, TRAP_ENTER_PIPE,
                                       REF_STAGE_X_TO_FIX(14 * 29 * 100 + 500),
@@ -976,12 +1038,16 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             trap->state = TRAP_IDLE;
         } else if (trap->kind == TRAP_QUESTION_BLOCK && trap->state == TRAP_ACTIVE) {
             if (trap->subtype == QUESTION_COIN_GENERATOR) {
-                trap->timer++;
-                if (trap->timer % 3 == 0) {
+                if (trap->timer >= QUESTION_COIN_INTERVAL) {
+                    trap->timer = 0;
                     spawn_coin_popup(manager, trap);
+                    trap->vy += FIX16_ONE;
                 }
-                if (trap->timer >= QUESTION_COIN_LIMIT * 3) {
+
+                if (FIX16_TO_INT(trap->vy) >= QUESTION_COIN_LIMIT) {
                     spend_question_block(manager, trap, level);
+                } else {
+                    trap->timer++;
                 }
             } else if (trap->subtype == QUESTION_GENERATOR_ACTIVE) {
                 trap->timer++;
@@ -1004,7 +1070,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             continue;
         }
 
-        if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
+        if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT ||
+            entity->kind == TRAP_ENTITY_COIN_POPUP) {
             if (entity->timer > 0) {
                 entity->timer--;
             } else {
@@ -1287,15 +1354,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px,
             trigger_question_block(manager, trap, level);
             triggered = 1;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
-            audio_play_block_hit();
-            trap->timer = EVASIVE_BLOCK_HOLD_FRAMES;
-            if (trap->y > EVASIVE_BLOCK_MIN_Y) {
-                trap->y -= EVASIVE_BLOCK_STEP;
-                if (trap->y < EVASIVE_BLOCK_MIN_Y) {
-                    trap->y = EVASIVE_BLOCK_MIN_Y;
-                }
-            }
-            triggered = 1;
+            bump_evasive_block(trap, world_x_px, world_y_px);
         }
     }
 
