@@ -85,6 +85,7 @@ extern TrapManager traps_current;
 
 void traps_init_video(void);
 void traps_load_1_1(TrapManager *manager, Level *level);
+void traps_load_1_2(TrapManager *manager, Level *level);
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
 void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);

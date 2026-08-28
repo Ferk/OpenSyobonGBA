@@ -415,10 +415,8 @@ void enemies_init_video(void)
     memcpy(&SPRITE_GFX[ENEMY_TILE_INDEX * 16], enemies_16Tiles, enemies_16TilesLen);
 }
 
-void enemies_load_1_1(EnemyManager *manager, const Level *level)
+static void load_source_spawns(EnemyManager *manager, const Level *level)
 {
-    memset(manager, 0, sizeof(*manager));
-
     for (uint16_t y = 0; y < level->height; ++y) {
         for (uint16_t x = 0; x < level->width; ++x) {
             if (level->source[y][x] == 50) {
@@ -430,6 +428,12 @@ void enemies_load_1_1(EnemyManager *manager, const Level *level)
             }
         }
     }
+}
+
+void enemies_load_1_1(EnemyManager *manager, const Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+    load_source_spawns(manager, level);
 
     Enemy *cloud = add_enemy_reference(manager, ENEMY_STATIC_HAZARD,
                                        103 * 29, 5 * 29 - 12, -1);
@@ -438,6 +442,12 @@ void enemies_load_1_1(EnemyManager *manager, const Level *level)
         cloud->w = 64;
         cloud->h = 32;
     }
+}
+
+void enemies_load_1_2(EnemyManager *manager, const Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+    load_source_spawns(manager, level);
 }
 
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,

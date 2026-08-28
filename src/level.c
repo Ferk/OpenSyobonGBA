@@ -105,6 +105,19 @@ static const SourceRun level_1_1_runs[] = {
     { 138, 145, 14, 6 },
 };
 
+static const SourceEntry level_1_2_entries[] = {
+    { 11, 8, 7 }, { 16, 8, 7 }, { 1, 10, 83 }, { 13, 11, 44 },
+};
+
+static const SourceRun level_1_2_runs[] = {
+    { 0, 39, 13, 5 }, { 43, 53, 13, 5 }, { 57, 71, 13, 5 },
+    { 77, 84, 13, 5 }, { 88, 93, 13, 5 }, { 95, 136, 13, 5 },
+    { 138, 144, 13, 5 },
+    { 0, 39, 14, 6 }, { 43, 53, 14, 6 }, { 57, 71, 14, 6 },
+    { 77, 84, 14, 6 }, { 88, 93, 14, 6 }, { 95, 136, 14, 6 },
+    { 138, 145, 14, 6 },
+};
+
 static uint16_t tile_for_metatile(uint8_t metatile, uint8_t palette,
                                   uint8_t sub_x, uint8_t sub_y)
 {
@@ -335,6 +348,30 @@ void level_load_1_1(Level *level)
 
     for (uint16_t i = 0; i < sizeof(level_1_1_runs) / sizeof(level_1_1_runs[0]); ++i) {
         const SourceRun *run = &level_1_1_runs[i];
+
+        for (uint16_t x = run->x0; x <= run->x1; ++x) {
+            level->source[run->y][x] = run->value;
+        }
+    }
+
+    convert_source_to_metatiles(level);
+    level_force_stream_update();
+}
+
+void level_load_1_2(Level *level)
+{
+    memset(level, 0, sizeof(*level));
+    level->width = LEVEL_SOURCE_COLS;
+    level->height = LEVEL_SOURCE_ROWS;
+
+    for (uint16_t i = 0; i < sizeof(level_1_2_entries) / sizeof(level_1_2_entries[0]); ++i) {
+        const SourceEntry *entry = &level_1_2_entries[i];
+
+        level->source[entry->y][entry->x] = entry->value;
+    }
+
+    for (uint16_t i = 0; i < sizeof(level_1_2_runs) / sizeof(level_1_2_runs[0]); ++i) {
+        const SourceRun *run = &level_1_2_runs[i];
 
         for (uint16_t x = run->x0; x <= run->x1; ++x) {
             level->source[run->y][x] = run->value;

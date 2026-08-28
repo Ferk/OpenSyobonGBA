@@ -62,6 +62,7 @@
 #define QUESTION_STAR 104
 #define QUESTION_POISON_GENERATOR 110
 #define QUESTION_COIN_GENERATOR 112
+#define QUESTION_HIDDEN_POISON 114
 #define QUESTION_GENERATOR_ACTIVE 200
 #define QUESTION_COIN_LIMIT 20
 #define QUESTION_GENERATOR_INTERVAL 16
@@ -484,6 +485,14 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
                            LEVEL_COLLISION_SOLID, 0);
         audio_play_trap_trigger();
         break;
+    case QUESTION_HIDDEN_POISON:
+        audio_play_trap_trigger();
+        spawn_block_item(manager, trap, TRAP_ENTITY_BAD_ITEM, ITEM_FAST_SPEED);
+        trap->state = TRAP_SPENT;
+        level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_EMPTY);
+        set_cell_collision(manager, trap->source_x, trap->source_y,
+                           LEVEL_COLLISION_EMPTY, 1);
+        break;
     case QUESTION_COIN_GENERATOR:
         trap->state = TRAP_ACTIVE;
         trap->timer = 1;
@@ -780,6 +789,48 @@ void traps_load_1_1(TrapManager *manager, Level *level)
     add_world_trap(manager, TRAP_STAGE_SPAWNER,
                    REF_POS_TO_FIX(125 * 29 * 100), REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(9000), REF_POS_TO_FIX(70000), 101);
+}
+
+void traps_load_1_2(TrapManager *manager, Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+
+    for (uint16_t y = 0; y < level->height; ++y) {
+        for (uint16_t x = 0; x < level->width; ++x) {
+            if (level->source[y][x] == 7) {
+                add_trap(manager, TRAP_INVISIBLE_BLOCK, x, y, 1, 1);
+                set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 1);
+            }
+        }
+    }
+
+    add_question_block_visual(manager, level, 13, 8, QUESTION_HIDDEN_POISON,
+                              METATILE_EMPTY);
+
+    Trap *entry_pipe = add_world_trap(manager, TRAP_ENTER_PIPE,
+                                      REF_STAGE_X_TO_FIX(14 * 29 * 100 + 500),
+                                      REF_STAGE_Y_TO_FIX((9 * 29 - 12) * 100),
+                                      REF_POS_TO_FIX(6000),
+                                      REF_POS_TO_FIX(12000 - 200),
+                                      1);
+    if (entry_pipe) {
+        add_dynamic_collider(manager, entry_pipe);
+    }
+
+    Trap *side_pipe = add_world_trap(manager, TRAP_SIDE_PIPE,
+                                    REF_STAGE_X_TO_FIX(12 * 29 * 100),
+                                    REF_STAGE_Y_TO_FIX((11 * 29 - 12) * 100),
+                                    REF_POS_TO_FIX(3000),
+                                    REF_POS_TO_FIX(6000 - 200),
+                                    0);
+    if (side_pipe) {
+        add_dynamic_collider(manager, side_pipe);
+    }
+
+    add_world_trap(manager, TRAP_STAGE_SPAWNER,
+                   REF_POS_TO_FIX(14 * 29 * 100 + 1000),
+                   REF_STAGE_Y_TO_FIX(-6000),
+                   REF_POS_TO_FIX(5000), REF_POS_TO_FIX(70000), 100);
 }
 
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player)

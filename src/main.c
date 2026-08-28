@@ -19,11 +19,32 @@
 #define LIFE_TEXT_COLOR 15
 #define PLAYER_SPRITE_TILE 32
 #define PLAYER_SPRITE_PALETTE 2
+#define KEY_START_MASK KEY_START
+#define KEY_A_MASK KEY_A
+#define KEY_B_MASK KEY_B
+#define KEY_SELECT_MASK KEY_SELECT
+#define KEY_LEFT_MASK KEY_LEFT
+#define KEY_RIGHT_MASK KEY_RIGHT
+
+typedef enum StageId {
+    STAGE_ID_1_1 = 0,
+    STAGE_ID_1_2,
+    STAGE_ID_COUNT,
+} StageId;
 
 typedef enum GameState {
     GAME_STATE_LIVES = 0,
     GAME_STATE_PLAYING,
 } GameState;
+
+#ifdef DEBUG_STAGE_SELECT
+static uint16_t menu_previous_keys;
+
+static uint16_t keys_held(void)
+{
+    return (uint16_t)(~REG_KEYINPUT & 0x03ff);
+}
+#endif
 
 static void clear_oam(void)
 {
@@ -87,14 +108,46 @@ static void draw_life_text_tile(uint8_t tile_offset, const char *text,
     }
 }
 
-static void draw_lives_screen(int lives)
+static void append_text(char *text, const char *suffix)
 {
-    char text[16] = "X ";
+    uint8_t out = 0;
+    uint8_t in = 0;
+
+    while (text[out] != '\0') {
+        out++;
+    }
+
+    while (suffix[in] != '\0') {
+        text[out++] = suffix[in++];
+    }
+    text[out] = '\0';
+}
+
+#ifdef DEBUG_STAGE_SELECT
+static const char *stage_label(StageId stage)
+{
+    if (stage == STAGE_ID_1_2) {
+        return "1-2 ";
+    }
+
+    return "1-1 ";
+}
+#endif
+
+static void draw_lives_screen(StageId stage, int lives)
+{
+    char text[20] = "";
     uint8_t len = 0;
     uint8_t tile_len;
     uint16_t *map = (uint16_t *)SCREEN_BASE_BLOCK(30);
     uint16_t blank_entry = LIFE_TEXT_BLANK_TILE;
 
+#ifdef DEBUG_STAGE_SELECT
+    append_text(text, stage_label(stage));
+#else
+    (void)stage;
+#endif
+    append_text(text, "X ");
     append_int(text, lives);
     BG_PALETTE[0] = RGB5(0, 0, 0);
     BG_PALETTE[LIFE_TEXT_COLOR] = RGB5(31, 31, 31);
@@ -126,12 +179,46 @@ static void draw_lives_screen(int lives)
                               ATTR2_PALETTE(PLAYER_SPRITE_PALETTE));
 }
 
-static void start_stage(Player *player, Camera *camera)
+#ifdef DEBUG_STAGE_SELECT
+static void change_stage(StageId *stage, int delta)
+{
+    int next = (int)*stage + delta;
+
+    if (next < 0) {
+        next = STAGE_ID_COUNT - 1;
+    } else if (next >= STAGE_ID_COUNT) {
+        next = 0;
+    }
+
+    *stage = (StageId)next;
+}
+#endif
+
+static void show_lives_screen(StageId stage, Player *player,
+                              uint8_t *lives_timer, GameState *game_state)
+{
+    draw_lives_screen(stage, 2 - (int)player->death_count);
+    *lives_timer = RESTART_SCREEN_FRAMES;
+    *game_state = GAME_STATE_LIVES;
+}
+
+static void load_stage(StageId stage)
+{
+    if (stage == STAGE_ID_1_2) {
+        level_load_1_2(&level_current);
+        traps_load_1_2(&traps_current, &level_current);
+        enemies_load_1_2(&enemy_current, &level_current);
+    } else {
+        level_load_1_1(&level_current);
+        traps_load_1_1(&traps_current, &level_current);
+        enemies_load_1_1(&enemy_current, &level_current);
+    }
+}
+
+static void start_stage(Player *player, Camera *camera, StageId stage)
 {
     level_init_video();
-    level_load_1_1(&level_current);
-    traps_load_1_1(&traps_current, &level_current);
-    enemies_load_1_1(&enemy_current, &level_current);
+    load_stage(stage);
     player_spawn(player);
     camera_init(camera);
     level_force_stream_update();
@@ -161,19 +248,50 @@ int main(void)
 
     Player player = { 0 };
     Camera camera;
+    StageId current_stage = STAGE_ID_1_1;
     GameState game_state = GAME_STATE_LIVES;
     uint8_t lives_timer = RESTART_SCREEN_FRAMES;
 
     camera_init(&camera);
-    draw_lives_screen(2);
+    draw_lives_screen(current_stage, 2);
 
     while (1) {
         if (game_state == GAME_STATE_LIVES) {
+#ifdef DEBUG_STAGE_SELECT
+            uint16_t keys = keys_held();
+            uint16_t pressed = keys & (uint16_t)~menu_previous_keys;
+            uint8_t select_held = (keys & KEY_SELECT_MASK) != 0;
+
+            if (select_held && (pressed & KEY_LEFT_MASK)) {
+                change_stage(&current_stage, -1);
+                player.checkpoint_active = 0;
+                draw_lives_screen(current_stage, 2 - (int)player.death_count);
+            } else if (select_held && (pressed & KEY_RIGHT_MASK)) {
+                change_stage(&current_stage, 1);
+                player.checkpoint_active = 0;
+                draw_lives_screen(current_stage, 2 - (int)player.death_count);
+            }
+
+            if (!select_held && (pressed & (KEY_START_MASK | KEY_A_MASK | KEY_B_MASK))) {
+                lives_timer = 0;
+            }
+
+            menu_previous_keys = keys;
+
+            if (select_held) {
+                VBlankIntrWait();
+                audio_update();
+                continue;
+            }
+#endif
             if (lives_timer > 0) {
                 lives_timer--;
             } else {
-                start_stage(&player, &camera);
+                start_stage(&player, &camera, current_stage);
                 game_state = GAME_STATE_PLAYING;
+#ifdef DEBUG_STAGE_SELECT
+                menu_previous_keys = 0;
+#endif
             }
 
             VBlankIntrWait();
@@ -186,10 +304,32 @@ int main(void)
         enemies_update(&enemy_current, &level_current, &player);
         messages_update();
 
+#ifdef DEBUG_STAGE_SELECT
+        {
+            uint16_t keys = keys_held();
+            uint16_t pressed = keys & (uint16_t)~menu_previous_keys;
+
+            if ((pressed & KEY_SELECT_MASK) && player.alive) {
+                player.death_count++;
+                player.vx = 0;
+                player.vy = 0;
+                player.alive = 0;
+                player.death_timer = 0;
+                audio_stop_bgm();
+                audio_play_death();
+                show_lives_screen(current_stage, &player, &lives_timer, &game_state);
+                menu_previous_keys = keys;
+                VBlankIntrWait();
+                audio_update();
+                continue;
+            }
+
+            menu_previous_keys = keys;
+        }
+#endif
+
         if (!player.alive && player.death_timer == 0) {
-            draw_lives_screen(2 - (int)player.death_count);
-            lives_timer = RESTART_SCREEN_FRAMES;
-            game_state = GAME_STATE_LIVES;
+            show_lives_screen(current_stage, &player, &lives_timer, &game_state);
             VBlankIntrWait();
             audio_update();
             continue;
@@ -199,15 +339,14 @@ int main(void)
             uint16_t death_count = player_death_count(&player);
 
             traps_ack_stage_clear(&traps_current);
-            level_load_1_1(&level_current);
-            traps_load_1_1(&traps_current, &level_current);
-            enemies_load_1_1(&enemy_current, &level_current);
+            if (current_stage == STAGE_ID_1_1) {
+                current_stage = STAGE_ID_1_2;
+            }
             memset(&player, 0, sizeof(player));
             player.death_count = death_count;
-            player_spawn(&player);
+            show_lives_screen(current_stage, &player, &lives_timer, &game_state);
             camera_init(&camera);
-            level_force_stream_update();
-            audio_play_bgm();
+            continue;
         }
 
         camera_update(&camera, &player, &level_current);

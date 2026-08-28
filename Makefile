@@ -86,6 +86,10 @@ $(warning Maxmod audio assets found, but mmutil/maxmod.h/libmm.a is missing; aud
 endif
 endif
 
+ifeq ($(DEBUG_STAGE_SELECT),1)
+CFLAGS      += -DDEBUG_STAGE_SELECT
+endif
+
 DEPS        := $(OFILES:.o=.d)
 
 .PHONY: all clean assets dirs prepare-assets prepare-audio
