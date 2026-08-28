@@ -27,6 +27,7 @@ typedef enum EnemyKind {
     ENEMY_JUMPER,
     ENEMY_STATIC_HAZARD,
     ENEMY_CEILING_FALLER,
+    ENEMY_PIPE_SHOT,
 } EnemyKind;
 
 typedef enum EnemyState {

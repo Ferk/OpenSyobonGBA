@@ -43,7 +43,7 @@
 #define PLAYER_JUMP_LIFT REF_Y_POS_TO_FIX(400)
 #define PLAYER_JUMP_BUFFER_FRAMES 20
 #define PLAYER_COYOTE_FRAMES 8
-#define PLAYER_DEATH_FRAMES 160
+#define PLAYER_DEATH_FRAMES 80
 #define PLAYER_DEATH_BOUNCE (-REF_Y_VEL_TO_FIX(1050))
 #define PLAYER_WALK_FRAME_DISTANCE FIX16_FROM_INT(6)
 #define PLAYER_GOAL_DROP_SPEED REF_Y_VEL_TO_FIX(600)
@@ -440,6 +440,7 @@ void player_kill(Player *player)
     player->alive = 0;
     player->death_timer = PLAYER_DEATH_FRAMES;
     player->death_count++;
+    audio_stop_bgm();
     audio_play_death();
     player->vx = 0;
     player->vy = PLAYER_DEATH_BOUNCE;
@@ -529,8 +530,6 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
 
         if (player->death_timer > 0) {
             player->death_timer--;
-        } else {
-            player_spawn(player);
         }
 
         previous_keys = keys;

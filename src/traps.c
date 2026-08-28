@@ -23,6 +23,7 @@
 #define BAD_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 8)
 #define STAR_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 12)
 #define BRICK_FRAGMENT_TILE_INDEX 116
+#define FALLING_BRICK_TILE_INDEX 120
 #define CHECKPOINT_TILE_INDEX 176
 #define EVASIVE_BLOCK_PALETTE_BANK 1
 #define ITEM_PALETTE_BANK 3
@@ -63,7 +64,7 @@
 #define QUESTION_COIN_GENERATOR 112
 #define QUESTION_GENERATOR_ACTIVE 200
 #define QUESTION_COIN_LIMIT 20
-#define QUESTION_GENERATOR_INTERVAL 32
+#define QUESTION_GENERATOR_INTERVAL 16
 #define QUESTION_GENERATOR_DESPAWN_LEFT 128
 #define QUESTION_GENERATOR_DESPAWN_RIGHT 384
 #define ITEM_EMERGE_FRAMES 16
@@ -316,6 +317,10 @@ static void load_trap_tiles(void)
                16 * sizeof(uint16_t));
     }
 
+    memcpy(&SPRITE_GFX[FALLING_BRICK_TILE_INDEX * 16],
+           &tiles_16Tiles[METATILE_BRICK * 4 * 8],
+           4 * 16 * sizeof(uint16_t));
+
     for (uint8_t i = 0; i < 6; ++i) {
         memcpy(&SPRITE_GFX[(CHECKPOINT_TILE_INDEX + i * 4) * 16],
                &tiles_16Tiles[(METATILE_CHECKPOINT_00 * 4 + i * 4) * 8],
@@ -355,9 +360,13 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
     }
 
     for (uint16_t x = 0; x < (uint16_t)FIX16_TO_INT(trap->w) / LEVEL_METATILE_SIZE; ++x) {
-        spawn_entity(manager, TRAP_ENTITY_FALLING_TILE,
-                     trap->x + FIX16_FROM_INT(x * LEVEL_METATILE_SIZE),
-                     trap->y, 0, 0, 16, 16);
+        TrapEntity *entity = spawn_entity(manager, TRAP_ENTITY_FALLING_TILE,
+                                          trap->x + FIX16_FROM_INT(x * LEVEL_METATILE_SIZE),
+                                          trap->y, 0, 0, 16, 16);
+
+        if (entity && trap->subtype == 51) {
+            entity->frame = 1;
+        }
     }
 }
 
@@ -497,20 +506,20 @@ static void trigger_stage_spawner(Trap *trap)
     audio_play_trap_trigger();
 
     if (trap->subtype == 100) {
-        enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
+        enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
                              trap->x + REF_POS_TO_FIX(1000),
-                             REF_POS_TO_FIX(32000),
+                             REF_STAGE_Y_TO_FIX(32000),
                              ENEMY_SPRITE_ATYPE3, -1);
     } else if (trap->subtype == 101) {
-        enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
+        enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
                              trap->x + REF_POS_TO_FIX(6000),
-                             REF_POS_TO_FIX(-4000),
-                             ENEMY_SPRITE_ATYPE3, -1);
+                             REF_STAGE_Y_TO_FIX(-4000),
+                             ENEMY_SPRITE_ATYPE3, 1);
     } else if (trap->subtype == 102) {
         for (uint8_t i = 0; i < 4; ++i) {
             enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
                                  trap->x + REF_POS_TO_FIX(i * 3000),
-                                 REF_POS_TO_FIX(-3000),
+                                 REF_STAGE_Y_TO_FIX(-3000),
                                  ENEMY_SPRITE_GHOST, -1);
         }
     }
@@ -708,6 +717,19 @@ void traps_load_1_1(TrapManager *manager, Level *level)
         }
     }
 
+    Trap *falling_bricks = add_trap(manager, TRAP_FALLING_FLOOR, 49, 5, 3, 1);
+    if (falling_bricks) {
+        falling_bricks->w = REF_POS_TO_FIX(9000 - 1);
+        falling_bricks->h = REF_POS_TO_FIX(3000);
+        falling_bricks->subtype = 51;
+
+        for (uint16_t x = 0; x < 3; ++x) {
+            level_set_metatile_cell(level, 49 + x, 5, METATILE_BRICK);
+            set_cell_collision(manager, 49 + x, 5,
+                               LEVEL_COLLISION_SOLID, 0);
+        }
+    }
+
     Trap *evasive = add_trap(manager, TRAP_EVASIVE_BLOCK, 8, 9, 1, 1);
     if (evasive) {
         evasive->x = EVASIVE_BLOCK_HOME_X;
@@ -729,10 +751,6 @@ void traps_load_1_1(TrapManager *manager, Level *level)
     add_question_block_visual(manager, level, 67, 9, QUESTION_STAR,
                               METATILE_BRICK);
 
-    for (uint16_t x = 49; x <= 51; ++x) {
-        level_set_metatile_cell(level, x, 5, METATILE_BRICK);
-    }
-
     for (uint8_t i = 0;
          i < sizeof(level_1_1_stage_objects) / sizeof(level_1_1_stage_objects[0]);
          ++i) {
@@ -751,16 +769,16 @@ void traps_load_1_1(TrapManager *manager, Level *level)
     }
 
     add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(20 * 29 * 100 + 500), REF_POS_TO_FIX(-6000),
+                   REF_POS_TO_FIX(20 * 29 * 100 + 500), REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(5000), REF_POS_TO_FIX(70000), 100);
     add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(54 * 29 * 100 - 500), REF_POS_TO_FIX(-6000),
+                   REF_POS_TO_FIX(54 * 29 * 100 - 500), REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(7000), REF_POS_TO_FIX(70000), 101);
     add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(112 * 29 * 100 + 1000), REF_POS_TO_FIX(-6000),
+                   REF_POS_TO_FIX(112 * 29 * 100 + 1000), REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(3000), REF_POS_TO_FIX(70000), 102);
     add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(125 * 29 * 100), REF_POS_TO_FIX(-6000),
+                   REF_POS_TO_FIX(125 * 29 * 100), REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(9000), REF_POS_TO_FIX(70000), 101);
 }
 
@@ -859,11 +877,21 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             int trap_y = FIX16_TO_INT(trap->y);
             int trap_w = FIX16_TO_INT(trap->w);
 
-            if (player->on_ground &&
-                player_x + PLAYER_WIDTH_PX > trap_x + 4 &&
-                player_x < trap_x + trap_w - 4 &&
-                player_y + PLAYER_HEIGHT_PX >= trap_y &&
-                player_y + PLAYER_HEIGHT_PX <= trap_y + 4) {
+            if (trap->subtype == 51) {
+                int left_margin = FIX16_TO_INT(REF_POS_TO_FIX(3200));
+                int right_margin = FIX16_TO_INT(REF_POS_TO_FIX(200));
+                int trigger_y = trap_y + FIX16_TO_INT(REF_POS_TO_FIX(3000));
+
+                if (player_x + PLAYER_WIDTH_PX > trap_x + left_margin &&
+                    player_x < trap_x + trap_w - right_margin &&
+                    player_y + PLAYER_HEIGHT_PX > trigger_y) {
+                    trigger_falling_floor(manager, trap, level);
+                }
+            } else if (player->on_ground &&
+                       player_x + PLAYER_WIDTH_PX > trap_x + 4 &&
+                       player_x < trap_x + trap_w - 4 &&
+                       player_y + PLAYER_HEIGHT_PX >= trap_y &&
+                       player_y + PLAYER_HEIGHT_PX <= trap_y + 4) {
                 trigger_falling_floor(manager, trap, level);
             }
         } else if (trap->kind == TRAP_STAGE_SPAWNER && trap->state == TRAP_IDLE) {
@@ -987,6 +1015,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
                     message = MESSAGE_PLAYER_STABBED;
                 }
+                entity->active = 0;
                 messages_show(message,
                               player->x + FIX16_FROM_INT(PLAYER_WIDTH_PX),
                               player->y, 55);
@@ -1011,6 +1040,9 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             uint16_t tile = TRAP_TILE_INDEX;
             if (entity->kind == TRAP_ENTITY_PROJECTILE) {
                 tile = PROJECTILE_TILE_INDEX;
+            } else if (entity->kind == TRAP_ENTITY_FALLING_TILE &&
+                       entity->frame == 1) {
+                tile = FALLING_BRICK_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_COIN_POPUP) {
                 tile = COIN_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_GOOD_ITEM) {
@@ -1029,7 +1061,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                                 : ATTR1_SIZE_16;
             uint16_t palette = 0;
 
-            if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
+            if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT ||
+                (entity->kind == TRAP_ENTITY_FALLING_TILE && entity->frame == 1)) {
                 palette = EVASIVE_BLOCK_PALETTE_BANK;
             } else if (entity->kind == TRAP_ENTITY_COIN_POPUP ||
                        entity->kind == TRAP_ENTITY_GOOD_ITEM ||
@@ -1119,7 +1152,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                                                 ATTR0_COLOR_16 | ATTR0_SQUARE);
                         obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
                         obj->attr2 = (uint16_t)(OBJ_CHAR(tile) |
-                                                ATTR2_PALETTE(EVASIVE_BLOCK_PALETTE_BANK));
+                                                ATTR2_PALETTE(EVASIVE_BLOCK_PALETTE_BANK) |
+                                                ATTR2_PRIORITY(0));
                     }
 
                     OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;

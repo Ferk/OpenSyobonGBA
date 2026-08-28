@@ -32,6 +32,8 @@
 #define JUMPER_LAUNCH_SPEED (-REF_VEL_TO_FIX(1600))
 #define JUMPER_LAUNCH_DELAY 100
 #define CEILING_FALL_SPEED REF_VEL_TO_FIX(1200)
+#define PIPE_SHOT_UP_SPEED (-REF_VEL_TO_FIX(800))
+#define PIPE_SHOT_DOWN_SPEED REF_VEL_TO_FIX(1200)
 #define PLAYER_STOMP_BOUNCE (-REF_VEL_TO_FIX(950))
 
 EnemyManager enemy_current;
@@ -141,6 +143,10 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->sprite = ENEMY_SPRITE_GHOST;
     enemy->emerge_timer = 0;
 
+    if (kind == ENEMY_PIPE_SHOT) {
+        enemy->vy = (dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED;
+    }
+
     return enemy;
 }
 
@@ -215,7 +221,9 @@ void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
     enemy->x = x;
     enemy->y = y;
     enemy->vx = 0;
-    enemy->vy = 0;
+    enemy->vy = (kind == ENEMY_PIPE_SHOT)
+                    ? ((dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED)
+                    : 0;
     enemy->sprite = sprite;
     enemy->emerge_timer = 0;
 }
@@ -365,7 +373,8 @@ static void handle_player_collision(Enemy *enemy, Player *player)
 
     if (player->vy > 0 && player_y + PLAYER_HEIGHT_PX <= enemy_y + 8 &&
         enemy->kind != ENEMY_CEILING_FALLER &&
-        enemy->kind != ENEMY_STATIC_HAZARD) {
+        enemy->kind != ENEMY_STATIC_HAZARD &&
+        enemy->kind != ENEMY_PIPE_SHOT) {
         enemy->state = ENEMY_STATE_DEAD;
         enemy->timer = 18;
         enemy->vx = 0;
@@ -474,6 +483,17 @@ void enemies_update(EnemyManager *manager, const Level *level, Player *player)
             continue;
         }
 
+        if (enemy->kind == ENEMY_PIPE_SHOT) {
+            enemy->y += enemy->vy;
+            if (FIX16_TO_INT(enemy->y) < -96 ||
+                FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
+                enemy->state = ENEMY_STATE_EMPTY;
+                continue;
+            }
+            handle_player_collision(enemy, player);
+            continue;
+        }
+
         if (enemy->kind == ENEMY_CEILING_FALLER) {
             update_ceiling_faller(enemy, player);
             if (enemy->state == ENEMY_STATE_WAITING) {
@@ -546,7 +566,8 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                                                  ATTR0_COLOR_16 | ATTR0_SQUARE);
                     part_obj->attr1 = (uint16_t)((part_x & 0x01ff) | ATTR1_SIZE_16);
                     part_obj->attr2 = (uint16_t)(OBJ_CHAR(ENEMY_CLOUD_FACE_TILE_BASE +
-                                                           part * 4) | ATTR2_PALETTE(0));
+                                                           part * 4) |
+                                                 ATTR2_PALETTE(0));
                 }
 
                 OAM[FIRST_ENEMY_SPRITE + i] = *obj;
@@ -566,7 +587,10 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
             obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
             obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16 |
                                     (enemy->dir > 0 ? ATTR1_FLIP_X : 0));
-            obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(0));
+            obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(0) |
+                                    (enemy->kind == ENEMY_PIPE_SHOT
+                                         ? ATTR2_PRIORITY(1)
+                                         : ATTR2_PRIORITY(0)));
         }
 
         OAM[FIRST_ENEMY_SPRITE + i] = *obj;
