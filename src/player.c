@@ -402,6 +402,19 @@ void player_spawn(Player *player)
     previous_keys = 0;
 }
 
+void player_spawn_at(Player *player, fix16_t x, fix16_t y)
+{
+    uint16_t death_count = player->death_count;
+
+    memset(player, 0, sizeof(*player));
+    player->x = x;
+    player->y = y;
+    player->facing_right = 1;
+    player->alive = 1;
+    player->death_count = death_count;
+    previous_keys = 0;
+}
+
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y)
 {
     player->checkpoint_active = 1;

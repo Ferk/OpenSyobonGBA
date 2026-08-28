@@ -24,6 +24,7 @@ typedef enum TrapKind {
     TRAP_SIDE_PIPE,
     TRAP_CHECKPOINT,
     TRAP_GOAL,
+    TRAP_HINT_BLOCK,
 } TrapKind;
 
 typedef enum TrapState {
@@ -79,6 +80,8 @@ typedef struct TrapManager {
     uint8_t trap_count;
     uint8_t dynamic_collider_count;
     uint8_t stage_clear_requested;
+    uint8_t stage_transition_requested;
+    uint8_t stage_transition_target;
 } TrapManager;
 
 extern TrapManager traps_current;
@@ -86,6 +89,7 @@ extern TrapManager traps_current;
 void traps_init_video(void);
 void traps_load_1_1(TrapManager *manager, Level *level);
 void traps_load_1_2(TrapManager *manager, Level *level);
+void traps_load_1_2_underground(TrapManager *manager, Level *level);
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
 void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);
@@ -95,5 +99,8 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px,
 void traps_break_brick(TrapManager *manager, Level *level, uint16_t source_x, uint16_t source_y);
 uint8_t traps_stage_clear_requested(const TrapManager *manager);
 void traps_ack_stage_clear(TrapManager *manager);
+uint8_t traps_stage_transition_requested(const TrapManager *manager);
+uint8_t traps_stage_transition_target(const TrapManager *manager);
+void traps_ack_stage_transition(TrapManager *manager);
 
 #endif

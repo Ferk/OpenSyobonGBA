@@ -16,6 +16,7 @@ typedef enum MessageId {
     MESSAGE_ENEMY_SLEEP,
     MESSAGE_ENEMY_DELISH,
     MESSAGE_STAGE_CLEAR,
+    MESSAGE_HINT_STAGE_1,
 } MessageId;
 
 void messages_init(void);

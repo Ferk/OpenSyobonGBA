@@ -25,10 +25,13 @@
 #define KEY_SELECT_MASK KEY_SELECT
 #define KEY_LEFT_MASK KEY_LEFT
 #define KEY_RIGHT_MASK KEY_RIGHT
+#define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
+#define REF_STAGE_Y_TO_FIX(v) REF_POS_TO_FIX((v) + 12 * 100 - (LEVEL_VIEW_SOURCE_ROW_OFFSET * 29 * 100))
 
 typedef enum StageId {
     STAGE_ID_1_1 = 0,
     STAGE_ID_1_2,
+    STAGE_ID_1_2_UNDERGROUND,
     STAGE_ID_COUNT,
 } StageId;
 
@@ -126,6 +129,10 @@ static void append_text(char *text, const char *suffix)
 #ifdef DEBUG_STAGE_SELECT
 static const char *stage_label(StageId stage)
 {
+    if (stage == STAGE_ID_1_2_UNDERGROUND) {
+        return "1-2U ";
+    }
+
     if (stage == STAGE_ID_1_2) {
         return "1-2 ";
     }
@@ -216,7 +223,11 @@ static void apply_camera_left_limit(Player *player, const Camera *camera)
 
 static void load_stage(StageId stage)
 {
-    if (stage == STAGE_ID_1_2) {
+    if (stage == STAGE_ID_1_2_UNDERGROUND) {
+        level_load_1_2_underground(&level_current);
+        traps_load_1_2_underground(&traps_current, &level_current);
+        enemies_load_1_2_underground(&enemy_current, &level_current);
+    } else if (stage == STAGE_ID_1_2) {
         level_load_1_2(&level_current);
         traps_load_1_2(&traps_current, &level_current);
         enemies_load_1_2(&enemy_current, &level_current);
@@ -231,7 +242,11 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
 {
     level_init_video();
     load_stage(stage);
-    player_spawn(player);
+    if (stage == STAGE_ID_1_2_UNDERGROUND) {
+        player_spawn_at(player, REF_POS_TO_FIX(6000), REF_STAGE_Y_TO_FIX(3000));
+    } else {
+        player_spawn(player);
+    }
     camera_init(camera);
     level_force_stream_update();
     messages_init();
@@ -358,6 +373,25 @@ int main(void)
             player.death_count = death_count;
             show_lives_screen(current_stage, &player, &lives_timer, &game_state);
             camera_init(&camera);
+            continue;
+        }
+
+        if (traps_stage_transition_requested(&traps_current)) {
+            uint16_t death_count = player_death_count(&player);
+            StageId target = (StageId)traps_stage_transition_target(&traps_current);
+
+            traps_ack_stage_transition(&traps_current);
+            if (target >= STAGE_ID_COUNT) {
+                target = current_stage;
+            }
+            current_stage = target;
+            memset(&player, 0, sizeof(player));
+            player.death_count = death_count;
+            start_stage(&player, &camera, current_stage);
+            game_state = GAME_STATE_PLAYING;
+#ifdef DEBUG_STAGE_SELECT
+            menu_previous_keys = 0;
+#endif
             continue;
         }
 

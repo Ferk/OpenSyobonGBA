@@ -55,6 +55,8 @@ static const char *message_text(MessageId id)
         return TXT_ENEMY_DELISH;
     case MESSAGE_STAGE_CLEAR:
         return TXT_STAGE_CLEAR;
+    case MESSAGE_HINT_STAGE_1:
+        return TXT_HINT_STAGE_1;
     case MESSAGE_ENEMY_TAUNT: {
         const char *text = enemy_taunts[taunt_index];
         taunt_index = (uint8_t)((taunt_index + 1) %

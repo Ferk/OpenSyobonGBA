@@ -38,6 +38,7 @@ typedef struct Player {
 
 void player_init_video(void);
 void player_spawn(Player *player);
+void player_spawn_at(Player *player, fix16_t x, fix16_t y);
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
 void player_begin_goal(Player *player, fix16_t goal_x);
 uint8_t player_goal_clear_done(const Player *player);

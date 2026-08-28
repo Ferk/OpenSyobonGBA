@@ -118,6 +118,52 @@ static const SourceRun level_1_2_runs[] = {
     { 138, 145, 14, 6 },
 };
 
+static const SourceEntry level_1_2_underground_entries[] = {
+    { 147, 0, 97 }, { 0, 1, 1 }, { 53, 1, 1 }, { 65, 1, 1 },
+    { 75, 1, 1 }, { 131, 1, 98 }, { 0, 2, 1 }, { 84, 2, 4 },
+    { 0, 3, 1 }, { 84, 3, 4 }, { 0, 4, 1 }, { 84, 4, 4 },
+    { 0, 5, 1 }, { 26, 5, 7 }, { 79, 5, 2 }, { 84, 5, 4 },
+    { 0, 6, 1 }, { 84, 6, 4 }, { 0, 7, 1 }, { 129, 7, 97 },
+    { 130, 7, 44 }, { 0, 8, 1 }, { 19, 8, 7 }, { 81, 8, 1 },
+    { 84, 8, 54 }, { 86, 8, 1 }, { 108, 8, 97 }, { 0, 9, 1 },
+    { 7, 9, 98 }, { 8, 9, 2 }, { 9, 9, 2 }, { 10, 9, 98 },
+    { 20, 9, 4 }, { 25, 9, 4 }, { 49, 9, 98 }, { 81, 9, 1 },
+    { 86, 9, 1 }, { 87, 9, 1 }, { 121, 9, 1 }, { 122, 9, 1 },
+    { 0, 10, 1 }, { 20, 10, 4 }, { 25, 10, 4 }, { 27, 10, 4 },
+    { 29, 10, 51 }, { 72, 10, 7 }, { 80, 10, 1 }, { 81, 10, 1 },
+    { 108, 10, 1 }, { 121, 10, 1 }, { 122, 10, 1 }, { 0, 11, 1 },
+    { 16, 11, 4 }, { 18, 11, 4 }, { 20, 11, 4 }, { 25, 11, 4 },
+    { 27, 11, 4 }, { 29, 11, 4 }, { 54, 11, 40 }, { 61, 11, 30 },
+    { 96, 11, 1 }, { 107, 11, 1 }, { 108, 11, 1 }, { 121, 11, 1 },
+    { 122, 11, 1 }, { 0, 12, 1 }, { 2, 12, 7 }, { 10, 12, 50 },
+    { 12, 12, 50 }, { 14, 12, 4 }, { 16, 12, 4 }, { 18, 12, 4 },
+    { 20, 12, 4 }, { 22, 12, 50 }, { 25, 12, 4 }, { 27, 12, 4 },
+    { 29, 12, 4 }, { 31, 12, 4 }, { 39, 12, 7 }, { 54, 12, 41 },
+    { 121, 12, 1 }, { 122, 12, 1 }, { 0, 13, 5 }, { 1, 13, 5 },
+    { 60, 13, 5 }, { 61, 13, 5 }, { 121, 13, 1 }, { 122, 13, 1 },
+    { 0, 14, 6 }, { 1, 14, 6 }, { 60, 14, 6 }, { 61, 14, 6 },
+    { 121, 14, 1 }, { 122, 14, 1 },
+};
+
+static const SourceRun level_1_2_underground_runs[] = {
+    { 4, 51, 1, 1 }, { 76, 84, 1, 4 }, { 85, 108, 1, 1 },
+    { 121, 130, 1, 1 }, { 133, 149, 1, 1 }, { 133, 140, 2, 1 },
+    { 133, 140, 3, 1 }, { 133, 140, 4, 1 }, { 133, 140, 5, 1 },
+    { 133, 140, 6, 1 }, { 133, 140, 7, 1 }, { 123, 127, 8, 7 },
+    { 133, 140, 8, 1 }, { 21, 24, 9, 7 }, { 82, 85, 9, 4 },
+    { 128, 140, 9, 1 }, { 82, 85, 10, 4 }, { 86, 88, 10, 1 },
+    { 128, 140, 10, 1 }, { 79, 81, 11, 1 }, { 82, 85, 11, 4 },
+    { 86, 89, 11, 1 }, { 128, 140, 11, 1 }, { 36, 38, 12, 50 },
+    { 78, 81, 12, 1 }, { 82, 85, 12, 4 }, { 86, 90, 12, 1 },
+    { 95, 97, 12, 1 }, { 106, 108, 12, 1 }, { 128, 140, 12, 1 },
+    { 3, 23, 13, 5 }, { 25, 42, 13, 5 }, { 46, 48, 13, 5 },
+    { 52, 57, 13, 5 }, { 66, 71, 13, 5 }, { 75, 108, 13, 5 },
+    { 128, 140, 13, 1 }, { 141, 149, 13, 5 }, { 3, 23, 14, 6 },
+    { 25, 42, 14, 6 }, { 46, 48, 14, 6 }, { 52, 57, 14, 6 },
+    { 66, 71, 14, 6 }, { 75, 108, 14, 6 }, { 128, 140, 14, 1 },
+    { 141, 149, 14, 6 },
+};
+
 static uint16_t tile_for_metatile(uint8_t metatile, uint8_t palette,
                                   uint8_t sub_x, uint8_t sub_y)
 {
@@ -382,6 +428,32 @@ void level_load_1_2(Level *level)
     level_force_stream_update();
 }
 
+void level_load_1_2_underground(Level *level)
+{
+    memset(level, 0, sizeof(*level));
+    level->width = LEVEL_SOURCE_COLS;
+    level->height = LEVEL_SOURCE_ROWS;
+
+    for (uint16_t i = 0; i < sizeof(level_1_2_underground_entries) /
+             sizeof(level_1_2_underground_entries[0]); ++i) {
+        const SourceEntry *entry = &level_1_2_underground_entries[i];
+
+        level->source[entry->y][entry->x] = entry->value;
+    }
+
+    for (uint16_t i = 0; i < sizeof(level_1_2_underground_runs) /
+             sizeof(level_1_2_underground_runs[0]); ++i) {
+        const SourceRun *run = &level_1_2_underground_runs[i];
+
+        for (uint16_t x = run->x0; x <= run->x1; ++x) {
+            level->source[run->y][x] = run->value;
+        }
+    }
+
+    convert_source_to_metatiles(level);
+    level_force_stream_update();
+}
+
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px)
 {
     int first_world_tile_x = floor_div_int(camera_x_px + LEVEL_STREAM_LEFT_PX, 8);
@@ -455,8 +527,6 @@ LevelCollision level_collision_at(const Level *level, int world_x_px, int world_
         return LEVEL_COLLISION_SOLID;
     case METATILE_SPIKES:
         return LEVEL_COLLISION_DEATH;
-    case METATILE_PLATFORM:
-        return LEVEL_COLLISION_PASS_THROUGH;
     default:
         return LEVEL_COLLISION_EMPTY;
     }

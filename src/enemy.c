@@ -450,6 +450,12 @@ void enemies_load_1_2(EnemyManager *manager, const Level *level)
     load_source_spawns(manager, level);
 }
 
+void enemies_load_1_2_underground(EnemyManager *manager, const Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+    load_source_spawns(manager, level);
+}
+
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir)
 {

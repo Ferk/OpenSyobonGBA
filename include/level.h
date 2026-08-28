@@ -25,7 +25,7 @@ typedef enum MetatileId {
     METATILE_GROUND_TOP,
     METATILE_GROUND_DIRT,
     METATILE_HIDDEN,
-    METATILE_PLATFORM,
+    METATILE_HINT_BLOCK,
     METATILE_HILL_00,
     METATILE_HILL_01,
     METATILE_HILL_02,
@@ -108,6 +108,7 @@ extern Level level_current;
 void level_init_video(void);
 void level_load_1_1(Level *level);
 void level_load_1_2(Level *level);
+void level_load_1_2_underground(Level *level);
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px);
 void level_force_stream_update(void);
 uint8_t level_metatile_at(const Level *level, int world_x_px, int world_y_px);

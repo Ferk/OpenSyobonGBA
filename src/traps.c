@@ -55,6 +55,8 @@
 #define PIPE_PLAYER_SINK_SPEED REF_POS_TO_FIX(240)
 #define PIPE_RISE_ACCEL REF_ACCEL_TO_FIX(80)
 #define PIPE_RISE_MAX_SPEED REF_VEL_TO_FIX(1600)
+#define PIPE_TRANSITION_FRAME 20
+#define PIPE_TRANSITION_1_2_UNDERGROUND 2
 #define KEY_DOWN_MASK 0x0080
 #define QUESTION_ENEMY 101
 #define QUESTION_GOOD_MUSHROOM 102
@@ -248,7 +250,8 @@ static uint8_t has_cell_trap(const TrapManager *manager, uint16_t source_x,
         if (trap->source_x == source_x && trap->source_y == source_y &&
             (trap->kind == TRAP_QUESTION_BLOCK ||
              trap->kind == TRAP_INVISIBLE_BLOCK ||
-             trap->kind == TRAP_EVASIVE_BLOCK)) {
+             trap->kind == TRAP_EVASIVE_BLOCK ||
+             trap->kind == TRAP_HINT_BLOCK)) {
             return 1;
         }
     }
@@ -609,6 +612,15 @@ static void trigger_goal(Trap *trap, Player *player)
                   90);
 }
 
+static void trigger_hint_block(Trap *trap)
+{
+    audio_play_trap_trigger();
+    messages_show(MESSAGE_HINT_STAGE_1,
+                  trap->x - FIX16_FROM_INT(24),
+                  trap->y - FIX16_FROM_INT(8),
+                  120);
+}
+
 static void update_evasive_block(Trap *trap, const struct Player *player)
 {
     if (trap->subtype == EVASIVE_BLOCK_HORIZONTAL) {
@@ -667,7 +679,7 @@ static uint8_t player_on_enter_pipe(const Trap *trap, const struct Player *playe
            player_y + PLAYER_HEIGHT_PX <= pipe_y + 8;
 }
 
-static void update_enter_pipe(Trap *trap, struct Player *player)
+static void update_enter_pipe(TrapManager *manager, Trap *trap, struct Player *player)
 {
     if (trap->state == TRAP_IDLE) {
         if (player_on_enter_pipe(trap, player) && (keys_held() & KEY_DOWN_MASK)) {
@@ -696,7 +708,20 @@ static void update_enter_pipe(Trap *trap, struct Player *player)
 
     if (trap->timer <= PIPE_PLAYER_SINK_FRAMES) {
         player->y += PIPE_PLAYER_SINK_SPEED;
-    } else if (trap->timer == 23) {
+    }
+
+    if (trap->subtype == 1) {
+        if (trap->timer == PIPE_TRANSITION_FRAME) {
+            manager->stage_transition_requested = 1;
+            manager->stage_transition_target = PIPE_TRANSITION_1_2_UNDERGROUND;
+            trap->state = TRAP_SPENT;
+        } else if (trap->timer < 255) {
+            trap->timer++;
+        }
+        return;
+    }
+
+    if (trap->timer == 23) {
         trap->x -= FIX16_ONE;
     } else if (trap->timer >= PIPE_SHAKE_START_FRAME &&
                trap->timer < PIPE_RISE_START_FRAME) {
@@ -867,6 +892,13 @@ void traps_load_1_2(TrapManager *manager, Level *level)
     add_question_block_visual(manager, level, 13, 8, QUESTION_HIDDEN_POISON,
                               METATILE_EMPTY);
 
+    Trap *hint = add_trap(manager, TRAP_HINT_BLOCK, 4, 9, 1, 1);
+    if (hint) {
+        hint->subtype = 1;
+        level_set_metatile_cell(level, 4, 9, METATILE_HINT_BLOCK);
+        set_cell_collision(manager, 4, 9, LEVEL_COLLISION_SOLID, 0);
+    }
+
     register_source_coin_blocks(manager, level);
 
     Trap *entry_pipe = add_world_trap(manager, TRAP_ENTER_PIPE,
@@ -893,6 +925,22 @@ void traps_load_1_2(TrapManager *manager, Level *level)
                    REF_POS_TO_FIX(14 * 29 * 100 + 1000),
                    REF_STAGE_Y_TO_FIX(-6000),
                    REF_POS_TO_FIX(5000), REF_POS_TO_FIX(70000), 100);
+}
+
+void traps_load_1_2_underground(TrapManager *manager, Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+
+    for (uint16_t y = 0; y < level->height; ++y) {
+        for (uint16_t x = 0; x < level->width; ++x) {
+            if (level->source[y][x] == 7) {
+                add_trap(manager, TRAP_INVISIBLE_BLOCK, x, y, 1, 1);
+                set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 1);
+            }
+        }
+    }
+
+    register_source_coin_blocks(manager, level);
 }
 
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player)
@@ -1018,7 +1066,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 trigger_stage_spawner(trap);
             }
         } else if (trap->kind == TRAP_ENTER_PIPE) {
-            update_enter_pipe(trap, player);
+            update_enter_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -1355,6 +1403,9 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px,
             triggered = 1;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
             bump_evasive_block(trap, world_x_px, world_y_px);
+        } else if (trap->kind == TRAP_HINT_BLOCK) {
+            trigger_hint_block(trap);
+            triggered = 1;
         }
     }
 
@@ -1369,4 +1420,20 @@ uint8_t traps_stage_clear_requested(const TrapManager *manager)
 void traps_ack_stage_clear(TrapManager *manager)
 {
     manager->stage_clear_requested = 0;
+}
+
+uint8_t traps_stage_transition_requested(const TrapManager *manager)
+{
+    return manager->stage_transition_requested;
+}
+
+uint8_t traps_stage_transition_target(const TrapManager *manager)
+{
+    return manager->stage_transition_target;
+}
+
+void traps_ack_stage_transition(TrapManager *manager)
+{
+    manager->stage_transition_requested = 0;
+    manager->stage_transition_target = 0;
 }
