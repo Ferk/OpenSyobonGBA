@@ -202,6 +202,18 @@ static void show_lives_screen(StageId stage, Player *player,
     *game_state = GAME_STATE_LIVES;
 }
 
+static void apply_camera_left_limit(Player *player, const Camera *camera)
+{
+    int left_limit = camera_player_left_limit_px(camera);
+
+    if (player->alive && FIX16_TO_INT(player->x) < left_limit) {
+        player->x = FIX16_FROM_INT(left_limit);
+        if (player->vx < 0) {
+            player->vx = 0;
+        }
+    }
+}
+
 static void load_stage(StageId stage)
 {
     if (stage == STAGE_ID_1_2) {
@@ -350,6 +362,7 @@ int main(void)
         }
 
         camera_update(&camera, &player, &level_current);
+        apply_camera_left_limit(&player, &camera);
 
         VBlankIntrWait();
         audio_update();

@@ -5,6 +5,7 @@
 #define CAMERA_Y_HIGH_LINE 42
 #define CAMERA_Y_LOW_LINE 104
 #define CAMERA_Y_UP_LOOKAHEAD_MAX 32
+#define CAMERA_BACKTRACK_GRACE_PX (LEVEL_METATILE_SIZE * 2)
 
 static int clamp_int(int value, int min_value, int max_value)
 {
@@ -34,6 +35,7 @@ void camera_init(Camera *camera)
 {
     camera->x = 0;
     camera->y = 0;
+    camera->max_x = 0;
     camera->screen_x = 0;
     camera->screen_y = 0;
 }
@@ -44,6 +46,7 @@ void camera_update(Camera *camera, const Player *player, const Level *level)
     int player_top_y = FIX16_TO_INT(player->y);
     int player_bottom_y = player_top_y + PLAYER_HEIGHT_PX;
     int max_x = level->width * LEVEL_METATILE_SIZE - CAMERA_VIEW_WIDTH;
+    int min_x = FIX16_TO_INT(camera->max_x) - CAMERA_BACKTRACK_GRACE_PX;
     int target_x = player_center_x - CAMERA_VIEW_WIDTH / 2;
     int target_y = 0;
 
@@ -53,12 +56,17 @@ void camera_update(Camera *camera, const Player *player, const Level *level)
         target_y = player_bottom_y - CAMERA_Y_LOW_LINE;
     }
 
-    target_x = clamp_int(target_x, 0, max_x);
+    target_x = clamp_int(target_x, min_x > 0 ? min_x : 0, max_x);
     target_y = clamp_int(target_y, -CAMERA_Y_UP_LOOKAHEAD_MAX,
                          level_camera_max_y_px(level));
 
     camera->x = approach_smooth(camera->x, FIX16_FROM_INT(target_x), CAMERA_X_LAG_SHIFT);
     camera->y = approach_smooth(camera->y, FIX16_FROM_INT(target_y), CAMERA_Y_LAG_SHIFT);
+
+    if (camera->x > camera->max_x) {
+        camera->max_x = camera->x;
+    }
+
     camera->screen_x = (int16_t)FIX16_TO_INT(camera->x);
     camera->screen_y = (int16_t)FIX16_TO_INT(camera->y);
 }
@@ -71,6 +79,13 @@ int camera_x_px(const Camera *camera)
 int camera_y_px(const Camera *camera)
 {
     return camera->screen_y;
+}
+
+int camera_player_left_limit_px(const Camera *camera)
+{
+    int limit = FIX16_TO_INT(camera->max_x) - CAMERA_BACKTRACK_GRACE_PX;
+
+    return limit > 0 ? limit : 0;
 }
 
 int camera_world_to_screen_x(const Camera *camera, fix16_t world_x)
