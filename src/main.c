@@ -7,6 +7,8 @@
 #include "enemy.h"
 #include "font4x6.h"
 #include "generated/level1_data.h"
+#include "generated/level1_2_data.h"
+#include "generated/level1_2u_data.h"
 #include "level.h"
 #include "messages.h"
 #include "player.h"
@@ -241,14 +243,21 @@ static void load_stage(StageId stage)
 
 static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
 {
-    if (stage != STAGE_ID_1_1) {
-        return 0;
+    const GeneratedMapObject *objects = level1_objects;
+    uint16_t object_count = level1_object_count;
+
+    if (stage == STAGE_ID_1_2) {
+        objects = level1_2_objects;
+        object_count = level1_2_object_count;
+    } else if (stage == STAGE_ID_1_2_UNDERGROUND) {
+        objects = level1_2u_objects;
+        object_count = level1_2u_object_count;
     }
 
-    for (uint16_t i = 0; i < level1_object_count; ++i) {
-        if (level1_objects[i].kind == GENERATED_OBJECT_PLAYER_START) {
-            *x = level1_objects[i].x;
-            *y = level1_objects[i].y;
+    for (uint16_t i = 0; i < object_count; ++i) {
+        if (objects[i].kind == GENERATED_OBJECT_PLAYER_START) {
+            *x = objects[i].x;
+            *y = objects[i].y;
             return 1;
         }
     }
@@ -260,18 +269,14 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
 {
     level_init_video();
     load_stage(stage);
-    if (stage == STAGE_ID_1_2_UNDERGROUND) {
-        player_spawn_at(player, REF_POS_TO_FIX(6000), REF_STAGE_Y_TO_FIX(3000));
-    } else {
-        player_spawn(player);
-        if (!player->checkpoint_active) {
-            fix16_t start_x = 0;
-            fix16_t start_y = 0;
+    player_spawn(player);
+    if (!player->checkpoint_active) {
+        fix16_t start_x = 0;
+        fix16_t start_y = 0;
 
-            if (generated_player_start(stage, &start_x, &start_y)) {
-                player->x = start_x;
-                player->y = start_y;
-            }
+        if (generated_player_start(stage, &start_x, &start_y)) {
+            player->x = start_x;
+            player->y = start_y;
         }
     }
     camera_init(camera);

@@ -49,11 +49,9 @@ LDFLAGS     := $(SPECS) $(ARCH) -L$(LIBGBA)/lib \
 CC          := $(DEVKITARM)/bin/arm-none-eabi-gcc
 OBJCOPY     := $(DEVKITARM)/bin/arm-none-eabi-objcopy
 
-MAP_SOURCE  := $(LEVELS)/level1.tmj
-MAP_C       := $(SOURCES)/generated/level1_data.c
-MAP_H       := $(INCLUDES)/generated/level1_data.h
-MAP_DEPS    := $(MAP_SOURCE) $(wildcard $(LEVELS)/*.json) \
-               $(wildcard $(LEVELS)/*.tmj) tools/compile_map.py
+MAP_SOURCES := $(wildcard $(LEVELS)/*.tmj)
+MAP_C       := $(patsubst $(LEVELS)/%.tmj,$(SOURCES)/generated/%_data.c,$(MAP_SOURCES))
+MAP_H       := $(patsubst $(LEVELS)/%.tmj,$(INCLUDES)/generated/%_data.h,$(MAP_SOURCES))
 
 CFILES      := $(wildcard $(SOURCES)/*.c) $(MAP_C)
 SFILES      := $(wildcard $(SOURCES)/*.s)
@@ -135,8 +133,8 @@ $(BUILD)/level.o $(BUILD)/player.o $(BUILD)/traps.o $(BUILD)/enemy.o: $(GFX_HEAD
 $(BUILD)/level.o $(BUILD)/traps.o: $(MAP_H)
 $(BUILD)/audio.o: $(SOUND_HEADERS)
 
-$(MAP_C) $(MAP_H) &: $(MAP_DEPS) | dirs
-	python3 tools/compile_map.py $(MAP_SOURCE) --source $(MAP_C) --header $(MAP_H) --symbol-prefix level1
+$(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py | dirs
+	python3 tools/compile_map.py $< --source $(SOURCES)/generated/$*_data.c --header $(INCLUDES)/generated/$*_data.h --symbol-prefix $*
 
 $(BUILD)/%.o: $(SOURCES)/%.s | dirs
 	$(CC) $(ASFLAGS) -MMD -MP -c $< -o $@

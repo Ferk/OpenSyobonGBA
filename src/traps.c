@@ -7,6 +7,8 @@
 #include "camera.h"
 #include "enemy.h"
 #include "generated/level1_data.h"
+#include "generated/level1_2_data.h"
+#include "generated/level1_2u_data.h"
 #include "messages.h"
 #include "player.h"
 #include "items_16.h"
@@ -171,33 +173,6 @@ static uint16_t keys_held(void)
     return (uint16_t)(~REG_KEYINPUT & 0x03ff);
 }
 
-static Trap *add_trap(TrapManager *manager, TrapKind kind,
-                      uint16_t source_x, uint16_t source_y,
-                      uint16_t width_cells, uint16_t height_cells)
-{
-    if (manager->trap_count >= TRAPS_MAX_TRAPS) {
-        return 0;
-    }
-
-    Trap *trap = &manager->traps[manager->trap_count++];
-
-    trap->kind = kind;
-    trap->state = TRAP_IDLE;
-    trap->source_x = source_x;
-    trap->source_y = source_y;
-    trap->x = CELL_WORLD_X(source_x);
-    trap->y = CELL_WORLD_Y(source_y);
-    trap->w = FIX16_FROM_INT(width_cells * LEVEL_METATILE_SIZE);
-    trap->h = FIX16_FROM_INT(height_cells * LEVEL_METATILE_SIZE);
-    trap->vy = 0;
-    trap->timer = 0;
-    trap->subtype = 0;
-    trap->spawn_dir = 0;
-    trap->visual_palette = 0;
-
-    return trap;
-}
-
 static void set_trap_metatile_cell(Level *level, const Trap *trap,
                                    uint16_t source_x, uint16_t source_y,
                                    uint8_t metatile)
@@ -205,75 +180,6 @@ static void set_trap_metatile_cell(Level *level, const Trap *trap,
     uint8_t palette = (metatile == METATILE_EMPTY) ? 0 : trap->visual_palette;
 
     level_set_metatile_cell_palette(level, source_x, source_y, metatile, palette);
-}
-
-static Trap *add_question_block(TrapManager *manager, uint16_t source_x,
-                                uint16_t source_y, uint8_t subtype)
-{
-    Trap *trap = add_trap(manager, TRAP_QUESTION_BLOCK, source_x, source_y, 1, 1);
-
-    if (trap) {
-        trap->subtype = subtype;
-    }
-
-    return trap;
-}
-
-static Trap *add_question_block_visual(TrapManager *manager, Level *level,
-                                       uint16_t source_x, uint16_t source_y,
-                                       uint8_t subtype, uint8_t visual)
-{
-    Trap *trap = add_question_block(manager, source_x, source_y, subtype);
-
-    if (trap) {
-        set_trap_metatile_cell(level, trap, source_x, source_y, visual);
-        if (visual == METATILE_EMPTY) {
-            set_cell_collision(manager, source_x, source_y,
-                               LEVEL_COLLISION_EMPTY, 1);
-        } else {
-            set_cell_collision(manager, source_x, source_y,
-                               LEVEL_COLLISION_SOLID, 0);
-        }
-    }
-
-    return trap;
-}
-
-static uint8_t has_cell_trap(const TrapManager *manager, uint16_t source_x,
-                             uint16_t source_y)
-{
-    for (uint8_t i = 0; i < manager->trap_count; ++i) {
-        const Trap *trap = &manager->traps[i];
-
-        if (trap->source_x == source_x && trap->source_y == source_y &&
-            (trap->kind == TRAP_QUESTION_BLOCK ||
-             trap->kind == TRAP_INVISIBLE_BLOCK ||
-             trap->kind == TRAP_EVASIVE_BLOCK ||
-             trap->kind == TRAP_HINT_BLOCK)) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-static void register_source_coin_blocks(TrapManager *manager, Level *level)
-{
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            uint8_t source = level->source[y][x];
-
-            if (has_cell_trap(manager, x, y)) {
-                continue;
-            }
-
-            if (source == 2) {
-                add_question_block_visual(manager, level, x, y, 0, METATILE_QUESTION);
-            } else if (source == 7) {
-                add_question_block_visual(manager, level, x, y, 0, METATILE_EMPTY);
-            }
-        }
-    }
 }
 
 static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
@@ -867,67 +773,18 @@ void traps_load_1_2(TrapManager *manager, Level *level)
 {
     memset(manager, 0, sizeof(*manager));
 
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            if (level->source[y][x] == 7) {
-                add_trap(manager, TRAP_INVISIBLE_BLOCK, x, y, 1, 1);
-                set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 1);
-            }
-        }
+    for (uint16_t i = 0; i < level1_2_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_2_traps[i]);
     }
-
-    add_question_block_visual(manager, level, 13, 8, QUESTION_HIDDEN_POISON,
-                              METATILE_EMPTY);
-
-    Trap *hint = add_trap(manager, TRAP_HINT_BLOCK, 4, 9, 1, 1);
-    if (hint) {
-        hint->subtype = 1;
-        level_set_metatile_cell(level, 4, 9, METATILE_HINT_BLOCK);
-        set_cell_collision(manager, 4, 9, LEVEL_COLLISION_SOLID, 0);
-    }
-
-    register_source_coin_blocks(manager, level);
-
-    Trap *entry_pipe = add_world_trap(manager, TRAP_ENTER_PIPE,
-                                      REF_STAGE_X_TO_FIX(14 * 29 * 100 + 500),
-                                      REF_STAGE_Y_TO_FIX((9 * 29 - 12) * 100),
-                                      REF_POS_TO_FIX(6000),
-                                      REF_POS_TO_FIX(12000 - 200),
-                                      1);
-    if (entry_pipe) {
-        add_dynamic_collider(manager, entry_pipe);
-    }
-
-    Trap *side_pipe = add_world_trap(manager, TRAP_SIDE_PIPE,
-                                    REF_STAGE_X_TO_FIX(12 * 29 * 100),
-                                    REF_STAGE_Y_TO_FIX((11 * 29 - 12) * 100),
-                                    REF_POS_TO_FIX(3000),
-                                    REF_POS_TO_FIX(6000 - 200),
-                                    0);
-    if (side_pipe) {
-        add_dynamic_collider(manager, side_pipe);
-    }
-
-    add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(14 * 29 * 100 + 1000),
-                   REF_STAGE_Y_TO_FIX(-6000),
-                   REF_POS_TO_FIX(5000), REF_POS_TO_FIX(70000), 100);
 }
 
 void traps_load_1_2_underground(TrapManager *manager, Level *level)
 {
     memset(manager, 0, sizeof(*manager));
 
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            if (level->source[y][x] == 7) {
-                add_trap(manager, TRAP_INVISIBLE_BLOCK, x, y, 1, 1);
-                set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 1);
-            }
-        }
+    for (uint16_t i = 0; i < level1_2u_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_2u_traps[i]);
     }
-
-    register_source_coin_blocks(manager, level);
 }
 
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player)

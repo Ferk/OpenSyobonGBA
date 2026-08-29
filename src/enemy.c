@@ -6,6 +6,8 @@
 #include "camera.h"
 #include "enemies_16.h"
 #include "generated/level1_data.h"
+#include "generated/level1_2_data.h"
+#include "generated/level1_2u_data.h"
 #include "messages.h"
 
 #define FIRST_ENEMY_SPRITE 64
@@ -388,21 +390,6 @@ void enemies_init_video(void)
     memcpy(&SPRITE_GFX[ENEMY_TILE_INDEX * 16], enemies_16Tiles, enemies_16TilesLen);
 }
 
-static void load_source_spawns(EnemyManager *manager, const Level *level)
-{
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            if (level->source[y][x] == 50) {
-                add_spawn(manager, CELL_WORLD_X(x), CELL_WORLD_Y(y),
-                          ENEMY_WALKER, ENEMY_SPRITE_GHOST, -1);
-            } else if (level->source[y][x] == 51) {
-                add_spawn(manager, CELL_WORLD_X(x), CELL_WORLD_Y(y),
-                          ENEMY_WALKER, ENEMY_SPRITE_TALL, -1);
-            }
-        }
-    }
-}
-
 static void load_generated_spawns(EnemyManager *manager,
                                   const GeneratedEnemySpawn *spawns,
                                   uint16_t spawn_count)
@@ -428,14 +415,18 @@ void enemies_load_1_1(EnemyManager *manager, const Level *level)
 
 void enemies_load_1_2(EnemyManager *manager, const Level *level)
 {
+    (void)level;
     memset(manager, 0, sizeof(*manager));
-    load_source_spawns(manager, level);
+    load_generated_spawns(manager, level1_2_enemy_spawns,
+                          level1_2_enemy_spawn_count);
 }
 
 void enemies_load_1_2_underground(EnemyManager *manager, const Level *level)
 {
+    (void)level;
     memset(manager, 0, sizeof(*manager));
-    load_source_spawns(manager, level);
+    load_generated_spawns(manager, level1_2u_enemy_spawns,
+                          level1_2u_enemy_spawn_count);
 }
 
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,

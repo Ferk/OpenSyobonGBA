@@ -177,10 +177,14 @@ def metatile_from_gid(gid, props):
     return gid - 1
 
 
-def palette_from_gid(gid, props):
+def palette_from_gid(gid, props, default=0):
     if gid == 0:
         return 0
-    return int(props.get(gid, {}).get("palette", 0))
+    return enum_int(props.get(gid, {}).get("palette"), BG_PALETTE_NAMES, default)
+
+
+def layer_properties(layer):
+    return {p.get("name"): p.get("value") for p in layer.get("properties", [])}
 
 
 def source_from_gid(gid, props):
@@ -373,8 +377,10 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
             if is_source_layer:
                 source[y][x] = source_from_gid(gid, props) or (gid - 1)
             else:
+                layer_palette = enum_int(layer_properties(layer).get("palette"),
+                                         BG_PALETTE_NAMES, 0)
                 metatiles[y][x] = metatile_from_gid(gid, props)
-                palettes[y][x] = palette_from_gid(gid, props)
+                palettes[y][x] = palette_from_gid(gid, props, layer_palette)
 
     objects, enemy_spawns, traps = parse_object_layers(map_data, props)
     prefix = symbol_prefix or c_ident(tmj_path.name)
@@ -391,6 +397,9 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
 #include \"enemy.h\"
 #include \"fixed.h\"
 #include \"traps.h\"
+
+#ifndef GENERATED_MAP_TYPES_H
+#define GENERATED_MAP_TYPES_H
 
 typedef struct GeneratedMapObject {{
     uint8_t kind;
@@ -415,6 +424,8 @@ typedef struct GeneratedEnemySpawn {{
     fix16_t x;
     fix16_t y;
 }} GeneratedEnemySpawn;
+
+#endif
 
 #define {prefix.upper()}_WIDTH {width}
 #define {prefix.upper()}_HEIGHT {height}

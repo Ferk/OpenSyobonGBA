@@ -1,0 +1,253 @@
+{
+  "automappingRulesFile": "",
+  "commands": [],
+  "extensionsPath": "extensions",
+  "folders": [
+    "."
+  ],
+  "objectTypesFile": "",
+  "propertyTypes": [
+    {
+      "id": 1,
+      "name": "TrapKind",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "invisible_block",
+        "falling_floor",
+        "bump_shooter",
+        "question_block",
+        "evasive_block",
+        "stage_spawner",
+        "enter_pipe",
+        "side_pipe",
+        "checkpoint",
+        "goal",
+        "hint_block"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "TrapSubtype",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "none",
+        "invisible_reveal",
+        "falling_brick_group",
+        "stage_pipe_shot",
+        "stage_flying_enemy",
+        "stage_ghost_swarm",
+        "question_enemy",
+        "question_good_mushroom",
+        "question_bad_mushroom",
+        "question_star",
+        "question_poison_generator",
+        "question_coin_generator",
+        "question_hidden_poison",
+        "question_generator_active_internal",
+        "evasive_vertical",
+        "evasive_horizontal",
+        "pipe_fake_kill",
+        "pipe_to_underground",
+        "hint_stage_1"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "TrapSpawnDirection",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "auto",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "BgPalette",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "normal",
+        "underground",
+        "palette2",
+        "palette3",
+        "palette4",
+        "palette5",
+        "palette6",
+        "palette7",
+        "palette8",
+        "palette9",
+        "palette10",
+        "palette11",
+        "palette12",
+        "palette13",
+        "palette14",
+        "palette15"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "EnemyKind",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "walker",
+        "jumper",
+        "static_hazard",
+        "ceiling_faller",
+        "pipe_shot"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "EnemySprite",
+      "type": "enum",
+      "storageType": "string",
+      "valuesAsFlags": false,
+      "values": [
+        "ghost",
+        "tall",
+        "hazard",
+        "atype3",
+        "cloud",
+        "cloud_face"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "LevelCollision",
+      "type": "enum",
+      "storageType": "int",
+      "valuesAsFlags": false,
+      "values": [
+        "empty",
+        "solid",
+        "pass_through",
+        "death"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Trap",
+      "type": "class",
+      "color": "#ffff7070",
+      "drawFill": true,
+      "useAs": [
+        "object"
+      ],
+      "members": [
+        {
+          "name": "trap_type",
+          "type": "string",
+          "propertyType": "TrapKind",
+          "value": "invisible_block"
+        },
+        {
+          "name": "subtype",
+          "type": "string",
+          "propertyType": "TrapSubtype",
+          "value": "none"
+        },
+        {
+          "name": "spawn_dir",
+          "type": "string",
+          "propertyType": "TrapSpawnDirection",
+          "value": "auto"
+        },
+        {
+          "name": "source_x",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "name": "source_y",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "name": "visual_metatile",
+          "type": "int",
+          "value": 255
+        },
+        {
+          "name": "visual_palette",
+          "type": "string",
+          "propertyType": "BgPalette",
+          "value": "normal"
+        },
+        {
+          "name": "collision",
+          "type": "int",
+          "propertyType": "LevelCollision",
+          "value": 255
+        },
+        {
+          "name": "hidden",
+          "type": "bool",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Enemy",
+      "type": "class",
+      "color": "#ffffb060",
+      "drawFill": true,
+      "useAs": [
+        "object"
+      ],
+      "members": [
+        {
+          "name": "enemy_kind",
+          "type": "string",
+          "propertyType": "EnemyKind",
+          "value": "walker"
+        },
+        {
+          "name": "enemy_sprite",
+          "type": "string",
+          "propertyType": "EnemySprite",
+          "value": "ghost"
+        },
+        {
+          "name": "dir",
+          "type": "int",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Player Start",
+      "type": "class",
+      "color": "#ff70c0ff",
+      "drawFill": true,
+      "useAs": [
+        "object"
+      ],
+      "members": []
+    },
+    {
+      "id": 11,
+      "name": "Goal Flag",
+      "type": "class",
+      "color": "#ff70ff70",
+      "drawFill": true,
+      "useAs": [
+        "object"
+      ],
+      "members": []
+    }
+  ],
+  "propertyTypesFile": "",
+  "version": "1.10"
+}
