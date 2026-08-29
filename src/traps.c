@@ -192,8 +192,19 @@ static Trap *add_trap(TrapManager *manager, TrapKind kind,
     trap->vy = 0;
     trap->timer = 0;
     trap->subtype = 0;
+    trap->spawn_dir = 0;
+    trap->visual_palette = 0;
 
     return trap;
+}
+
+static void set_trap_metatile_cell(Level *level, const Trap *trap,
+                                   uint16_t source_x, uint16_t source_y,
+                                   uint8_t metatile)
+{
+    uint8_t palette = (metatile == METATILE_EMPTY) ? 0 : trap->visual_palette;
+
+    level_set_metatile_cell_palette(level, source_x, source_y, metatile, palette);
 }
 
 static Trap *add_question_block(TrapManager *manager, uint16_t source_x,
@@ -215,7 +226,7 @@ static Trap *add_question_block_visual(TrapManager *manager, Level *level,
     Trap *trap = add_question_block(manager, source_x, source_y, subtype);
 
     if (trap) {
-        level_set_metatile_cell(level, source_x, source_y, visual);
+        set_trap_metatile_cell(level, trap, source_x, source_y, visual);
         if (visual == METATILE_EMPTY) {
             set_cell_collision(manager, source_x, source_y,
                                LEVEL_COLLISION_EMPTY, 1);
@@ -287,6 +298,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->timer = 0;
     trap->subtype = subtype;
     trap->spawn_dir = 0;
+    trap->visual_palette = 0;
 
     return trap;
 }
@@ -314,8 +326,11 @@ static void apply_generated_cells(TrapManager *manager, Level *level,
             }
 
             if (trigger->visual_metatile != 255) {
-                level_set_metatile_cell(level, source_x, source_y,
-                                        trigger->visual_metatile);
+                uint8_t palette = (trigger->visual_metatile == METATILE_EMPTY) ?
+                    0 : trigger->visual_palette;
+
+                level_set_metatile_cell_palette(level, source_x, source_y,
+                                                trigger->visual_metatile, palette);
             }
 
             if (trigger->collision != 255) {
@@ -342,6 +357,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->source_x = trigger->source_x;
     trap->source_y = trigger->source_y;
     trap->spawn_dir = trigger->spawn_dir;
+    trap->visual_palette = trigger->visual_palette;
 
     apply_generated_cells(manager, level, trigger);
 
@@ -426,7 +442,7 @@ static void reveal_hidden_block(TrapManager *manager, Trap *trap, Level *level)
 
     trap->state = TRAP_ACTIVE;
     audio_play_block_hit();
-    level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_BRICK);
+    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_BRICK);
     set_cell_collision(manager, trap->source_x, trap->source_y,
                        LEVEL_COLLISION_SOLID, 0);
 }
@@ -443,8 +459,10 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
     audio_play_trap_trigger();
 
     for (uint16_t x = 0; x < (uint16_t)FIX16_TO_INT(trap->w) / LEVEL_METATILE_SIZE; ++x) {
-        level_set_metatile_cell(level, trap->source_x + x, trap->source_y, METATILE_EMPTY);
-        level_set_metatile_cell(level, trap->source_x + x, trap->source_y + 1, METATILE_EMPTY);
+        set_trap_metatile_cell(level, trap, trap->source_x + x, trap->source_y,
+                               METATILE_EMPTY);
+        set_trap_metatile_cell(level, trap, trap->source_x + x, trap->source_y + 1,
+                               METATILE_EMPTY);
         set_cell_collision(manager, trap->source_x + x, trap->source_y,
                            LEVEL_COLLISION_EMPTY, 0);
     }
@@ -510,7 +528,7 @@ void traps_break_brick(TrapManager *manager, Level *level,
 static void spend_question_block(TrapManager *manager, Trap *trap, Level *level)
 {
     trap->state = TRAP_SPENT;
-    level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_SOLID);
+    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_SOLID);
     set_cell_collision(manager, trap->source_x, trap->source_y,
                        LEVEL_COLLISION_SOLID, 0);
 }
@@ -590,7 +608,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         trap->state = TRAP_ACTIVE;
         trap->subtype = QUESTION_GENERATOR_ACTIVE;
         trap->timer = 1;
-        level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_SOLID);
+        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_SOLID);
         set_cell_collision(manager, trap->source_x, trap->source_y,
                            LEVEL_COLLISION_SOLID, 0);
         audio_play_trap_trigger();
@@ -599,7 +617,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         audio_play_trap_trigger();
         spawn_block_item(manager, trap, TRAP_ENTITY_BAD_ITEM, ITEM_FAST_SPEED);
         trap->state = TRAP_SPENT;
-        level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_EMPTY);
+        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_EMPTY);
         set_cell_collision(manager, trap->source_x, trap->source_y,
                            LEVEL_COLLISION_EMPTY, 1);
         break;
@@ -607,7 +625,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         trap->state = TRAP_ACTIVE;
         trap->timer = QUESTION_COIN_INTERVAL;
         trap->vy = 0;
-        level_set_metatile_cell(level, trap->source_x, trap->source_y, METATILE_SOLID);
+        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_SOLID);
         set_cell_collision(manager, trap->source_x, trap->source_y,
                            LEVEL_COLLISION_SOLID, 0);
         break;

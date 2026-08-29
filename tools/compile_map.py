@@ -51,6 +51,28 @@ TRAP_SPAWN_DIRECTION_NAMES = {
     "right": 1,
 }
 
+BG_PALETTE_NAMES = {
+    "normal": 0,
+    "default": 0,
+    "palette0": 0,
+    "palette1": 1,
+    "underground": 1,
+    "palette2": 2,
+    "palette3": 3,
+    "palette4": 4,
+    "palette5": 5,
+    "palette6": 6,
+    "palette7": 7,
+    "palette8": 8,
+    "palette9": 9,
+    "palette10": 10,
+    "palette11": 11,
+    "palette12": 12,
+    "palette13": 13,
+    "palette14": 14,
+    "palette15": 15,
+}
+
 ENTITY_KIND_NAMES = {
     "Player Start": 1,
     "PlayerStart": 1,
@@ -267,6 +289,10 @@ def parse_object_layers(map_data, tile_props):
                     "kind": trap or "TRAP_INVISIBLE_BLOCK",
                     "subtype": subtype,
                     "spawn_dir": spawn_dir,
+                    "visual_palette": enum_int(prop_value(props, "visual_palette",
+                                                tile_prop.get("visual_palette",
+                                                              tile_prop.get("palette"))),
+                                               BG_PALETTE_NAMES, 0),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
                                            tile_prop.get("visual_metatile", 255))),
                     "collision": int(prop_value(props, "collision",
@@ -445,14 +471,14 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
-                          trap["visual_metatile"], trap["collision"],
-                          trap["hidden"], trap["source_x"], trap["source_y"],
-                          trap["x"], trap["y"], trap["w"], trap["h"],
-                          trap["trigger_x"], trap["trigger_y"]))
+                          trap["visual_palette"], trap["visual_metatile"],
+                          trap["collision"], trap["hidden"], trap["source_x"],
+                          trap["source_y"], trap["x"], trap["y"], trap["w"],
+                          trap["h"], trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

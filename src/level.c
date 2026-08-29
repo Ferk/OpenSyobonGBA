@@ -478,12 +478,18 @@ LevelCollision level_collision_at(const Level *level, int world_x_px, int world_
 
 void level_set_metatile_cell(Level *level, uint16_t source_x, uint16_t source_y, uint8_t metatile)
 {
+    level_set_metatile_cell_palette(level, source_x, source_y, metatile, 0);
+}
+
+void level_set_metatile_cell_palette(Level *level, uint16_t source_x, uint16_t source_y,
+                                     uint8_t metatile, uint8_t palette)
+{
     if (source_x >= level->width || source_y >= level->height) {
         return;
     }
 
     level->metatiles[source_y][source_x] = metatile;
-    level->palettes[source_y][source_x] = 0;
+    level->palettes[source_y][source_x] = palette & 15;
     level_force_stream_update();
 }
 

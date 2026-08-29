@@ -57,6 +57,7 @@ typedef struct Trap {
     uint8_t timer;
     uint8_t subtype;
     int8_t spawn_dir;
+    uint8_t visual_palette;
 } Trap;
 
 typedef struct TrapEntity {
@@ -76,6 +77,7 @@ typedef struct TrapTrigger {
     TrapKind kind;
     uint8_t subtype;
     int8_t spawn_dir;
+    uint8_t visual_palette;
     uint8_t visual_metatile;
     uint8_t collision;
     uint8_t hidden;

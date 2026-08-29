@@ -114,6 +114,8 @@ void level_force_stream_update(void);
 uint8_t level_metatile_at(const Level *level, int world_x_px, int world_y_px);
 LevelCollision level_collision_at(const Level *level, int world_x_px, int world_y_px);
 void level_set_metatile_cell(Level *level, uint16_t source_x, uint16_t source_y, uint8_t metatile);
+void level_set_metatile_cell_palette(Level *level, uint16_t source_x, uint16_t source_y,
+                                     uint8_t metatile, uint8_t palette);
 void level_restore_source_cell(Level *level, uint16_t source_x, uint16_t source_y);
 int level_death_y_px(const Level *level);
 int level_camera_max_y_px(const Level *level);
