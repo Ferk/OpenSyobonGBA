@@ -286,6 +286,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->vy = 0;
     trap->timer = 0;
     trap->subtype = subtype;
+    trap->spawn_dir = 0;
 
     return trap;
 }
@@ -340,6 +341,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
 
     trap->source_x = trigger->source_x;
     trap->source_y = trigger->source_y;
+    trap->spawn_dir = trigger->spawn_dir;
 
     apply_generated_cells(manager, level, trigger);
 
@@ -537,7 +539,23 @@ static void spawn_block_item(TrapManager *manager, Trap *trap,
     }
 }
 
-static void trigger_question_block(TrapManager *manager, Trap *trap, Level *level)
+static int8_t resolve_question_enemy_dir(const Trap *trap, const Player *player)
+{
+    if (trap->spawn_dir < 0) {
+        return -1;
+    }
+    if (trap->spawn_dir > 0) {
+        return 1;
+    }
+
+    int block_center = FIX16_TO_INT(trap->x) + FIX16_TO_INT(trap->w) / 2;
+    int player_center = FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX / 2;
+
+    return (block_center <= player_center) ? 1 : -1;
+}
+
+static void trigger_question_block(TrapManager *manager, Trap *trap, Level *level,
+                                   const Player *player)
 {
     if (trap->state != TRAP_IDLE) {
         return;
@@ -550,7 +568,8 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         audio_play_trap_trigger();
         spend_question_block(manager, trap, level);
         enemies_spawn_from_block(&enemy_current, trap->x, trap->y,
-                                 ENEMY_SPRITE_GHOST, -1);
+                                 ENEMY_SPRITE_GHOST,
+                                 resolve_question_enemy_dir(trap, player));
         break;
     case QUESTION_GOOD_MUSHROOM:
         audio_play_trap_trigger();
@@ -1331,7 +1350,8 @@ uint8_t traps_hides_collision_at(const TrapManager *manager, int world_x_px, int
     return manager->cell_hidden[source_y][source_x];
 }
 
-uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px, int world_y_px)
+uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *player,
+                             int world_x_px, int world_y_px)
 {
     uint8_t triggered = 0;
 
@@ -1349,7 +1369,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px,
             trigger_bump_shooter(manager, trap);
             triggered = 1;
         } else if (trap->kind == TRAP_QUESTION_BLOCK) {
-            trigger_question_block(manager, trap, level);
+            trigger_question_block(manager, trap, level, player);
             triggered = 1;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
             bump_evasive_block(trap, world_x_px, world_y_px);

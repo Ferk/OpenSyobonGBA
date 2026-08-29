@@ -19,6 +19,38 @@ TRAP_KIND_NAMES = {
     "hint_block": "TRAP_HINT_BLOCK",
 }
 
+TRAP_SUBTYPE_NAMES = {
+    "none": 0,
+    "default": 0,
+    "invisible_reveal_brick": 1,
+    "invisible_reveal": 1,
+    "falling_brick_group": 51,
+    "stage_pipe_shot": 100,
+    "stage_flying_enemy": 101,
+    "stage_ghost_swarm": 102,
+    "question_enemy": 101,
+    "question_good_mushroom": 102,
+    "question_bad_mushroom": 103,
+    "question_star": 104,
+    "question_poison_generator": 110,
+    "question_coin_generator": 112,
+    "question_hidden_poison": 114,
+    "question_generator_active": 200,
+    "question_generator_active_internal": 200,
+    "evasive_vertical": 0,
+    "evasive_horizontal": 1,
+    "pipe_fake_kill": 0,
+    "pipe_to_underground": 1,
+    "hint_stage_1": 1,
+}
+
+TRAP_SPAWN_DIRECTION_NAMES = {
+    "auto": 0,
+    "default": 0,
+    "left": -1,
+    "right": 1,
+}
+
 ENTITY_KIND_NAMES = {
     "Player Start": 1,
     "PlayerStart": 1,
@@ -153,8 +185,42 @@ def enum_name(value, names, default):
     return names.get(text.lower(), default)
 
 
+def enum_int(value, names, default):
+    if value is None:
+        return default
+
+    if isinstance(value, bool):
+        return int(value)
+
+    if isinstance(value, (int, float)):
+        return int(value)
+
+    text = str(value).strip()
+    if not text:
+        return default
+
+    try:
+        return int(text, 0)
+    except ValueError:
+        pass
+
+    key = text.lower()
+    if key in names:
+        return names[key]
+
+    key = re.sub(r"[^0-9a-zA-Z_]+", "_", text).strip("_").lower()
+    if key in names:
+        return names[key]
+
+    match = re.match(r"^(-?\d+)", text)
+    if match:
+        return int(match.group(1), 0)
+
+    raise ValueError(f"unknown enum integer value: {text}")
+
+
 def object_name(obj):
-    return obj.get("type") or obj.get("name") or ""
+    return obj.get("class") or obj.get("type") or obj.get("name") or ""
 
 
 def parse_object_layers(map_data, tile_props):
@@ -182,7 +248,12 @@ def parse_object_layers(map_data, tile_props):
             y = fixed(world_y)
             w = fixed(obj.get("width", GBA_METATILE_SIZE))
             h = fixed(obj.get("height", GBA_METATILE_SIZE))
-            subtype = int(prop_value(props, "subtype", tile_prop.get("subtype", 0)))
+            subtype = enum_int(prop_value(props, "subtype",
+                                          tile_prop.get("subtype")),
+                               TRAP_SUBTYPE_NAMES, 0)
+            spawn_dir = enum_int(prop_value(props, "spawn_dir",
+                                            tile_prop.get("spawn_dir")),
+                                 TRAP_SPAWN_DIRECTION_NAMES, 0)
             source_x = int(float(prop_value(props, "source_x",
                            tiled_x / GBA_METATILE_SIZE)))
             source_y = int(float(prop_value(props, "source_y",
@@ -195,6 +266,7 @@ def parse_object_layers(map_data, tile_props):
                 traps.append({
                     "kind": trap or "TRAP_INVISIBLE_BLOCK",
                     "subtype": subtype,
+                    "spawn_dir": spawn_dir,
                     "visual_metatile": int(prop_value(props, "visual_metatile",
                                            tile_prop.get("visual_metatile", 255))),
                     "collision": int(prop_value(props, "collision",
@@ -373,13 +445,14 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
-                         (trap["kind"], trap["subtype"], trap["visual_metatile"],
-                          trap["collision"], trap["hidden"], trap["source_x"],
-                          trap["source_y"], trap["x"], trap["y"], trap["w"],
-                          trap["h"], trap["trigger_x"], trap["trigger_y"]))
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+                         (trap["kind"], trap["subtype"], trap["spawn_dir"],
+                          trap["visual_metatile"], trap["collision"],
+                          trap["hidden"], trap["source_x"], trap["source_y"],
+                          trap["x"], trap["y"], trap["w"], trap["h"],
+                          trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

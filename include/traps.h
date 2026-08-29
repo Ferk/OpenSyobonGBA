@@ -56,6 +56,7 @@ typedef struct Trap {
     fix16_t vy;
     uint8_t timer;
     uint8_t subtype;
+    int8_t spawn_dir;
 } Trap;
 
 typedef struct TrapEntity {
@@ -74,6 +75,7 @@ typedef struct TrapEntity {
 typedef struct TrapTrigger {
     TrapKind kind;
     uint8_t subtype;
+    int8_t spawn_dir;
     uint8_t visual_metatile;
     uint8_t collision;
     uint8_t hidden;
@@ -111,7 +113,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);
 uint8_t traps_hides_collision_at(const TrapManager *manager, int world_x_px, int world_y_px);
 LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, int world_y_px);
-uint8_t traps_on_player_bump(TrapManager *manager, Level *level, int world_x_px, int world_y_px);
+uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const struct Player *player,
+                             int world_x_px, int world_y_px);
 void traps_break_brick(TrapManager *manager, Level *level, uint16_t source_x, uint16_t source_y);
 uint8_t traps_stage_clear_requested(const TrapManager *manager);
 void traps_ack_stage_clear(TrapManager *manager);

@@ -221,7 +221,7 @@ static uint8_t bump_head_points(Player *player, Level *level, TrapManager *traps
     for (uint8_t i = 0; i < sizeof(head_offsets); ++i) {
         int hit_x = x + head_offsets[i];
 
-        if (traps_on_player_bump(traps, level, hit_x, hit_y)) {
+        if (traps_on_player_bump(traps, level, player, hit_x, hit_y)) {
             bumped = 1;
         } else if (bump_level_cell(level, traps, hit_x, hit_y)) {
             bumped = 1;
