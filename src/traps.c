@@ -6,6 +6,7 @@
 #include "audio.h"
 #include "camera.h"
 #include "enemy.h"
+#include "generated/level1_data.h"
 #include "messages.h"
 #include "player.h"
 #include "items_16.h"
@@ -80,20 +81,6 @@ TrapManager traps_current;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
 static OBJATTR dynamic_trap_oam[TRAPS_MAX_DYNAMIC_SPRITES];
-
-typedef struct StageObjectDef {
-    TrapKind kind;
-    int32_t x;
-    int32_t y;
-    int32_t w;
-    int32_t h;
-    uint8_t subtype;
-} StageObjectDef;
-
-static const StageObjectDef level_1_1_stage_objects[] = {
-    { TRAP_ENTER_PIPE, 29 * 29 * 100 + 500, (9 * 29 - 12) * 100,
-      6000, 12000 - 200, 0 },
-};
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
                             int bx, int by, int bw, int bh)
@@ -301,6 +288,65 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->subtype = subtype;
 
     return trap;
+}
+
+static void apply_generated_cells(TrapManager *manager, Level *level,
+                                  const TrapTrigger *trigger)
+{
+    uint16_t cols = (uint16_t)(FIX16_TO_INT(trigger->w) / LEVEL_METATILE_SIZE);
+    uint16_t rows = (uint16_t)(FIX16_TO_INT(trigger->h) / LEVEL_METATILE_SIZE);
+
+    if (cols == 0) {
+        cols = 1;
+    }
+    if (rows == 0) {
+        rows = 1;
+    }
+
+    for (uint16_t y = 0; y < rows; ++y) {
+        for (uint16_t x = 0; x < cols; ++x) {
+            uint16_t source_x = trigger->source_x + x;
+            uint16_t source_y = trigger->source_y + y;
+
+            if (source_x >= level->width || source_y >= level->height) {
+                continue;
+            }
+
+            if (trigger->visual_metatile != 255) {
+                level_set_metatile_cell(level, source_x, source_y,
+                                        trigger->visual_metatile);
+            }
+
+            if (trigger->collision != 255) {
+                set_cell_collision(manager, source_x, source_y,
+                                   (LevelCollision)trigger->collision,
+                                   trigger->hidden);
+            }
+        }
+    }
+}
+
+static void add_generated_trap(TrapManager *manager, Level *level,
+                               const TrapTrigger *trigger)
+{
+    Trap *trap = add_world_trap(manager, trigger->kind,
+                                trigger->x, trigger->y,
+                                trigger->w, trigger->h,
+                                trigger->subtype);
+
+    if (!trap) {
+        return;
+    }
+
+    trap->source_x = trigger->source_x;
+    trap->source_y = trigger->source_y;
+
+    apply_generated_cells(manager, level, trigger);
+
+    if (trigger->kind == TRAP_ENTER_PIPE || trigger->kind == TRAP_SIDE_PIPE ||
+        trigger->kind == TRAP_EVASIVE_BLOCK) {
+        add_dynamic_collider(manager, trap);
+    }
 }
 
 static TrapEntity *spawn_entity(TrapManager *manager, TrapEntityKind kind,
@@ -775,105 +821,9 @@ void traps_load_1_1(TrapManager *manager, Level *level)
 {
     memset(manager, 0, sizeof(*manager));
 
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            if (level->source[y][x] == 7) {
-                add_trap(manager, TRAP_INVISIBLE_BLOCK, x, y, 1, 1);
-                set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 1);
-            } else if (level->source[y][x] == 30) {
-                Trap *checkpoint = add_trap(manager, TRAP_CHECKPOINT, x, y, 1, 2);
-                if (checkpoint) {
-                    checkpoint->w = REF_POS_TO_FIX(3000);
-                    checkpoint->h = REF_POS_TO_FIX(6000);
-                }
-            } else if (level->source[y][x] == 99) {
-                Trap *goal = add_trap(manager, TRAP_GOAL, x, y, 1,
-                                      (uint16_t)(12 - y));
-                if (goal) {
-                    goal->w = REF_POS_TO_FIX(3000);
-                    goal->h = REF_POS_TO_FIX((12 - y) * 3000);
-                    set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 0);
-                }
-            }
-        }
+    for (uint16_t i = 0; i < level1_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_traps[i]);
     }
-
-    Trap *floor = add_trap(manager, TRAP_FALLING_FLOOR, 72, 13, 5, 1);
-    if (floor) {
-        for (uint16_t x = 0; x < 5; ++x) {
-            level_set_metatile_cell(level, 72 + x, 13, METATILE_GROUND_TOP);
-            level_set_metatile_cell(level, 72 + x, 14, METATILE_GROUND_DIRT);
-            set_cell_collision(manager, 72 + x, 13,
-                               LEVEL_COLLISION_PASS_THROUGH, 0);
-        }
-    }
-
-    Trap *falling_bricks = add_trap(manager, TRAP_FALLING_FLOOR, 49, 5, 3, 1);
-    if (falling_bricks) {
-        falling_bricks->w = REF_POS_TO_FIX(9000 - 1);
-        falling_bricks->h = REF_POS_TO_FIX(3000);
-        falling_bricks->subtype = 51;
-
-        for (uint16_t x = 0; x < 3; ++x) {
-            level_set_metatile_cell(level, 49 + x, 5, METATILE_BRICK);
-            set_cell_collision(manager, 49 + x, 5,
-                               LEVEL_COLLISION_SOLID, 0);
-        }
-    }
-
-    Trap *evasive = add_trap(manager, TRAP_EVASIVE_BLOCK, 8, 9, 1, 1);
-    if (evasive) {
-        evasive->subtype = EVASIVE_BLOCK_VERTICAL;
-        evasive->x = EVASIVE_BLOCK_HOME_X;
-        evasive->y = EVASIVE_BLOCK_HOME_Y;
-        level_set_metatile_cell(level, 8, 9, METATILE_EMPTY);
-        add_dynamic_collider(manager, evasive);
-    }
-
-    add_question_block_visual(manager, level, 13, 9, QUESTION_GOOD_MUSHROOM,
-                              METATILE_QUESTION);
-    add_question_block_visual(manager, level, 14, 5, QUESTION_ENEMY,
-                              METATILE_QUESTION);
-    add_question_block_visual(manager, level, 35, 8, QUESTION_POISON_GENERATOR,
-                              METATILE_EMPTY);
-    add_question_block_visual(manager, level, 47, 9, QUESTION_BAD_MUSHROOM,
-                              METATILE_QUESTION);
-    add_question_block_visual(manager, level, 59, 9, QUESTION_COIN_GENERATOR,
-                              METATILE_QUESTION);
-    add_question_block_visual(manager, level, 67, 9, QUESTION_STAR,
-                              METATILE_BRICK);
-
-    register_source_coin_blocks(manager, level);
-
-    for (uint8_t i = 0;
-         i < sizeof(level_1_1_stage_objects) / sizeof(level_1_1_stage_objects[0]);
-         ++i) {
-        const StageObjectDef *object = &level_1_1_stage_objects[i];
-
-        Trap *trap = add_world_trap(manager, object->kind,
-                                    REF_STAGE_X_TO_FIX(object->x),
-                                    REF_STAGE_Y_TO_FIX(object->y),
-                                    REF_POS_TO_FIX(object->w),
-                                    REF_POS_TO_FIX(object->h),
-                                    object->subtype);
-        if (trap && (object->kind == TRAP_ENTER_PIPE ||
-                     object->kind == TRAP_SIDE_PIPE)) {
-            add_dynamic_collider(manager, trap);
-        }
-    }
-
-    add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(20 * 29 * 100 + 500), REF_STAGE_Y_TO_FIX(-6000),
-                   REF_POS_TO_FIX(5000), REF_POS_TO_FIX(70000), 100);
-    add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(54 * 29 * 100 - 500), REF_STAGE_Y_TO_FIX(-6000),
-                   REF_POS_TO_FIX(7000), REF_POS_TO_FIX(70000), 101);
-    add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(112 * 29 * 100 + 1000), REF_STAGE_Y_TO_FIX(-6000),
-                   REF_POS_TO_FIX(3000), REF_POS_TO_FIX(70000), 102);
-    add_world_trap(manager, TRAP_STAGE_SPAWNER,
-                   REF_POS_TO_FIX(125 * 29 * 100), REF_STAGE_Y_TO_FIX(-6000),
-                   REF_POS_TO_FIX(9000), REF_POS_TO_FIX(70000), 101);
 }
 
 void traps_load_1_2(TrapManager *manager, Level *level)

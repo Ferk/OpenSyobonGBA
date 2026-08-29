@@ -195,13 +195,14 @@ static uint8_t bump_level_cell(Level *level, TrapManager *traps,
         return 0;
     }
 
-    if (level->source[source_y][source_x] == 1) {
+    uint8_t metatile = level->metatiles[source_y][source_x];
+
+    if (metatile == METATILE_BRICK) {
         traps_break_brick(traps, level, (uint16_t)source_x, (uint16_t)source_y);
         return 1;
     }
 
-    if (level->source[source_y][source_x] == 2) {
-        level->source[source_y][source_x] = 3;
+    if (metatile == METATILE_QUESTION) {
         level_set_metatile_cell(level, (uint16_t)source_x, (uint16_t)source_y,
                                 METATILE_SOLID);
         audio_play_block_hit();

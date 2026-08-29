@@ -1,2 +1,4 @@
 *.gba
 build
+include/generated/
+src/generated/

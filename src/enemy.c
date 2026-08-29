@@ -5,6 +5,7 @@
 
 #include "camera.h"
 #include "enemies_16.h"
+#include "generated/level1_data.h"
 #include "messages.h"
 
 #define FIRST_ENEMY_SPRITE 64
@@ -23,8 +24,6 @@
 #define REF_ACCEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 4)
 #define CELL_WORLD_X(cell_x) FIX16_FROM_INT((cell_x) * LEVEL_METATILE_SIZE)
 #define CELL_WORLD_Y(cell_y) FIX16_FROM_INT(((cell_y) - LEVEL_VIEW_SOURCE_ROW_OFFSET) * LEVEL_METATILE_SIZE)
-#define REF_VIEW_TOP_PX (LEVEL_VIEW_SOURCE_ROW_OFFSET * 29 - 12)
-
 #define ENEMY_GRAVITY REF_ACCEL_TO_FIX(120)
 #define ENEMY_MAX_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define WALKER_SPEED REF_VEL_TO_FIX(100)
@@ -146,32 +145,6 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     if (kind == ENEMY_PIPE_SHOT) {
         enemy->vy = (dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED;
     }
-
-    return enemy;
-}
-
-static fix16_t ref_px_to_world_x(int ref_px)
-{
-    return (fix16_t)(((int64_t)ref_px * LEVEL_METATILE_SIZE * FIX16_ONE) / 29);
-}
-
-static fix16_t ref_px_to_world_y(int ref_px)
-{
-    return (fix16_t)(((int64_t)(ref_px - REF_VIEW_TOP_PX) *
-                      LEVEL_METATILE_SIZE * FIX16_ONE) / 29);
-}
-
-static Enemy *add_enemy_reference(EnemyManager *manager, EnemyKind kind,
-                                  int ref_x_px, int ref_y_px, int8_t dir)
-{
-    Enemy *enemy = add_enemy(manager, kind, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
-
-    if (!enemy) {
-        return 0;
-    }
-
-    enemy->x = ref_px_to_world_x(ref_x_px);
-    enemy->y = ref_px_to_world_y(ref_y_px);
 
     return enemy;
 }
@@ -430,18 +403,27 @@ static void load_source_spawns(EnemyManager *manager, const Level *level)
     }
 }
 
+static void load_generated_spawns(EnemyManager *manager,
+                                  const GeneratedEnemySpawn *spawns,
+                                  uint16_t spawn_count)
+{
+    for (uint16_t i = 0; i < spawn_count; ++i) {
+        const GeneratedEnemySpawn *spawn = &spawns[i];
+
+        if (spawn->kind == ENEMY_NONE) {
+            continue;
+        }
+
+        add_spawn(manager, spawn->x, spawn->y, spawn->kind,
+                  spawn->sprite, spawn->dir);
+    }
+}
+
 void enemies_load_1_1(EnemyManager *manager, const Level *level)
 {
+    (void)level;
     memset(manager, 0, sizeof(*manager));
-    load_source_spawns(manager, level);
-
-    Enemy *cloud = add_enemy_reference(manager, ENEMY_STATIC_HAZARD,
-                                       103 * 29, 5 * 29 - 12, -1);
-    if (cloud) {
-        cloud->sprite = ENEMY_SPRITE_CLOUD;
-        cloud->w = 64;
-        cloud->h = 32;
-    }
+    load_generated_spawns(manager, level1_enemy_spawns, level1_enemy_spawn_count);
 }
 
 void enemies_load_1_2(EnemyManager *manager, const Level *level)

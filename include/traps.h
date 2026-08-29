@@ -71,6 +71,22 @@ typedef struct TrapEntity {
     uint8_t frame;
 } TrapEntity;
 
+typedef struct TrapTrigger {
+    TrapKind kind;
+    uint8_t subtype;
+    uint8_t visual_metatile;
+    uint8_t collision;
+    uint8_t hidden;
+    uint16_t source_x;
+    uint16_t source_y;
+    fix16_t x;
+    fix16_t y;
+    fix16_t w;
+    fix16_t h;
+    fix16_t trigger_x;
+    fix16_t trigger_y;
+} TrapTrigger;
+
 typedef struct TrapManager {
     Trap traps[TRAPS_MAX_TRAPS];
     TrapEntity entities[TRAPS_MAX_ENTITIES];

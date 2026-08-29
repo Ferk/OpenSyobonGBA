@@ -6,6 +6,7 @@ SOURCES     := src
 INCLUDES    := include
 DATA        := gfx
 AUDIO       := audio
+LEVELS      := levels
 
 DEVKITPRO ?= /opt/devkitpro
 DEVKITARM ?= $(DEVKITPRO)/devkitARM
@@ -48,7 +49,13 @@ LDFLAGS     := $(SPECS) $(ARCH) -L$(LIBGBA)/lib \
 CC          := $(DEVKITARM)/bin/arm-none-eabi-gcc
 OBJCOPY     := $(DEVKITARM)/bin/arm-none-eabi-objcopy
 
-CFILES      := $(wildcard $(SOURCES)/*.c)
+MAP_SOURCE  := $(LEVELS)/level1.tmj
+MAP_C       := $(SOURCES)/generated/level1_data.c
+MAP_H       := $(INCLUDES)/generated/level1_data.h
+MAP_DEPS    := $(MAP_SOURCE) $(wildcard $(LEVELS)/*.json) \
+               $(wildcard $(LEVELS)/*.tmj) tools/compile_map.py
+
+CFILES      := $(wildcard $(SOURCES)/*.c) $(MAP_C)
 SFILES      := $(wildcard $(SOURCES)/*.s)
 PNGFILES    := $(DATA)/player_16.png $(DATA)/tiles_16.png $(DATA)/traps_16.png \
                $(DATA)/items_16.png $(DATA)/enemies_16.png
@@ -97,7 +104,7 @@ DEPS        := $(OFILES:.o=.d)
 all: dirs $(TARGET).gba
 
 dirs:
-	@mkdir -p $(BUILD)
+	@mkdir -p $(BUILD) $(BUILD)/generated $(SOURCES)/generated $(INCLUDES)/generated
 
 assets: $(patsubst $(DATA)/%.png,$(BUILD)/%.c,$(PNGFILES))
 
@@ -125,7 +132,11 @@ $(BUILD)/%.o: $(SOURCES)/%.c | dirs
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(BUILD)/level.o $(BUILD)/player.o $(BUILD)/traps.o $(BUILD)/enemy.o: $(GFX_HEADERS)
+$(BUILD)/level.o $(BUILD)/traps.o: $(MAP_H)
 $(BUILD)/audio.o: $(SOUND_HEADERS)
+
+$(MAP_C) $(MAP_H) &: $(MAP_DEPS) | dirs
+	python3 tools/compile_map.py $(MAP_SOURCE) --source $(MAP_C) --header $(MAP_H) --symbol-prefix level1
 
 $(BUILD)/%.o: $(SOURCES)/%.s | dirs
 	$(CC) $(ASFLAGS) -MMD -MP -c $< -o $@
