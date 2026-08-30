@@ -43,13 +43,17 @@ typedef enum GameState {
     GAME_STATE_PLAYING,
 } GameState;
 
-#ifdef DEBUG_STAGE_SELECT
-static uint16_t menu_previous_keys;
+static uint16_t modal_previous_keys;
+static uint8_t modal_input_armed;
+static uint8_t bg0_priority_cache = 1;
 
 static uint16_t keys_held(void)
 {
     return (uint16_t)(~REG_KEYINPUT & 0x03ff);
 }
+
+#ifdef DEBUG_STAGE_SELECT
+static uint16_t menu_previous_keys;
 #endif
 
 static void clear_oam(void)
@@ -58,6 +62,29 @@ static void clear_oam(void)
         OAM[i].attr0 = ATTR0_DISABLED;
         OAM[i].attr1 = 0;
         OAM[i].attr2 = 0;
+    }
+}
+
+static void set_bg0_priority(uint16_t priority)
+{
+    if (bg0_priority_cache != priority) {
+        REG_BG0CNT = (uint16_t)((REG_BG0CNT & ~BG_PRIORITY(3)) |
+                                BG_PRIORITY(priority));
+        bg0_priority_cache = (uint8_t)priority;
+    }
+}
+
+static void layer_sprites_between_dialog_and_world(void)
+{
+    for (uint16_t i = 0; i < 128; ++i) {
+        if ((OAM[i].attr0 & ATTR0_DISABLED) != ATTR0_DISABLED) {
+            uint16_t attr2 = OAM[i].attr2;
+
+            if ((attr2 & ATTR2_PRIORITY(3)) != ATTR2_PRIORITY(2)) {
+                OAM[i].attr2 = (uint16_t)((attr2 & ~ATTR2_PRIORITY(3)) |
+                                          ATTR2_PRIORITY(2));
+            }
+        }
     }
 }
 
@@ -224,6 +251,19 @@ static void apply_camera_left_limit(Player *player, const Camera *camera)
     }
 }
 
+static void draw_game_scene(const Player *player, const Camera *camera,
+                            uint8_t modal_layers)
+{
+    level_stream_bg0(&level_current, camera_x_px(camera), camera_y_px(camera));
+    player_draw(player, camera);
+    traps_draw(&traps_current, camera);
+    enemies_draw(&enemy_current, camera);
+    if (modal_layers) {
+        layer_sprites_between_dialog_and_world();
+    }
+    messages_draw(camera);
+}
+
 static void load_stage(StageId stage)
 {
     if (stage == STAGE_ID_1_2_UNDERGROUND) {
@@ -268,6 +308,7 @@ static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
 static void start_stage(Player *player, Camera *camera, StageId stage)
 {
     level_init_video();
+    bg0_priority_cache = 1;
     load_stage(stage);
     player_spawn(player);
     if (!player->checkpoint_active) {
@@ -358,6 +399,33 @@ int main(void)
             continue;
         }
 
+        if (messages_is_modal()) {
+            uint16_t keys = keys_held();
+            uint16_t pressed = modal_input_armed ?
+                (keys & (uint16_t)~modal_previous_keys) : 0;
+            uint8_t dismissed_modal = 0;
+
+            set_bg0_priority(3);
+            if (!modal_input_armed) {
+                modal_input_armed = 1;
+            } else if (pressed & (KEY_A_MASK | KEY_B_MASK)) {
+                messages_dismiss();
+                player_sync_input();
+                set_bg0_priority(1);
+                modal_input_armed = 0;
+                dismissed_modal = 1;
+            }
+            modal_previous_keys = keys;
+
+            VBlankIntrWait();
+            audio_update();
+
+            draw_game_scene(&player, &camera, !dismissed_modal);
+            continue;
+        }
+        set_bg0_priority(1);
+        modal_input_armed = 0;
+
         player_update(&player, &level_current, &traps_current);
         traps_update(&traps_current, &level_current, &player);
         enemies_update(&enemy_current, &level_current, &player);
@@ -433,10 +501,6 @@ int main(void)
         VBlankIntrWait();
         audio_update();
 
-        level_stream_bg0(&level_current, camera_x_px(&camera), camera_y_px(&camera));
-        player_draw(&player, &camera);
-        traps_draw(&traps_current, &camera);
-        enemies_draw(&enemy_current, &camera);
-        messages_draw(&camera);
+        draw_game_scene(&player, &camera, 0);
     }
 }

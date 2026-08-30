@@ -45,6 +45,7 @@ void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
 uint8_t player_goal_clear_done(const Player *player);
 void player_update(Player *player, Level *level, struct TrapManager *traps);
+void player_sync_input(void);
 void player_draw(const Player *player, const struct Camera *camera);
 void player_kill(Player *player);
 uint16_t player_death_count(const Player *player);

@@ -60,6 +60,11 @@ static uint16_t keys_held(void)
     return (uint16_t)(~REG_KEYINPUT & 0x03ff);
 }
 
+void player_sync_input(void)
+{
+    previous_keys = keys_held();
+}
+
 static LevelCollision collision_at(const Level *level, const TrapManager *traps,
                                    int world_x_px, int world_y_px)
 {

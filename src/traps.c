@@ -732,10 +732,9 @@ static void trigger_goal(Trap *trap, Player *player)
 static void trigger_hint_block(Trap *trap)
 {
     audio_play_trap_trigger();
-    messages_show_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
-                       trap->x - FIX16_FROM_INT(24),
-                       trap->y - FIX16_FROM_INT(8),
-                       180);
+    messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
+                             trap->x - FIX16_FROM_INT(24),
+                             trap->y - FIX16_FROM_INT(8));
 }
 
 static void update_evasive_block(Trap *trap, const struct Player *player)
