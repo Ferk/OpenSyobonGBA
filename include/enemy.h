@@ -17,6 +17,11 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_ATYPE3,
     ENEMY_SPRITE_FACE_HIDDEN,
     ENEMY_SPRITE_FACE_GRIN,
+    ENEMY_SPRITE_NYASSUN,
+    ENEMY_SPRITE_NYASSUN_ALERT,
+    ENEMY_SPRITE_TALL32,
+    ENEMY_SPRITE_CUCKOO32,
+    ENEMY_SPRITE_SPIKY_SOLDIER,
 } EnemySprite;
 
 struct Camera;
@@ -28,6 +33,7 @@ typedef enum EnemyKind {
     ENEMY_STATIC_HAZARD,
     ENEMY_CEILING_FALLER,
     ENEMY_PIPE_SHOT,
+    ENEMY_FIREBAR,
 } EnemyKind;
 
 typedef enum EnemyState {
@@ -52,6 +58,7 @@ typedef struct Enemy {
     uint8_t launched;
     uint8_t sprite;
     uint8_t palette;
+    uint8_t param;
     uint8_t emerge_timer;
 } Enemy;
 
@@ -63,6 +70,7 @@ typedef struct EnemySpawn {
     EnemyKind kind;
     uint8_t sprite;
     uint8_t palette;
+    uint8_t param;
     int8_t dir;
     uint8_t spawned;
 } EnemySpawn;
@@ -82,6 +90,10 @@ void enemies_load_1_2(EnemyManager *manager, const Level *level);
 void enemies_load_1_2_underground(EnemyManager *manager, const Level *level);
 void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
                           fix16_t y, uint8_t sprite, int8_t dir);
+void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
+                                   fix16_t x, fix16_t y,
+                                   fix16_t vx, fix16_t vy,
+                                   uint8_t sprite, int8_t dir);
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir);
 void enemies_update(EnemyManager *manager, const Level *level, Player *player);

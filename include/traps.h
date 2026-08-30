@@ -25,6 +25,7 @@ typedef enum TrapKind {
     TRAP_CHECKPOINT,
     TRAP_GOAL,
     TRAP_HINT_BLOCK,
+    TRAP_SPIKE_BLOCK,
 } TrapKind;
 
 typedef enum TrapState {

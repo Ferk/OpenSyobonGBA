@@ -56,7 +56,7 @@ MAP_H       := $(patsubst $(LEVELS)/%.tmj,$(INCLUDES)/generated/%_data.h,$(MAP_S
 CFILES      := $(wildcard $(SOURCES)/*.c) $(MAP_C)
 SFILES      := $(wildcard $(SOURCES)/*.s)
 PNGFILES    := $(DATA)/player_16.png $(DATA)/tiles_16.png $(DATA)/traps_16.png \
-               $(DATA)/items_16.png $(DATA)/enemies_16.png
+               $(DATA)/items_16.png $(DATA)/enemies_16.png $(DATA)/spike_block_16.png
 AUDIOFILES  := $(AUDIO)/block_hit.wav $(AUDIO)/brick_break.wav \
                $(AUDIO)/death.wav $(AUDIO)/jump.wav \
                $(AUDIO)/trap_trigger.wav $(AUDIO)/bgm1-1.xm

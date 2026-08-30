@@ -306,9 +306,11 @@ static void move_x(Player *player, const Level *level, TrapManager *traps)
     if (player->vx > 0) {
         int tile_right = (px + PLAYER_WIDTH_PX - 1) / LEVEL_METATILE_SIZE;
         player->x = FIX16_FROM_INT(tile_right * LEVEL_METATILE_SIZE - PLAYER_WIDTH_PX);
+        player->blocked_right = 1;
     } else if (player->vx < 0) {
         int tile_left = px / LEVEL_METATILE_SIZE;
         player->x = FIX16_FROM_INT((tile_left + 1) * LEVEL_METATILE_SIZE);
+        player->blocked_left = 1;
     }
 
     player->vx = 0;
@@ -399,6 +401,8 @@ void player_spawn(Player *player)
     player->jump_timer = 0;
     player->control_locked = 0;
     player->hidden = 0;
+    player->blocked_left = 0;
+    player->blocked_right = 0;
     player->goal_clear_done = 0;
     player->goal_phase = 0;
     player->goal_timer = 0;
@@ -563,6 +567,9 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         return;
     }
 
+    player->blocked_left = 0;
+    player->blocked_right = 0;
+
     if (player_is_supported(level, traps, FIX16_TO_INT(player->x), FIX16_TO_INT(player->y))) {
         player->on_ground = 1;
         player->coyote_timer = PLAYER_COYOTE_FRAMES;
@@ -583,6 +590,7 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         player->facing_right = 0;
 
         if (blocked_left) {
+            player->blocked_left = 1;
             if (player->vx < 0) {
                 player->vx = 0;
             }
@@ -595,6 +603,7 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         player->facing_right = 1;
 
         if (blocked_right) {
+            player->blocked_right = 1;
             if (player->vx > 0) {
                 player->vx = 0;
             }

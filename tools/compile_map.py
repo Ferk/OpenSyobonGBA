@@ -17,6 +17,7 @@ TRAP_KIND_NAMES = {
     "checkpoint": "TRAP_CHECKPOINT",
     "goal": "TRAP_GOAL",
     "hint_block": "TRAP_HINT_BLOCK",
+    "spike_block": "TRAP_SPIKE_BLOCK",
 }
 
 TRAP_SUBTYPE_NAMES = {
@@ -30,6 +31,7 @@ TRAP_SUBTYPE_NAMES = {
     "stage_pipe_shot": 100,
     "stage_flying_enemy": 101,
     "stage_ghost_swarm": 102,
+    "stage_pipe_hazard": 180,
     "question_enemy": 101,
     "question_good_mushroom": 102,
     "question_bad_mushroom": 103,
@@ -92,6 +94,7 @@ ENEMY_KIND_NAMES = {
     "static_hazard": "ENEMY_STATIC_HAZARD",
     "ceiling_faller": "ENEMY_CEILING_FALLER",
     "pipe_shot": "ENEMY_PIPE_SHOT",
+    "firebar": "ENEMY_FIREBAR",
 }
 
 ENEMY_SPRITE_NAMES = {
@@ -103,6 +106,11 @@ ENEMY_SPRITE_NAMES = {
     "face_grin": "ENEMY_SPRITE_FACE_GRIN",
     "cloud": "ENEMY_SPRITE_FACE_HIDDEN",
     "cloud_face": "ENEMY_SPRITE_FACE_GRIN",
+    "nyassun": "ENEMY_SPRITE_NYASSUN",
+    "nyassun_alert": "ENEMY_SPRITE_NYASSUN_ALERT",
+    "tall32": "ENEMY_SPRITE_TALL32",
+    "cuckoo32": "ENEMY_SPRITE_CUCKOO32",
+    "spiky_soldier": "ENEMY_SPRITE_SPIKY_SOLDIER",
 }
 
 FLIP_MASK = 0xE0000000
@@ -363,6 +371,9 @@ def parse_object_layers(map_data, tile_props):
                     "palette": max(0, min(15, int(prop_value(
                         props, "enemy_palette",
                         tile_prop.get("enemy_palette", 0))))),
+                    "param": max(0, min(255, int(prop_value(
+                        props, "enemy_param",
+                        tile_prop.get("enemy_param", 0))))),
                     "x": x,
                     "y": y,
                 })
@@ -494,6 +505,7 @@ typedef struct GeneratedEnemySpawn {{
     uint8_t w;
     uint8_t h;
     uint8_t palette;
+    uint8_t param;
     fix16_t x;
     fix16_t y;
 }} GeneratedEnemySpawn;
@@ -542,12 +554,12 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if enemy_spawns:
         for spawn in enemy_spawns:
-            lines.append("    { %s, %s, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %s, %d, %d, %d, %d, %d, %d, %d }," %
                          (spawn["kind"], spawn["sprite"], spawn["dir"],
                           spawn["w"], spawn["h"], spawn["palette"],
-                          spawn["x"], spawn["y"]))
+                          spawn["param"], spawn["x"], spawn["y"]))
     else:
-        lines.append("    { ENEMY_NONE, 0, 0, 16, 16, 0, 0, 0 },")
+        lines.append("    { ENEMY_NONE, 0, 0, 16, 16, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_enemy_spawn_count = {len(enemy_spawns)};",

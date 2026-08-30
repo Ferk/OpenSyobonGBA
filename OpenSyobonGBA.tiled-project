@@ -24,7 +24,8 @@
         "side_pipe",
         "checkpoint",
         "goal",
-        "hint_block"
+        "hint_block",
+        "spike_block"
       ]
     },
     {
@@ -40,6 +41,7 @@
         "stage_pipe_shot",
         "stage_flying_enemy",
         "stage_ghost_swarm",
+        "stage_pipe_hazard",
         "question_enemy",
         "question_good_mushroom",
         "question_bad_mushroom",
@@ -103,7 +105,8 @@
         "jumper",
         "static_hazard",
         "ceiling_faller",
-        "pipe_shot"
+        "pipe_shot",
+        "firebar"
       ]
     },
     {
@@ -118,7 +121,12 @@
         "hazard",
         "atype3",
         "face_hidden",
-        "face_grin"
+        "face_grin",
+        "nyassun",
+        "nyassun_alert",
+        "tall32",
+        "cuckoo32",
+        "spiky_soldier"
       ]
     },
     {
@@ -245,6 +253,11 @@
         },
         {
           "name": "enemy_palette",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "name": "enemy_param",
           "type": "int",
           "value": 0
         }

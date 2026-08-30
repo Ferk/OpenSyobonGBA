@@ -13,6 +13,7 @@
 #include "player.h"
 #include "text.h"
 #include "items_16.h"
+#include "spike_block_16.h"
 #include "tiles_16.h"
 #include "traps_16.h"
 
@@ -27,12 +28,17 @@
 #define BAD_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 8)
 #define STAR_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 12)
 #define BRICK_FRAGMENT_TILE_INDEX 116
-/* Keep this past enemy tiles 128-175 and checkpoint tiles 176-199. */
+#define SPIKE_BLOCK_TOP_TILE_INDEX 120
+#define SPIKE_BLOCK_LEFT_TILE_INDEX 124
+#define SPIKE_BLOCK_RIGHT_TILE_INDEX 128
+/* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
 #define FALLING_TILE_DYNAMIC_INDEX 200
 #define FALLING_TILE_DYNAMIC_SLOTS 16
 #define CHECKPOINT_TILE_INDEX 176
 #define EVASIVE_BLOCK_PALETTE_BANK 1
 #define ITEM_PALETTE_BANK 3
+#define UNDERGROUND_TILE_PALETTE_BANK 5
+#define RGB15(r, g, b) ((uint16_t)((r) | ((g) << 5) | ((b) << 10)))
 #define TRAPS_MAX_DYNAMIC_SPRITES 32
 
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
@@ -80,6 +86,7 @@
 #define QUESTION_COIN_POPUP_LIFETIME 16
 #define QUESTION_GENERATOR_DESPAWN_LEFT 128
 #define QUESTION_GENERATOR_DESPAWN_RIGHT 384
+#define STAGE_PIPE_HAZARD 180
 #define ITEM_EMERGE_FRAMES 16
 #define ITEM_WALK_SPEED REF_VEL_TO_FIX(100)
 #define ITEM_FAST_SPEED REF_VEL_TO_FIX(200)
@@ -87,12 +94,26 @@
 TrapManager traps_current;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
+static uint16_t trap_rng = 0xace1;
+
+static const uint16_t underground_tile_obj_palette[16] = {
+    RGB15(31, 0, 31), RGB15(20, 27, 31), RGB15(11, 11, 12), RGB15(23, 23, 24),
+    RGB15(31, 27, 10), RGB15(11, 21, 7), RGB15(7, 14, 4), RGB15(15, 15, 16),
+    RGB15(7, 7, 8), RGB15(27, 27, 28), RGB15(19, 19, 20), RGB15(5, 5, 6),
+    RGB15(31, 31, 31), RGB15(0, 28, 0), RGB15(0, 18, 0), RGB15(0, 0, 0),
+};
 static OBJATTR dynamic_trap_oam[TRAPS_MAX_DYNAMIC_SPRITES];
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
                             int bx, int by, int bw, int bh)
 {
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+static uint16_t trap_random(uint16_t max)
+{
+    trap_rng = (uint16_t)(trap_rng * 109u + 1021u);
+    return max ? (uint16_t)(trap_rng % max) : 0;
 }
 
 static uint8_t trap_contains_point(const Trap *trap, int world_x_px, int world_y_px)
@@ -319,6 +340,11 @@ static void add_generated_trap(TrapManager *manager, Level *level,
         trigger->kind == TRAP_EVASIVE_BLOCK) {
         add_dynamic_collider(manager, trap);
     }
+
+    if (trigger->kind == TRAP_STAGE_SPAWNER && trigger->subtype == STAGE_PIPE_HAZARD) {
+        trap->state = TRAP_ACTIVE;
+        trap->timer = 0;
+    }
 }
 
 static TrapEntity *spawn_entity(TrapManager *manager, TrapEntityKind kind,
@@ -354,6 +380,8 @@ static void load_trap_tiles(void)
            tiles_16Pal, 16 * sizeof(uint16_t));
     memcpy(&SPRITE_PALETTE[ITEM_PALETTE_BANK * 16],
            items_16Pal, 16 * sizeof(uint16_t));
+    memcpy(&SPRITE_PALETTE[UNDERGROUND_TILE_PALETTE_BANK * 16],
+           underground_tile_obj_palette, sizeof(underground_tile_obj_palette));
     memcpy(&SPRITE_GFX[TRAP_TILE_INDEX * 16], traps_16Tiles, traps_16TilesLen);
     memcpy(&SPRITE_GFX[EVASIVE_BLOCK_TILE_INDEX * 16],
            &tiles_16Tiles[METATILE_QUESTION * 4 * 8],
@@ -371,6 +399,8 @@ static void load_trap_tiles(void)
            &tiles_16Tiles[METATILE_PIPE_BODY_RIGHT * 4 * 8],
            4 * 16 * sizeof(uint16_t));
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
+    memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
+           spike_block_16Tiles, spike_block_16TilesLen);
 
     for (uint8_t i = 0; i < 4; ++i) {
         memcpy(&SPRITE_GFX[(BRICK_FRAGMENT_TILE_INDEX + i) * 16],
@@ -416,8 +446,94 @@ static void load_falling_tile_sprite(uint8_t slot, uint8_t metatile)
 
 static uint8_t falling_tile_obj_palette(uint8_t bg_palette)
 {
-    (void)bg_palette;
+    if (bg_palette == 1) {
+        return UNDERGROUND_TILE_PALETTE_BANK;
+    }
+
     return EVASIVE_BLOCK_PALETTE_BANK;
+}
+
+static uint8_t block_overlay_obj_palette(uint8_t bg_palette)
+{
+    return falling_tile_obj_palette(bg_palette);
+}
+
+static uint8_t is_stage_pipe_hazard(const Trap *trap)
+{
+    return trap->kind == TRAP_STAGE_SPAWNER &&
+           trap->subtype == STAGE_PIPE_HAZARD;
+}
+
+static uint8_t player_triggers_spike_block(const Player *player,
+                                           int block_x, int block_y)
+{
+    const int tolerance = 1;
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    int player_right = player_x + PLAYER_WIDTH_PX;
+    int player_bottom = player_y + PLAYER_HEIGHT_PX;
+    int block_right = block_x + LEVEL_METATILE_SIZE;
+    int block_bottom = block_y + LEVEL_METATILE_SIZE;
+    uint8_t horizontal_overlap = player_right > block_x + tolerance &&
+                                 player_x < block_right - tolerance;
+    uint8_t vertical_overlap = player_bottom > block_y + tolerance &&
+                               player_y < block_bottom - tolerance;
+
+    if (horizontal_overlap &&
+        player_bottom >= block_y - tolerance &&
+        player_bottom <= block_y + tolerance) {
+        return 1;
+    }
+
+    if (horizontal_overlap &&
+        player_y >= block_bottom - tolerance &&
+        player_y <= block_bottom + tolerance) {
+        return 1;
+    }
+
+    return vertical_overlap &&
+           ((player->blocked_right &&
+             player_right >= block_x - tolerance &&
+             player_right <= block_x + tolerance) ||
+            (player->blocked_left &&
+             player_x >= block_right - tolerance &&
+             player_x <= block_right + tolerance));
+}
+
+static void update_spike_block(Trap *trap, Player *player)
+{
+    if (!player->alive) {
+        return;
+    }
+
+    int trap_x = FIX16_TO_INT(trap->x);
+    int trap_y = FIX16_TO_INT(trap->y);
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+
+    if (trap->state == TRAP_IDLE) {
+        if (!player_triggers_spike_block(player, trap_x, trap_y)) {
+            return;
+        }
+
+        trap->state = TRAP_ACTIVE;
+        audio_play_trap_trigger();
+        messages_show(MESSAGE_ENEMY_BLOCK,
+                      trap->x + FIX16_FROM_INT(16), trap->y, 45);
+        player_kill(player);
+        return;
+    }
+
+    if (aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                     trap_x, trap_y - 10, 16, 10) ||
+        aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                     trap_x - 10, trap_y + 2, 10, 12) ||
+        aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                     trap_x + 16, trap_y + 2, 10, 12)) {
+        messages_show(MESSAGE_ENEMY_BLOCK,
+                      trap->x + FIX16_FROM_INT(16), trap->y, 45);
+        player_kill(player);
+    }
 }
 
 static void reveal_hidden_block(TrapManager *manager, Trap *trap, Level *level)
@@ -697,6 +813,31 @@ static void trigger_stage_spawner(Trap *trap)
                                  ENEMY_SPRITE_GHOST, -1);
         }
     }
+}
+
+static void update_stage_pipe_hazard(Trap *trap, const Player *player)
+{
+    uint8_t interval = trap->spawn_interval ? trap->spawn_interval : 48;
+    int trap_x = FIX16_TO_INT(trap->x);
+    int player_x = FIX16_TO_INT(player->x);
+
+    if (trap_x < player_x - LEVEL_STREAM_MARGIN_PX ||
+        trap_x > player_x + LEVEL_STREAM_RIGHT_PX) {
+        return;
+    }
+
+    trap->timer++;
+    if (trap->timer < interval) {
+        return;
+    }
+
+    trap->timer = 0;
+    enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
+                                  trap->x,
+                                  REF_STAGE_Y_TO_FIX(30000),
+                                  REF_VEL_TO_FIX((int16_t)trap_random(600) - 300),
+                                  -REF_VEL_TO_FIX(1600 + trap_random(900)),
+                                  ENEMY_SPRITE_SPIKY_SOLDIER, -1);
 }
 
 static void trigger_checkpoint(Trap *trap, Level *level, Player *player)
@@ -1036,6 +1177,12 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                              trap_x, trap_y, trap_w, trap_h)) {
                 trigger_stage_spawner(trap);
             }
+        } else if (trap->kind == TRAP_STAGE_SPAWNER &&
+                   trap->state == TRAP_ACTIVE &&
+                   trap->subtype == STAGE_PIPE_HAZARD) {
+            update_stage_pipe_hazard(trap, player);
+        } else if (trap->kind == TRAP_SPIKE_BLOCK) {
+            update_spike_block(trap, player);
         } else if (trap->kind == TRAP_ENTER_PIPE) {
             update_enter_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
@@ -1250,6 +1397,40 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
 
             OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
             dynamic_index++;
+        } else if (trap->kind == TRAP_SPIKE_BLOCK && trap->state != TRAP_IDLE) {
+            static const int8_t offsets[3][2] = {
+                {0, -12},
+                {-12, 0},
+                {12, 0},
+            };
+            static const uint16_t tiles[3] = {
+                SPIKE_BLOCK_TOP_TILE_INDEX,
+                SPIKE_BLOCK_LEFT_TILE_INDEX,
+                SPIKE_BLOCK_RIGHT_TILE_INDEX,
+            };
+            uint16_t palette = block_overlay_obj_palette(trap->visual_palette);
+            int base_x = camera_world_to_screen_x(camera, trap->x);
+            int base_y = camera_world_to_screen_y(camera, trap->y);
+
+            for (uint8_t part = 0; part < 3 && dynamic_index < TRAPS_MAX_DYNAMIC_SPRITES; ++part) {
+                int screen_x = base_x + offsets[part][0];
+                int screen_y = base_y + offsets[part][1];
+                OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
+
+                if (!camera_sprite_visible(screen_x, screen_y,
+                                           LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE)) {
+                    obj->attr0 = ATTR0_DISABLED;
+                } else {
+                    obj->attr0 = (uint16_t)((screen_y & 0x00ff) |
+                                            ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
+                    obj->attr2 = (uint16_t)(OBJ_CHAR(tiles[part]) |
+                                            ATTR2_PALETTE(palette));
+                }
+
+                OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
+                dynamic_index++;
+            }
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
             int base_y = camera_world_to_screen_y(camera, trap->y);
@@ -1276,14 +1457,22 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
-        } else if (trap->kind == TRAP_ENTER_PIPE || trap->kind == TRAP_SIDE_PIPE) {
-            int base_x = camera_world_to_screen_x(camera, trap->x);
-            int base_y = camera_world_to_screen_y(camera, trap->y);
+        } else if (trap->kind == TRAP_ENTER_PIPE || trap->kind == TRAP_SIDE_PIPE ||
+                   is_stage_pipe_hazard(trap)) {
+            fix16_t draw_x = trap->x;
+            fix16_t draw_y = trap->y;
             int rows = FIX16_TO_INT(trap->h) / LEVEL_METATILE_SIZE;
 
-            if (rows < 1) {
+            if (is_stage_pipe_hazard(trap)) {
+                draw_x = CELL_WORLD_X(trap->source_x > 0 ? trap->source_x - 1 : 0);
+                draw_y = CELL_WORLD_Y(trap->source_y);
+                rows = 4;
+            } else if (rows < 1) {
                 rows = 1;
             }
+
+            int base_x = camera_world_to_screen_x(camera, draw_x);
+            int base_y = camera_world_to_screen_y(camera, draw_y);
 
             for (int row = 0; row < rows && dynamic_index + 1 < TRAPS_MAX_DYNAMIC_SPRITES; ++row) {
                 for (int col = 0; col < 2 && dynamic_index < TRAPS_MAX_DYNAMIC_SPRITES; ++col) {

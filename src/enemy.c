@@ -11,16 +11,20 @@
 #include "messages.h"
 
 #define FIRST_ENEMY_SPRITE 64
-#define ENEMY_TILE_INDEX 128
+#define ENEMY_TILE_INDEX 256
 #define ENEMY_WALKER_TILE ENEMY_TILE_INDEX
 #define ENEMY_JUMPER_TILE (ENEMY_TILE_INDEX + 4)
 #define ENEMY_FALLER_TILE (ENEMY_TILE_INDEX + 8)
 #define ENEMY_ATYPE3_TILE (ENEMY_TILE_INDEX + 12)
-#define ENEMY_FACE_TILE_BASE (ENEMY_TILE_INDEX + 16)
-#define ENEMY_FACE_TOP_LEFT (ENEMY_FACE_TILE_BASE + 4)
-#define ENEMY_FACE_TOP_RIGHT (ENEMY_FACE_TILE_BASE + 8)
-#define ENEMY_FACE_BOTTOM_LEFT (ENEMY_FACE_TILE_BASE + 20)
-#define ENEMY_FACE_BOTTOM_RIGHT (ENEMY_FACE_TILE_BASE + 24)
+#define ENEMY_FACE_TOP_LEFT (ENEMY_TILE_INDEX + 16)
+#define ENEMY_FACE_TOP_RIGHT (ENEMY_TILE_INDEX + 20)
+#define ENEMY_FACE_BOTTOM_LEFT (ENEMY_TILE_INDEX + 24)
+#define ENEMY_FACE_BOTTOM_RIGHT (ENEMY_TILE_INDEX + 28)
+#define ENEMY_NYASSUN_TILE (ENEMY_TILE_INDEX + 32)
+#define ENEMY_NYASSUN_ALERT_TILE (ENEMY_TILE_INDEX + 48)
+#define ENEMY_TALL32_TILE (ENEMY_TILE_INDEX + 64)
+#define ENEMY_CUCKOO32_TILE (ENEMY_TILE_INDEX + 72)
+#define ENEMY_SPIKY_SOLDIER_TILE (ENEMY_TILE_INDEX + 80)
 #define FIRST_ENEMY_EXTRA_SPRITE 96
 #define ENEMY_SPAWN_AHEAD_PX 304
 #define ENEMY_SPAWN_BEHIND_PX 96
@@ -39,13 +43,22 @@
 #define CEILING_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define PIPE_SHOT_UP_SPEED (-REF_VEL_TO_FIX(800))
 #define PIPE_SHOT_DOWN_SPEED REF_VEL_TO_FIX(1200)
+#define PIPE_SHOT_GRAVITY REF_ACCEL_TO_FIX(120)
 #define PLAYER_STOMP_BOUNCE (-REF_VEL_TO_FIX(950))
 #define ENEMY_DARK_PALETTE_BANK 4
+#define FIREBAR_SEGMENT_SPACING 18
 
 EnemyManager enemy_current;
 
 static OBJATTR enemy_oam[ENEMY_MAX_ACTIVE];
 static OBJATTR enemy_extra_oam[ENEMY_MAX_ACTIVE];
+
+static const int8_t firebar_unit_offsets[16][2] = {
+    {18, 0},   {17, 7},   {13, 13},  {7, 17},
+    {0, 18},   {-7, 17},  {-13, 13}, {-17, 7},
+    {-18, 0},  {-17, -7}, {-13, -13}, {-7, -17},
+    {0, -18},  {7, -17},  {13, -13}, {17, -7},
+};
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
                             int bx, int by, int bw, int bh)
@@ -148,6 +161,7 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->launched = 0;
     enemy->sprite = ENEMY_SPRITE_GHOST;
     enemy->palette = 0;
+    enemy->param = 0;
     enemy->emerge_timer = 0;
 
     if (kind == ENEMY_PIPE_SHOT) {
@@ -159,7 +173,8 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
 
 static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
                       uint8_t w, uint8_t h,
-                      EnemyKind kind, uint8_t sprite, uint8_t palette, int8_t dir)
+                      EnemyKind kind, uint8_t sprite, uint8_t palette,
+                      uint8_t param, int8_t dir)
 {
     if (manager->spawn_count >= ENEMY_MAX_SPAWNS) {
         return;
@@ -174,6 +189,7 @@ static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
     spawn->kind = kind;
     spawn->sprite = sprite;
     spawn->palette = palette;
+    spawn->param = param;
     spawn->dir = dir;
     spawn->spawned = 0;
 }
@@ -193,6 +209,7 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
     enemy->h = spawn->h;
     enemy->sprite = spawn->sprite;
     enemy->palette = spawn->palette;
+    enemy->param = spawn->param;
     spawn->spawned = 1;
 }
 
@@ -213,6 +230,28 @@ void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
                     ? ((dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED)
                     : 0;
     enemy->sprite = sprite;
+    enemy->param = 0;
+    enemy->emerge_timer = 0;
+}
+
+void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
+                                   fix16_t x, fix16_t y,
+                                   fix16_t vx, fix16_t vy,
+                                   uint8_t sprite, int8_t dir)
+{
+    Enemy *enemy = add_enemy(manager, kind, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
+
+    if (!enemy) {
+        return;
+    }
+
+    enemy->state = ENEMY_STATE_ACTIVE;
+    enemy->x = x;
+    enemy->y = y;
+    enemy->vx = vx;
+    enemy->vy = vy;
+    enemy->sprite = sprite;
+    enemy->param = 0;
     enemy->emerge_timer = 0;
 }
 
@@ -335,6 +374,9 @@ static void update_ceiling_faller(Enemy *enemy, const Player *player)
         player_y > enemy_y) {
         enemy->state = ENEMY_STATE_ACTIVE;
         enemy->vy = CEILING_FALL_SPEED;
+        if (enemy->sprite == ENEMY_SPRITE_NYASSUN) {
+            enemy->sprite = ENEMY_SPRITE_NYASSUN_ALERT;
+        }
     }
 }
 
@@ -343,6 +385,54 @@ static void apply_gravity(Enemy *enemy)
     enemy->vy += ENEMY_GRAVITY;
     if (enemy->vy > ENEMY_MAX_FALL_SPEED) {
         enemy->vy = ENEMY_MAX_FALL_SPEED;
+    }
+}
+
+static uint8_t firebar_segment_count(const Enemy *enemy)
+{
+    uint8_t count = enemy->param % 100;
+
+    return (count == 0) ? 5 : count;
+}
+
+static void firebar_segment_position(const Enemy *enemy, uint8_t segment,
+                                     int *x, int *y)
+{
+    uint8_t angle = (uint8_t)(enemy->timer >> 2) & 15;
+    const int8_t *unit = firebar_unit_offsets[angle];
+    int anchor_x = FIX16_TO_INT(enemy->x);
+    int anchor_y = FIX16_TO_INT(enemy->y);
+
+    *x = anchor_x + unit[0] * segment - 8;
+    *y = anchor_y + unit[1] * segment - 8;
+}
+
+static void update_firebar(Enemy *enemy, Player *player)
+{
+    if (enemy->dir < 0) {
+        enemy->timer -= 3;
+    } else {
+        enemy->timer += 3;
+    }
+
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    uint8_t segments = firebar_segment_count(enemy);
+
+    for (uint8_t segment = 0; segment <= segments; ++segment) {
+        int segment_x;
+        int segment_y;
+
+        firebar_segment_position(enemy, segment, &segment_x, &segment_y);
+        if (player->alive &&
+            aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                         segment_x + 4, segment_y + 4, 8, 8)) {
+            messages_show(MESSAGE_ENEMY_TAUNT,
+                          FIX16_FROM_INT(segment_x + 16),
+                          FIX16_FROM_INT(segment_y), 45);
+            player_kill(player);
+            return;
+        }
     }
 }
 
@@ -424,7 +514,7 @@ static void load_generated_spawns(EnemyManager *manager,
         }
 
         add_spawn(manager, spawn->x, spawn->y, spawn->w, spawn->h, spawn->kind,
-                  spawn->sprite, spawn->palette, spawn->dir);
+                  spawn->sprite, spawn->palette, spawn->param, spawn->dir);
     }
 }
 
@@ -465,6 +555,7 @@ void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
     enemy->vx = 0;
     enemy->vy = 0;
     enemy->sprite = sprite;
+    enemy->param = 0;
     enemy->emerge_timer = 16;
 }
 
@@ -495,7 +586,9 @@ void enemies_update(EnemyManager *manager, const Level *level, Player *player)
         }
 
         if (enemy->kind == ENEMY_PIPE_SHOT) {
+            enemy->x += enemy->vx;
             enemy->y += enemy->vy;
+            enemy->vy += PIPE_SHOT_GRAVITY;
             if (FIX16_TO_INT(enemy->y) < -96 ||
                 FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
                 enemy->state = ENEMY_STATE_EMPTY;
@@ -516,6 +609,11 @@ void enemies_update(EnemyManager *manager, const Level *level, Player *player)
 
         if (enemy->kind == ENEMY_STATIC_HAZARD) {
             handle_player_collision(enemy, player);
+            continue;
+        }
+
+        if (enemy->kind == ENEMY_FIREBAR) {
+            update_firebar(enemy, player);
             continue;
         }
 
@@ -555,6 +653,40 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
         } else {
             uint16_t tile = ENEMY_WALKER_TILE;
 
+            if (enemy->kind == ENEMY_FIREBAR) {
+                uint8_t segments = firebar_segment_count(enemy);
+
+                if (extra_index + segments > ENEMY_MAX_ACTIVE) {
+                    obj->attr0 = ATTR0_DISABLED;
+                    OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                    continue;
+                }
+
+                for (uint8_t segment = 0; segment <= segments; ++segment) {
+                    OBJATTR *part_obj = (segment == 0) ? obj : &enemy_extra_oam[extra_index++];
+                    int part_x;
+                    int part_y;
+
+                    firebar_segment_position(enemy, segment, &part_x, &part_y);
+                    part_x = camera_world_to_screen_x(camera, FIX16_FROM_INT(part_x));
+                    part_y = camera_world_to_screen_y(camera, FIX16_FROM_INT(part_y));
+
+                    if (!camera_sprite_visible(part_x, part_y, 16, 16)) {
+                        part_obj->attr0 = ATTR0_DISABLED;
+                        continue;
+                    }
+
+                    part_obj->attr0 = (uint16_t)((part_y & 0x00ff) |
+                                                 ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    part_obj->attr1 = (uint16_t)((part_x & 0x01ff) | ATTR1_SIZE_16);
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(ENEMY_FALLER_TILE) |
+                                                 ATTR2_PALETTE(enemy->palette));
+                }
+
+                OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                continue;
+            }
+
             if (enemy->sprite == ENEMY_SPRITE_FACE_HIDDEN) {
                 obj->attr0 = ATTR0_DISABLED;
                 OAM[FIRST_ENEMY_SPRITE + i] = *obj;
@@ -591,10 +723,74 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                 continue;
             }
 
+            if (enemy->sprite == ENEMY_SPRITE_NYASSUN ||
+                enemy->sprite == ENEMY_SPRITE_NYASSUN_ALERT) {
+                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_NYASSUN)
+                    ? ENEMY_NYASSUN_TILE
+                    : ENEMY_NYASSUN_ALERT_TILE;
+                static const uint8_t part_offsets[4] = {0, 4, 8, 12};
+
+                if (extra_index + 3 > ENEMY_MAX_ACTIVE) {
+                    obj->attr0 = ATTR0_DISABLED;
+                    OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                    continue;
+                }
+
+                for (uint8_t part = 0; part < 4; ++part) {
+                    OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
+                    int part_x = screen_x + (part & 1) * 16;
+                    int part_y = screen_y + (part >> 1) * 16;
+
+                    part_obj->attr0 = (uint16_t)((part_y & 0x00ff) |
+                                                 ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    part_obj->attr1 = (uint16_t)((part_x & 0x01ff) | ATTR1_SIZE_16 |
+                                                 (enemy->dir > 0 ? ATTR1_FLIP_X : 0));
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(base_tile + part_offsets[part]) |
+                                                 ATTR2_PALETTE(enemy->palette));
+                }
+
+                OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                continue;
+            }
+
+            if (enemy->sprite == ENEMY_SPRITE_TALL32 ||
+                enemy->sprite == ENEMY_SPRITE_CUCKOO32) {
+                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_TALL32)
+                    ? ENEMY_TALL32_TILE
+                    : ENEMY_CUCKOO32_TILE;
+
+                if (extra_index + 1 > ENEMY_MAX_ACTIVE) {
+                    obj->attr0 = ATTR0_DISABLED;
+                    OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                    continue;
+                }
+
+                for (uint8_t part = 0; part < 2; ++part) {
+                    OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
+                    int part_y = screen_y + part * 16;
+
+                    part_obj->attr0 = (uint16_t)((part_y & 0x00ff) |
+                                                 ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    part_obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16 |
+                                                 (enemy->dir > 0 ? ATTR1_FLIP_X : 0));
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(base_tile + part * 4) |
+                                                 ATTR2_PALETTE(enemy->palette));
+                }
+
+                OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                continue;
+            }
+
             if (enemy->sprite == ENEMY_SPRITE_TALL || enemy->kind == ENEMY_JUMPER) {
                 tile = ENEMY_JUMPER_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_ATYPE3) {
                 tile = ENEMY_ATYPE3_TILE;
+            } else if (enemy->sprite == ENEMY_SPRITE_NYASSUN) {
+                tile = ENEMY_NYASSUN_TILE;
+            } else if (enemy->sprite == ENEMY_SPRITE_NYASSUN_ALERT) {
+                tile = ENEMY_NYASSUN_ALERT_TILE;
+            } else if (enemy->sprite == ENEMY_SPRITE_SPIKY_SOLDIER) {
+                tile = ENEMY_SPIKY_SOLDIER_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_HAZARD ||
                        enemy->kind == ENEMY_CEILING_FALLER ||
                        enemy->kind == ENEMY_STATIC_HAZARD) {
@@ -606,7 +802,7 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                                     (enemy->dir > 0 ? ATTR1_FLIP_X : 0));
             obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(enemy->palette) |
                                     (enemy->kind == ENEMY_PIPE_SHOT
-                                         ? ATTR2_PRIORITY(1)
+                                         ? ATTR2_PRIORITY(0)
                                          : ATTR2_PRIORITY(0)));
         }
 

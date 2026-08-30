@@ -26,6 +26,8 @@ typedef struct Player {
     uint8_t jump_timer;
     uint8_t control_locked;
     uint8_t hidden;
+    uint8_t blocked_left;
+    uint8_t blocked_right;
     uint8_t goal_clear_done;
     uint8_t goal_phase;
     uint16_t goal_timer;
