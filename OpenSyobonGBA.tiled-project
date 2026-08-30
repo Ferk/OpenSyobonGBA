@@ -117,8 +117,8 @@
         "tall",
         "hazard",
         "atype3",
-        "cloud",
-        "cloud_face"
+        "face_hidden",
+        "face_grin"
       ]
     },
     {
@@ -242,6 +242,11 @@
           "name": "dir",
           "type": "int",
           "value": -1
+        },
+        {
+          "name": "enemy_palette",
+          "type": "int",
+          "value": 0
         }
       ]
     },

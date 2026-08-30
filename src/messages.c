@@ -397,11 +397,11 @@ void messages_draw(const struct Camera *camera)
 
     for (uint8_t line = 0; line < active_message.line_count; ++line) {
         uint8_t tile_base = active_message.line_tile_offset[line];
+        uint16_t palette = active_message.modal ? MESSAGE_SE_PALBANK : 0;
 
         for (uint8_t i = 0; i < new_len[line]; ++i) {
             map[new_y[line] * 32 + new_x[line] + i] =
-                (uint16_t)(MESSAGE_GLYPH_TILE_BASE + tile_base + i) |
-                MESSAGE_SE_PALBANK;
+                (uint16_t)(MESSAGE_GLYPH_TILE_BASE + tile_base + i) | palette;
         }
 
         active_message.old_len[line] = new_len[line];

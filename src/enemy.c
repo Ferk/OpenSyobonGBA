@@ -16,7 +16,11 @@
 #define ENEMY_JUMPER_TILE (ENEMY_TILE_INDEX + 4)
 #define ENEMY_FALLER_TILE (ENEMY_TILE_INDEX + 8)
 #define ENEMY_ATYPE3_TILE (ENEMY_TILE_INDEX + 12)
-#define ENEMY_CLOUD_FACE_TILE_BASE (ENEMY_TILE_INDEX + 16)
+#define ENEMY_FACE_TILE_BASE (ENEMY_TILE_INDEX + 16)
+#define ENEMY_FACE_TOP_LEFT (ENEMY_FACE_TILE_BASE + 4)
+#define ENEMY_FACE_TOP_RIGHT (ENEMY_FACE_TILE_BASE + 8)
+#define ENEMY_FACE_BOTTOM_LEFT (ENEMY_FACE_TILE_BASE + 20)
+#define ENEMY_FACE_BOTTOM_RIGHT (ENEMY_FACE_TILE_BASE + 24)
 #define FIRST_ENEMY_EXTRA_SPRITE 96
 #define ENEMY_SPAWN_AHEAD_PX 304
 #define ENEMY_SPAWN_BEHIND_PX 96
@@ -36,6 +40,7 @@
 #define PIPE_SHOT_UP_SPEED (-REF_VEL_TO_FIX(800))
 #define PIPE_SHOT_DOWN_SPEED REF_VEL_TO_FIX(1200)
 #define PLAYER_STOMP_BOUNCE (-REF_VEL_TO_FIX(950))
+#define ENEMY_DARK_PALETTE_BANK 4
 
 EnemyManager enemy_current;
 
@@ -142,6 +147,7 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->on_ground = 0;
     enemy->launched = 0;
     enemy->sprite = ENEMY_SPRITE_GHOST;
+    enemy->palette = 0;
     enemy->emerge_timer = 0;
 
     if (kind == ENEMY_PIPE_SHOT) {
@@ -152,7 +158,8 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
 }
 
 static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
-                      EnemyKind kind, uint8_t sprite, int8_t dir)
+                      uint8_t w, uint8_t h,
+                      EnemyKind kind, uint8_t sprite, uint8_t palette, int8_t dir)
 {
     if (manager->spawn_count >= ENEMY_MAX_SPAWNS) {
         return;
@@ -162,8 +169,11 @@ static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
 
     spawn->x = x;
     spawn->y = y;
+    spawn->w = w;
+    spawn->h = h;
     spawn->kind = kind;
     spawn->sprite = sprite;
+    spawn->palette = palette;
     spawn->dir = dir;
     spawn->spawned = 0;
 }
@@ -179,7 +189,10 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
 
     enemy->x = spawn->x;
     enemy->y = spawn->y;
+    enemy->w = spawn->w;
+    enemy->h = spawn->h;
     enemy->sprite = spawn->sprite;
+    enemy->palette = spawn->palette;
     spawn->spawned = 1;
 }
 
@@ -360,9 +373,9 @@ static void handle_player_collision(Enemy *enemy, Player *player)
     } else {
         MessageId message = MESSAGE_ENEMY_TAUNT;
 
-        if (enemy->sprite == ENEMY_SPRITE_CLOUD ||
-            enemy->sprite == ENEMY_SPRITE_CLOUD_FACE) {
-            enemy->sprite = ENEMY_SPRITE_CLOUD_FACE;
+        if (enemy->sprite == ENEMY_SPRITE_FACE_HIDDEN ||
+            enemy->sprite == ENEMY_SPRITE_FACE_GRIN) {
+            enemy->sprite = ENEMY_SPRITE_FACE_GRIN;
             message = MESSAGE_ENEMY_DELISH;
         } else if (enemy->sprite == ENEMY_SPRITE_ATYPE3) {
             message = MESSAGE_ENEMY_SLEEP;
@@ -387,6 +400,15 @@ void enemies_init_video(void)
     }
 
     memcpy(SPRITE_PALETTE, enemies_16Pal, 16 * sizeof(uint16_t));
+    for (uint8_t i = 0; i < 16; ++i) {
+        uint16_t color = enemies_16Pal[i];
+        uint16_t r = color & 31;
+        uint16_t g = (color >> 5) & 31;
+        uint16_t b = (color >> 10) & 31;
+
+        SPRITE_PALETTE[ENEMY_DARK_PALETTE_BANK * 16 + i] =
+            (uint16_t)((r / 2) | ((g / 2) << 5) | ((b / 2) << 10));
+    }
     memcpy(&SPRITE_GFX[ENEMY_TILE_INDEX * 16], enemies_16Tiles, enemies_16TilesLen);
 }
 
@@ -401,8 +423,8 @@ static void load_generated_spawns(EnemyManager *manager,
             continue;
         }
 
-        add_spawn(manager, spawn->x, spawn->y, spawn->kind,
-                  spawn->sprite, spawn->dir);
+        add_spawn(manager, spawn->x, spawn->y, spawn->w, spawn->h, spawn->kind,
+                  spawn->sprite, spawn->palette, spawn->dir);
     }
 }
 
@@ -533,30 +555,36 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
         } else {
             uint16_t tile = ENEMY_WALKER_TILE;
 
-            if (enemy->sprite == ENEMY_SPRITE_CLOUD) {
+            if (enemy->sprite == ENEMY_SPRITE_FACE_HIDDEN) {
                 obj->attr0 = ATTR0_DISABLED;
                 OAM[FIRST_ENEMY_SPRITE + i] = *obj;
                 continue;
             }
 
-            if (enemy->sprite == ENEMY_SPRITE_CLOUD_FACE) {
-                if (extra_index + 7 >= ENEMY_MAX_ACTIVE) {
+            if (enemy->sprite == ENEMY_SPRITE_FACE_GRIN) {
+                static const uint16_t face_tiles[4] = {
+                    ENEMY_FACE_TOP_LEFT,
+                    ENEMY_FACE_TOP_RIGHT,
+                    ENEMY_FACE_BOTTOM_LEFT,
+                    ENEMY_FACE_BOTTOM_RIGHT,
+                };
+
+                if (extra_index + 3 > ENEMY_MAX_ACTIVE) {
                     obj->attr0 = ATTR0_DISABLED;
                     OAM[FIRST_ENEMY_SPRITE + i] = *obj;
                     continue;
                 }
 
-                for (uint8_t part = 0; part < 8; ++part) {
+                for (uint8_t part = 0; part < 4; ++part) {
                     OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
-                    int part_x = screen_x + (part & 3) * 16;
-                    int part_y = screen_y + (part >> 2) * 16;
+                    int part_x = screen_x + (part & 1) * 16;
+                    int part_y = screen_y + (part >> 1) * 16;
 
                     part_obj->attr0 = (uint16_t)((part_y & 0x00ff) |
                                                  ATTR0_COLOR_16 | ATTR0_SQUARE);
                     part_obj->attr1 = (uint16_t)((part_x & 0x01ff) | ATTR1_SIZE_16);
-                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(ENEMY_CLOUD_FACE_TILE_BASE +
-                                                           part * 4) |
-                                                 ATTR2_PALETTE(0));
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(face_tiles[part]) |
+                                                 ATTR2_PALETTE(enemy->palette));
                 }
 
                 OAM[FIRST_ENEMY_SPRITE + i] = *obj;
@@ -576,7 +604,7 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
             obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
             obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16 |
                                     (enemy->dir > 0 ? ATTR1_FLIP_X : 0));
-            obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(0) |
+            obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(enemy->palette) |
                                     (enemy->kind == ENEMY_PIPE_SHOT
                                          ? ATTR2_PRIORITY(1)
                                          : ATTR2_PRIORITY(0)));

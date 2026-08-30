@@ -99,8 +99,10 @@ ENEMY_SPRITE_NAMES = {
     "tall": "ENEMY_SPRITE_TALL",
     "hazard": "ENEMY_SPRITE_HAZARD",
     "atype3": "ENEMY_SPRITE_ATYPE3",
-    "cloud": "ENEMY_SPRITE_CLOUD",
-    "cloud_face": "ENEMY_SPRITE_CLOUD_FACE",
+    "face_hidden": "ENEMY_SPRITE_FACE_HIDDEN",
+    "face_grin": "ENEMY_SPRITE_FACE_GRIN",
+    "cloud": "ENEMY_SPRITE_FACE_HIDDEN",
+    "cloud_face": "ENEMY_SPRITE_FACE_GRIN",
 }
 
 FLIP_MASK = 0xE0000000
@@ -347,6 +349,25 @@ def parse_object_layers(map_data, tile_props):
             trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
                               WORLD_Y_OFFSET_PX)
 
+            if layer_name.lower().startswith("enem") or name.lower() == "enemy":
+                enemy_spawns.append({
+                    "kind": enum_name(prop_value(props, "enemy_kind",
+                                      tile_prop.get("enemy_kind")),
+                                      ENEMY_KIND_NAMES, "ENEMY_WALKER"),
+                    "sprite": enum_name(prop_value(props, "enemy_sprite",
+                                        tile_prop.get("enemy_sprite")),
+                                        ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_GHOST"),
+                    "dir": int(prop_value(props, "dir", tile_prop.get("dir", -1))),
+                    "w": max(1, min(255, int(round(float(obj.get("width", 16)))))),
+                    "h": max(1, min(255, int(round(float(obj.get("height", 16)))))),
+                    "palette": max(0, min(15, int(prop_value(
+                        props, "enemy_palette",
+                        tile_prop.get("enemy_palette", 0))))),
+                    "x": x,
+                    "y": y,
+                })
+                continue
+
             if trap or layer_name.lower().startswith("trap"):
                 traps.append({
                     "kind": trap or "TRAP_INVISIBLE_BLOCK",
@@ -374,20 +395,6 @@ def parse_object_layers(map_data, tile_props):
                     "h": h,
                     "trigger_x": trigger_x,
                     "trigger_y": trigger_y,
-                })
-                continue
-
-            if layer_name.lower().startswith("enem") or name.lower() == "enemy":
-                enemy_spawns.append({
-                    "kind": enum_name(prop_value(props, "enemy_kind",
-                                      tile_prop.get("enemy_kind")),
-                                      ENEMY_KIND_NAMES, "ENEMY_WALKER"),
-                    "sprite": enum_name(prop_value(props, "enemy_sprite",
-                                        tile_prop.get("enemy_sprite")),
-                                        ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_GHOST"),
-                    "dir": int(prop_value(props, "dir", tile_prop.get("dir", -1))),
-                    "x": x,
-                    "y": y,
                 })
                 continue
 
@@ -484,6 +491,9 @@ typedef struct GeneratedEnemySpawn {{
     EnemyKind kind;
     uint8_t sprite;
     int8_t dir;
+    uint8_t w;
+    uint8_t h;
+    uint8_t palette;
     fix16_t x;
     fix16_t y;
 }} GeneratedEnemySpawn;
@@ -532,11 +542,12 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if enemy_spawns:
         for spawn in enemy_spawns:
-            lines.append("    { %s, %s, %d, %d, %d }," %
+            lines.append("    { %s, %s, %d, %d, %d, %d, %d, %d }," %
                          (spawn["kind"], spawn["sprite"], spawn["dir"],
+                          spawn["w"], spawn["h"], spawn["palette"],
                           spawn["x"], spawn["y"]))
     else:
-        lines.append("    { ENEMY_NONE, 0, 0, 0, 0 },")
+        lines.append("    { ENEMY_NONE, 0, 0, 16, 16, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_enemy_spawn_count = {len(enemy_spawns)};",

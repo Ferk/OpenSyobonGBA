@@ -15,8 +15,8 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_TALL,
     ENEMY_SPRITE_HAZARD,
     ENEMY_SPRITE_ATYPE3,
-    ENEMY_SPRITE_CLOUD,
-    ENEMY_SPRITE_CLOUD_FACE,
+    ENEMY_SPRITE_FACE_HIDDEN,
+    ENEMY_SPRITE_FACE_GRIN,
 } EnemySprite;
 
 struct Camera;
@@ -51,14 +51,18 @@ typedef struct Enemy {
     uint8_t on_ground;
     uint8_t launched;
     uint8_t sprite;
+    uint8_t palette;
     uint8_t emerge_timer;
 } Enemy;
 
 typedef struct EnemySpawn {
     fix16_t x;
     fix16_t y;
+    uint8_t w;
+    uint8_t h;
     EnemyKind kind;
     uint8_t sprite;
+    uint8_t palette;
     int8_t dir;
     uint8_t spawned;
 } EnemySpawn;
