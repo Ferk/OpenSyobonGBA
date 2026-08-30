@@ -49,8 +49,9 @@
 #define PLAYER_GOAL_DROP_SPEED REF_Y_VEL_TO_FIX(600)
 #define PLAYER_GOAL_WALK_SPEED REF_VEL_TO_FIX(300)
 #define PLAYER_GOAL_SNAP_OFFSET REF_POS_TO_FIX(2000)
-#define PLAYER_GOAL_HIDE_FRAME 110
-#define PLAYER_GOAL_DONE_FRAME 250
+#define PLAYER_GOAL_PHASE_DROP 1
+#define PLAYER_GOAL_PHASE_WALK 2
+#define PLAYER_GOAL_DEFAULT_WALK_FRAMES 207
 static OBJATTR shadow_oam[128];
 static uint16_t previous_keys;
 
@@ -394,7 +395,9 @@ void player_spawn(Player *player)
     player->control_locked = 0;
     player->hidden = 0;
     player->goal_clear_done = 0;
+    player->goal_phase = 0;
     player->goal_timer = 0;
+    player->goal_walk_frames = PLAYER_GOAL_DEFAULT_WALK_FRAMES;
     player->walk_frame = 0;
     player->walk_distance = 0;
     player->checkpoint_active = checkpoint_active;
@@ -414,6 +417,7 @@ void player_spawn_at(Player *player, fix16_t x, fix16_t y)
     player->facing_right = 1;
     player->alive = 1;
     player->death_count = death_count;
+    player->goal_walk_frames = PLAYER_GOAL_DEFAULT_WALK_FRAMES;
     previous_keys = 0;
 }
 
@@ -424,13 +428,16 @@ void player_set_checkpoint(Player *player, fix16_t x, fix16_t y)
     player->checkpoint_y = y;
 }
 
-void player_begin_goal(Player *player, fix16_t goal_x)
+void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames)
 {
     player->control_locked = 1;
     player->hidden = 0;
     player->alive = 1;
     player->goal_clear_done = 0;
+    player->goal_phase = PLAYER_GOAL_PHASE_DROP;
     player->goal_timer = 1;
+    player->goal_walk_frames = walk_frames != 0 ?
+        walk_frames : PLAYER_GOAL_DEFAULT_WALK_FRAMES;
     player->x = goal_x - PLAYER_GOAL_SNAP_OFFSET;
     player->vx = 0;
     player->vy = 0;
@@ -459,7 +466,9 @@ void player_kill(Player *player)
     audio_play_death();
     player->vx = 0;
     player->vy = PLAYER_DEATH_BOUNCE;
+    player->goal_phase = 0;
     player->goal_timer = 0;
+    player->goal_walk_frames = PLAYER_GOAL_DEFAULT_WALK_FRAMES;
     player->goal_clear_done = 0;
     player->jump_buffer = 0;
     player->coyote_timer = 0;
@@ -481,11 +490,8 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
     uint16_t keys = keys_held();
     uint16_t pressed = keys & (uint16_t)~previous_keys;
 
-    if (player->goal_timer > 0) {
-        if (player->goal_timer <= 1) {
-            player->vx = 0;
-            player->vy = 0;
-        } else if (player->goal_timer <= 42) {
+    if (player->goal_phase != 0) {
+        if (player->goal_phase == PLAYER_GOAL_PHASE_DROP) {
             int old_y = FIX16_TO_INT(player->y);
             int floor_y = 0;
 
@@ -497,31 +503,32 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
                 player->y = FIX16_FROM_INT(floor_y);
                 player->vy = 0;
                 player->on_ground = 1;
-                player->goal_timer = 43;
-            }
-        } else if (player->goal_timer <= 108) {
-            player->vx = PLAYER_GOAL_WALK_SPEED;
-            player->x += player->vx;
-            player->walk_distance += player->vx;
-            if (player->walk_distance < 0) {
-                player->walk_distance = -player->walk_distance;
-            }
-            if (player->walk_distance >= PLAYER_WALK_FRAME_DISTANCE) {
+                player->goal_phase = PLAYER_GOAL_PHASE_WALK;
+                player->goal_timer = 0;
                 player->walk_distance = 0;
-                player->walk_frame ^= 1;
             }
-        } else if (player->goal_timer == PLAYER_GOAL_HIDE_FRAME) {
-            player->hidden = 1;
-            player->vx = 0;
-            player->vy = 0;
-        } else {
-            player->vx = 0;
-            player->vy = 0;
+        } else if (player->goal_phase == PLAYER_GOAL_PHASE_WALK) {
+            if (player->goal_timer >= player->goal_walk_frames) {
+                player->vx = 0;
+                player->vy = 0;
+                player->hidden = 1;
+                player->goal_clear_done = 1;
+            } else {
+                player->vx = PLAYER_GOAL_WALK_SPEED;
+                player->x += player->vx;
+                player->walk_distance += player->vx;
+                if (player->walk_distance < 0) {
+                    player->walk_distance = -player->walk_distance;
+                }
+                if (player->walk_distance >= PLAYER_WALK_FRAME_DISTANCE) {
+                    player->walk_distance = 0;
+                    player->walk_frame ^= 1;
+                }
+
+            }
         }
 
-        if (player->goal_timer >= PLAYER_GOAL_DONE_FRAME) {
-            player->goal_clear_done = 1;
-        } else {
+        if (!player->goal_clear_done) {
             player->goal_timer++;
         }
 

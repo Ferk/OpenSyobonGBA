@@ -27,7 +27,9 @@ typedef struct Player {
     uint8_t control_locked;
     uint8_t hidden;
     uint8_t goal_clear_done;
+    uint8_t goal_phase;
     uint16_t goal_timer;
+    uint16_t goal_walk_frames;
     uint8_t walk_frame;
     fix16_t walk_distance;
     uint8_t checkpoint_active;
@@ -40,7 +42,7 @@ void player_init_video(void);
 void player_spawn(Player *player);
 void player_spawn_at(Player *player, fix16_t x, fix16_t y);
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
-void player_begin_goal(Player *player, fix16_t goal_x);
+void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
 uint8_t player_goal_clear_done(const Player *player);
 void player_update(Player *player, Level *level, struct TrapManager *traps);
 void player_draw(const Player *player, const struct Camera *camera);

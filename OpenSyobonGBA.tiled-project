@@ -36,7 +36,7 @@
       "values": [
         "none",
         "invisible_reveal",
-        "falling_brick_group",
+        "falling_on_pass_under",
         "stage_pipe_shot",
         "stage_flying_enemy",
         "stage_ghost_swarm",
@@ -161,6 +161,21 @@
           "type": "string",
           "propertyType": "TrapSpawnDirection",
           "value": "auto"
+        },
+        {
+          "name": "spawn_interval",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "name": "spawn_limit",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "name": "goal_walk_frames",
+          "type": "int",
+          "value": 207
         },
         {
           "name": "source_x",

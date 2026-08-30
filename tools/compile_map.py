@@ -24,6 +24,8 @@ TRAP_SUBTYPE_NAMES = {
     "default": 0,
     "invisible_reveal_brick": 1,
     "invisible_reveal": 1,
+    "falling_on_pass_under": 51,
+    "falling_when_below": 51,
     "falling_brick_group": 51,
     "stage_pipe_shot": 100,
     "stage_flying_enemy": 101,
@@ -125,6 +127,26 @@ def prop_value(props, name, default=None):
         if prop.get("name") == name:
             return prop.get("value")
     return default
+
+
+def default_question_spawn_interval(subtype):
+    if subtype == TRAP_SUBTYPE_NAMES["question_coin_generator"]:
+        return 3
+    if subtype == TRAP_SUBTYPE_NAMES["question_poison_generator"]:
+        return 16
+    return 0
+
+
+def default_question_spawn_limit(subtype):
+    if subtype == TRAP_SUBTYPE_NAMES["question_coin_generator"]:
+        return 20
+    if subtype == TRAP_SUBTYPE_NAMES["question_poison_generator"]:
+        return 0
+    return 1
+
+
+def default_goal_walk_frames(kind):
+    return 207 if kind == "TRAP_GOAL" else 0
 
 
 def tile_properties(map_data):
@@ -280,6 +302,18 @@ def parse_object_layers(map_data, tile_props):
             spawn_dir = enum_int(prop_value(props, "spawn_dir",
                                             tile_prop.get("spawn_dir")),
                                  TRAP_SPAWN_DIRECTION_NAMES, 0)
+            spawn_interval = int(prop_value(
+                props, "spawn_interval",
+                tile_prop.get("spawn_interval",
+                              default_question_spawn_interval(subtype))))
+            spawn_limit = int(prop_value(
+                props, "spawn_limit",
+                tile_prop.get("spawn_limit",
+                              default_question_spawn_limit(subtype))))
+            goal_walk_frames = int(prop_value(
+                props, "goal_walk_frames",
+                tile_prop.get("goal_walk_frames",
+                              default_goal_walk_frames(trap))))
             source_x = int(float(prop_value(props, "source_x",
                            tiled_x / GBA_METATILE_SIZE)))
             source_y = int(float(prop_value(props, "source_y",
@@ -297,6 +331,9 @@ def parse_object_layers(map_data, tile_props):
                                                 tile_prop.get("visual_palette",
                                                               tile_prop.get("palette"))),
                                                BG_PALETTE_NAMES, 0),
+                    "spawn_interval": max(0, min(255, spawn_interval)),
+                    "spawn_limit": max(0, min(255, spawn_limit)),
+                    "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
                                            tile_prop.get("visual_metatile", 255))),
                     "collision": int(prop_value(props, "collision",
@@ -482,14 +519,16 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
-                          trap["visual_palette"], trap["visual_metatile"],
+                          trap["visual_palette"], trap["spawn_interval"],
+                          trap["spawn_limit"], trap["goal_walk_frames"],
+                          trap["visual_metatile"],
                           trap["collision"], trap["hidden"], trap["source_x"],
                           trap["source_y"], trap["x"], trap["y"], trap["w"],
                           trap["h"], trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

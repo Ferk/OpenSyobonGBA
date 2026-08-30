@@ -58,6 +58,11 @@ typedef struct Trap {
     uint8_t subtype;
     int8_t spawn_dir;
     uint8_t visual_palette;
+    uint8_t visual_metatile;
+    uint8_t spawn_interval;
+    uint8_t spawn_limit;
+    uint16_t goal_walk_frames;
+    uint8_t spawn_count;
 } Trap;
 
 typedef struct TrapEntity {
@@ -71,6 +76,7 @@ typedef struct TrapEntity {
     uint8_t h;
     uint8_t timer;
     uint8_t frame;
+    uint8_t palette;
 } TrapEntity;
 
 typedef struct TrapTrigger {
@@ -78,6 +84,9 @@ typedef struct TrapTrigger {
     uint8_t subtype;
     int8_t spawn_dir;
     uint8_t visual_palette;
+    uint8_t spawn_interval;
+    uint8_t spawn_limit;
+    uint16_t goal_walk_frames;
     uint8_t visual_metatile;
     uint8_t collision;
     uint8_t hidden;
