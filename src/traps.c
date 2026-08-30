@@ -11,6 +11,7 @@
 #include "generated/level1_2u_data.h"
 #include "messages.h"
 #include "player.h"
+#include "text.h"
 #include "items_16.h"
 #include "tiles_16.h"
 #include "traps_16.h"
@@ -213,6 +214,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_interval = 0;
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
     trap->goal_walk_frames = 0;
+    trap->hint_text = 0;
     trap->spawn_count = 0;
 
     return trap;
@@ -308,6 +310,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_interval = trigger->spawn_interval;
     trap->spawn_limit = trigger->spawn_limit;
     trap->goal_walk_frames = trigger->goal_walk_frames;
+    trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
 
     apply_generated_cells(manager, level, trigger);
@@ -729,10 +732,10 @@ static void trigger_goal(Trap *trap, Player *player)
 static void trigger_hint_block(Trap *trap)
 {
     audio_play_trap_trigger();
-    messages_show(MESSAGE_HINT_STAGE_1,
-                  trap->x - FIX16_FROM_INT(24),
-                  trap->y - FIX16_FROM_INT(8),
-                  120);
+    messages_show_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
+                       trap->x - FIX16_FROM_INT(24),
+                       trap->y - FIX16_FROM_INT(8),
+                       180);
 }
 
 static void update_evasive_block(Trap *trap, const struct Player *player)

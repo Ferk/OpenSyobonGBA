@@ -2776,6 +2776,11 @@
        "value": false
       },
       {
+       "name": "hint_text",
+       "type": "string",
+       "value": "FROM STAGE 1\\nSPECIAL TRICKS SHOW UP NOW.\\nPLEASE BE CAREFUL.\\nSOME ITEMS MAY BE USEFUL...\\n\\n                    - CHIKU"
+      },
+      {
        "name": "source_x",
        "type": "int",
        "value": 4

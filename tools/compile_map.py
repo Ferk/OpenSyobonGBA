@@ -129,6 +129,29 @@ def prop_value(props, name, default=None):
     return default
 
 
+def c_string_literal(value):
+    if value is None:
+        return "0"
+
+    text = str(value).replace("\\n", "\n")
+    out = '"'
+    for ch in text:
+        if ch == "\\":
+            out += "\\\\"
+        elif ch == '"':
+            out += '\\"'
+        elif ch == "\n":
+            out += "\\n"
+        elif ch == "\r":
+            continue
+        elif ch == "\t":
+            out += "\\t"
+        else:
+            out += ch
+    out += '"'
+    return out
+
+
 def default_question_spawn_interval(subtype):
     if subtype == TRAP_SUBTYPE_NAMES["question_coin_generator"]:
         return 3
@@ -314,6 +337,8 @@ def parse_object_layers(map_data, tile_props):
                 props, "goal_walk_frames",
                 tile_prop.get("goal_walk_frames",
                               default_goal_walk_frames(trap))))
+            hint_text = prop_value(props, "hint_text",
+                                   tile_prop.get("hint_text"))
             source_x = int(float(prop_value(props, "source_x",
                            tiled_x / GBA_METATILE_SIZE)))
             source_y = int(float(prop_value(props, "source_y",
@@ -334,6 +359,7 @@ def parse_object_layers(map_data, tile_props):
                     "spawn_interval": max(0, min(255, spawn_interval)),
                     "spawn_limit": max(0, min(255, spawn_limit)),
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
+                    "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
                                            tile_prop.get("visual_metatile", 255))),
                     "collision": int(prop_value(props, "collision",
@@ -519,16 +545,17 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
                           trap["visual_palette"], trap["spawn_interval"],
                           trap["spawn_limit"], trap["goal_walk_frames"],
+                          trap["hint_text"],
                           trap["visual_metatile"],
                           trap["collision"], trap["hidden"], trap["source_x"],
                           trap["source_y"], trap["x"], trap["y"], trap["w"],
                           trap["h"], trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

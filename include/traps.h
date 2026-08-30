@@ -62,6 +62,7 @@ typedef struct Trap {
     uint8_t spawn_interval;
     uint8_t spawn_limit;
     uint16_t goal_walk_frames;
+    const char *hint_text;
     uint8_t spawn_count;
 } Trap;
 
@@ -87,6 +88,7 @@ typedef struct TrapTrigger {
     uint8_t spawn_interval;
     uint8_t spawn_limit;
     uint16_t goal_walk_frames;
+    const char *hint_text;
     uint8_t visual_metatile;
     uint8_t collision;
     uint8_t hidden;

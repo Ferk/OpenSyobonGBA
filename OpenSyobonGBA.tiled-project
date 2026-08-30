@@ -178,6 +178,11 @@
           "value": 207
         },
         {
+          "name": "hint_text",
+          "type": "string",
+          "value": ""
+        },
+        {
           "name": "source_x",
           "type": "int",
           "value": 0
