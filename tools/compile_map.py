@@ -405,6 +405,8 @@ def parse_object_layers(map_data, tile_props):
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
                                            tile_prop.get("visual_metatile", 255))),
+                    "spent_metatile": int(prop_value(props, "spent_metatile",
+                                          tile_prop.get("spent_metatile", 255))),
                     "collision": int(prop_value(props, "collision",
                                      tile_prop.get("collision", 255))),
                     "hidden": int(prop_value(props, "hidden",
@@ -584,17 +586,17 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
                           trap["visual_palette"], trap["spawn_interval"],
                           trap["spawn_limit"], trap["goal_walk_frames"],
                           trap["hint_text"],
-                          trap["visual_metatile"],
+                          trap["visual_metatile"], trap["spent_metatile"],
                           trap["collision"], trap["hidden"], trap["source_x"],
                           trap["source_y"], trap["x"], trap["y"], trap["w"],
                           trap["h"], trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

@@ -31,6 +31,7 @@
 #define SPIKE_BLOCK_TOP_TILE_INDEX 120
 #define SPIKE_BLOCK_LEFT_TILE_INDEX 124
 #define SPIKE_BLOCK_RIGHT_TILE_INDEX 128
+#define SIDE_PIPE_TILE_INDEX 132
 /* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
 #define FALLING_TILE_DYNAMIC_INDEX 200
 #define FALLING_TILE_DYNAMIC_SLOTS 16
@@ -65,11 +66,18 @@
 #define PIPE_KILL_FRAME 160
 #define PIPE_PLAYER_SINK_FRAMES 16
 #define PIPE_PLAYER_SINK_SPEED REF_POS_TO_FIX(240)
+#define SIDE_PIPE_PLAYER_SINK_SPEED REF_POS_TO_FIX(240)
+#define SIDE_PIPE_PLAYER_POP_UP REF_POS_TO_FIX(1100)
+#define SIDE_PIPE_PLAYER_BLAST_SPEED REF_POS_TO_FIX(2000)
 #define PIPE_RISE_ACCEL REF_ACCEL_TO_FIX(80)
 #define PIPE_RISE_MAX_SPEED REF_VEL_TO_FIX(1600)
 #define PIPE_TRANSITION_FRAME 20
+#define SIDE_PIPE_KILL_FRAME 48
+#define PIPE_TRANSITION_1_2 1
 #define PIPE_TRANSITION_1_2_UNDERGROUND 2
 #define KEY_DOWN_MASK 0x0080
+#define KEY_LEFT_MASK 0x0020
+#define KEY_RIGHT_MASK 0x0010
 #define FALLING_ON_PASS_UNDER 51
 #define FALLING_WHEN_APPROACHED 52
 #define STAGE_UPWARD_HAZARD 181
@@ -119,6 +127,71 @@ static uint16_t trap_random(uint16_t max)
 {
     trap_rng = (uint16_t)(trap_rng * 109u + 1021u);
     return max ? (uint16_t)(trap_rng % max) : 0;
+}
+
+static uint8_t obj_tile_pixel(uint16_t tile_index, uint8_t x, uint8_t y)
+{
+    const uint16_t *tile = &SPRITE_GFX[tile_index * 16];
+    uint16_t packed = tile[y * 2 + x / 4];
+    uint8_t shift = (uint8_t)((x & 3) * 4);
+
+    return (uint8_t)((packed >> shift) & 0x0f);
+}
+
+static void set_obj_tile_pixel(uint16_t tile_index, uint8_t x, uint8_t y,
+                               uint8_t color)
+{
+    uint16_t *tile = &SPRITE_GFX[tile_index * 16];
+    uint16_t *packed = &tile[y * 2 + x / 4];
+    uint8_t shift = (uint8_t)((x & 3) * 4);
+    uint16_t mask = (uint16_t)(0x000fu << shift);
+
+    *packed = (uint16_t)((*packed & ~mask) |
+                         (((uint16_t)color & 0x000f) << shift));
+}
+
+static uint8_t pipe_32_pixel(uint8_t x, uint8_t y)
+{
+    uint8_t meta_col = x / LEVEL_METATILE_SIZE;
+    uint8_t meta_row = y / LEVEL_METATILE_SIZE;
+    uint8_t local_x = x & 7;
+    uint8_t local_y = y & 7;
+    uint8_t char_col = (x & 8) ? 1 : 0;
+    uint8_t char_row = (y & 8) ? 1 : 0;
+    uint16_t tile = (uint16_t)(PIPE_TILE_INDEX +
+                    (meta_row * 2 + meta_col) * 4 +
+                    char_row * 2 + char_col);
+
+    return obj_tile_pixel(tile, local_x, local_y);
+}
+
+static void set_pipe_32_pixel(uint16_t base_tile, uint8_t x, uint8_t y,
+                              uint8_t color)
+{
+    uint8_t meta_col = x / LEVEL_METATILE_SIZE;
+    uint8_t meta_row = y / LEVEL_METATILE_SIZE;
+    uint8_t local_x = x & 7;
+    uint8_t local_y = y & 7;
+    uint8_t char_col = (x & 8) ? 1 : 0;
+    uint8_t char_row = (y & 8) ? 1 : 0;
+    uint16_t tile = (uint16_t)(base_tile +
+                    (meta_row * 2 + meta_col) * 4 +
+                    char_row * 2 + char_col);
+
+    set_obj_tile_pixel(tile, local_x, local_y, color);
+}
+
+static void build_side_pipe_tiles(void)
+{
+    memset(&SPRITE_GFX[SIDE_PIPE_TILE_INDEX * 16], 0, 16 * 16 * sizeof(uint16_t));
+
+    for (uint8_t y = 0; y < 32; ++y) {
+        for (uint8_t x = 0; x < 32; ++x) {
+            uint8_t color = pipe_32_pixel((uint8_t)(31 - y), x);
+
+            set_pipe_32_pixel(SIDE_PIPE_TILE_INDEX, x, y, color);
+        }
+    }
 }
 
 static uint8_t trap_contains_point(const Trap *trap, int world_x_px, int world_y_px)
@@ -237,6 +310,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_dir = 0;
     trap->visual_palette = 0;
     trap->visual_metatile = 255;
+    trap->spent_metatile = 255;
     trap->spawn_interval = 0;
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
     trap->goal_walk_frames = 0;
@@ -367,6 +441,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_dir = trigger->spawn_dir;
     trap->visual_palette = trigger->visual_palette;
     trap->visual_metatile = trigger->visual_metatile;
+    trap->spent_metatile = trigger->spent_metatile;
     trap->spawn_interval = trigger->spawn_interval;
     trap->spawn_limit = trigger->spawn_limit;
     trap->goal_walk_frames = trigger->goal_walk_frames;
@@ -442,6 +517,7 @@ static void load_trap_tiles(void)
     memcpy(&SPRITE_GFX[(PIPE_TILE_INDEX + 12) * 16],
            &tiles_16Tiles[METATILE_PIPE_BODY_RIGHT * 4 * 8],
            4 * 16 * sizeof(uint16_t));
+    build_side_pipe_tiles();
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
     memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
            spike_block_16Tiles, spike_block_16TilesLen);
@@ -720,10 +796,17 @@ void traps_break_brick(TrapManager *manager, Level *level,
 
 static void spend_question_block(TrapManager *manager, Trap *trap, Level *level)
 {
+    uint8_t spent_metatile = (trap->spent_metatile == 255)
+        ? METATILE_SOLID
+        : trap->spent_metatile;
+
     trap->state = TRAP_SPENT;
-    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_SOLID);
+    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, spent_metatile);
     set_cell_collision(manager, trap->source_x, trap->source_y,
-                       LEVEL_COLLISION_SOLID, 0);
+                       spent_metatile == METATILE_EMPTY
+                           ? LEVEL_COLLISION_EMPTY
+                           : LEVEL_COLLISION_SOLID,
+                       spent_metatile == METATILE_EMPTY);
 }
 
 static void spawn_coin_popup(TrapManager *manager, Trap *trap)
@@ -810,10 +893,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
     case QUESTION_HIDDEN_POISON:
         audio_play_trap_trigger();
         spawn_block_item(manager, trap, TRAP_ENTITY_BAD_ITEM, ITEM_FAST_SPEED);
-        trap->state = TRAP_SPENT;
-        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_EMPTY);
-        set_cell_collision(manager, trap->source_x, trap->source_y,
-                           LEVEL_COLLISION_EMPTY, 1);
+        spend_question_block(manager, trap, level);
         break;
     case QUESTION_COIN_GENERATOR:
         trap->state = TRAP_ACTIVE;
@@ -1080,6 +1160,87 @@ static void update_enter_pipe(TrapManager *manager, Trap *trap, struct Player *p
     }
 }
 
+static uint8_t player_on_side_pipe(const Trap *trap, const struct Player *player)
+{
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    int pipe_x = FIX16_TO_INT(trap->x);
+    int pipe_y = FIX16_TO_INT(trap->y);
+    int pipe_w = FIX16_TO_INT(trap->w);
+
+    return player->alive &&
+           player->on_ground &&
+           player_x + PLAYER_WIDTH_PX >= pipe_x - 1 &&
+           player_x + PLAYER_WIDTH_PX <= pipe_x + 8 &&
+           player_x < pipe_x + pipe_w &&
+           player_y > pipe_y + 4 &&
+           player_y + PLAYER_HEIGHT_PX < pipe_y + 38;
+}
+
+static void update_side_pipe(TrapManager *manager, Trap *trap, struct Player *player)
+{
+    if (trap->state == TRAP_IDLE) {
+        if (player_on_side_pipe(trap, player) && (keys_held() & KEY_RIGHT_MASK)) {
+            trap->state = TRAP_ACTIVE;
+            trap->timer = 1;
+            player->control_locked = 1;
+            player->hidden = 1;
+            player->vx = 0;
+            player->vy = 0;
+            audio_play_trap_trigger();
+        }
+        return;
+    }
+
+    if (trap->state != TRAP_ACTIVE) {
+        return;
+    }
+
+    player->control_locked = 1;
+    player->vx = 0;
+    player->vy = 0;
+
+    if (trap->subtype == 1) {
+        player->hidden = 1;
+        if (trap->timer <= PIPE_PLAYER_SINK_FRAMES) {
+            player->x += SIDE_PIPE_PLAYER_SINK_SPEED;
+        }
+        if (trap->timer == PIPE_TRANSITION_FRAME) {
+            manager->stage_transition_requested = 1;
+            manager->stage_transition_target = PIPE_TRANSITION_1_2;
+            trap->state = TRAP_SPENT;
+        } else if (trap->timer < 255) {
+            trap->timer++;
+        }
+        return;
+    }
+
+    player->hidden = trap->timer <= PIPE_PLAYER_SINK_FRAMES;
+
+    if (trap->timer <= PIPE_PLAYER_SINK_FRAMES) {
+        player->x += SIDE_PIPE_PLAYER_SINK_SPEED;
+    }
+    if (trap->timer == PIPE_PLAYER_SINK_FRAMES) {
+        player->y -= SIDE_PIPE_PLAYER_POP_UP;
+    }
+    if (trap->timer == 20) {
+        audio_play_trap_trigger();
+    }
+    if (trap->timer >= 24) {
+        player->hidden = 0;
+        player->x -= SIDE_PIPE_PLAYER_BLAST_SPEED;
+        player->facing_right = 0;
+    }
+    if (trap->timer >= SIDE_PIPE_KILL_FRAME) {
+        player->hidden = 0;
+        trap->state = TRAP_SPENT;
+        player_kill(player);
+        return;
+    }
+
+    trap->timer++;
+}
+
 void traps_init_video(void)
 {
     for (uint8_t i = 0; i < TRAPS_MAX_ENTITIES; ++i) {
@@ -1264,6 +1425,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             update_spike_block(trap, player);
         } else if (trap->kind == TRAP_ENTER_PIPE) {
             update_enter_pipe(manager, trap, player);
+        } else if (trap->kind == TRAP_SIDE_PIPE) {
+            update_side_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -1536,8 +1699,34 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
-        } else if (trap->kind == TRAP_ENTER_PIPE || trap->kind == TRAP_SIDE_PIPE ||
-                   is_stage_pipe_hazard(trap)) {
+        } else if (trap->kind == TRAP_SIDE_PIPE) {
+            int base_x = camera_world_to_screen_x(camera, trap->x);
+            int base_y = camera_world_to_screen_y(camera, trap->y);
+
+            for (int row = 0; row < 2 && dynamic_index + 1 < TRAPS_MAX_DYNAMIC_SPRITES; ++row) {
+                for (int col = 0; col < 2 && dynamic_index < TRAPS_MAX_DYNAMIC_SPRITES; ++col) {
+                    int screen_x = base_x + col * LEVEL_METATILE_SIZE;
+                    int screen_y = base_y + row * LEVEL_METATILE_SIZE;
+                    uint16_t tile = SIDE_PIPE_TILE_INDEX + (row * 2 + col) * 4;
+                    OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
+
+                    if (!camera_sprite_visible(screen_x, screen_y,
+                                               LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE)) {
+                        obj->attr0 = ATTR0_DISABLED;
+                    } else {
+                        obj->attr0 = (uint16_t)((screen_y & 0x00ff) |
+                                                ATTR0_COLOR_16 | ATTR0_SQUARE);
+                        obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
+                        obj->attr2 = (uint16_t)(OBJ_CHAR(tile) |
+                                                ATTR2_PALETTE(EVASIVE_BLOCK_PALETTE_BANK) |
+                                                ATTR2_PRIORITY(0));
+                    }
+
+                    OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
+                    dynamic_index++;
+                }
+            }
+        } else if (trap->kind == TRAP_ENTER_PIPE || is_stage_pipe_hazard(trap)) {
             fix16_t draw_x = trap->x;
             fix16_t draw_y = trap->y;
             int rows = FIX16_TO_INT(trap->h) / LEVEL_METATILE_SIZE;

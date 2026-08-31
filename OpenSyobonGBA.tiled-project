@@ -211,6 +211,11 @@
           "value": 255
         },
         {
+          "name": "spent_metatile",
+          "type": "int",
+          "value": 255
+        },
+        {
           "name": "visual_palette",
           "type": "string",
           "propertyType": "BgPalette",

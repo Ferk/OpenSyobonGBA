@@ -1721,7 +1721,7 @@
                         {
                          "name":"spawn_interval",
                          "type":"int",
-                         "value":48
+                         "value":68
                         }, 
                         {
                          "name":"spawn_limit",
