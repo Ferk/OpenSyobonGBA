@@ -1721,7 +1721,7 @@
                         {
                          "name":"spawn_interval",
                          "type":"int",
-                         "value":68
+                         "value":120
                         }, 
                         {
                          "name":"spawn_limit",
@@ -2290,7 +2290,7 @@
                  "rotation":0,
                  "type":"Trap",
                  "visible":true,
-                 "width":16,
+                 "width":64,
                  "x":2064,
                  "y":112
                 }, 
@@ -2370,6 +2370,186 @@
                  "width":96,
                  "x":1104,
                  "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":52,
+                 "name":"ref 1-2U lift upward 111,8",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"ref_vy",
+                         "type":"float",
+                         "value":-300
+                        }, 
+                        {
+                         "name":"source_x",
+                         "type":"int",
+                         "value":111
+                        }, 
+                        {
+                         "name":"source_y",
+                         "type":"int",
+                         "value":8
+                        }, 
+                        {
+                         "name":"subtype",
+                         "propertytype":"TrapSubtype",
+                         "type":"string",
+                         "value":"platform_vertical_wrap"
+                        }, 
+                        {
+                         "name":"trap_type",
+                         "propertytype":"TrapKind",
+                         "type":"string",
+                         "value":"moving_platform"
+                        }, 
+                        {
+                         "name":"visual_metatile",
+                         "type":"int",
+                         "value":6
+                        }],
+                 "rotation":0,
+                 "type":"Trap",
+                 "visible":true,
+                 "width":48,
+                 "x":1776,
+                 "y":128
+                }, 
+                {
+                 "height":16,
+                 "id":53,
+                 "name":"ref 1-2U lift upward 111,0",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"ref_vy",
+                         "type":"float",
+                         "value":-300
+                        }, 
+                        {
+                         "name":"source_x",
+                         "type":"int",
+                         "value":111
+                        }, 
+                        {
+                         "name":"source_y",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"subtype",
+                         "propertytype":"TrapSubtype",
+                         "type":"string",
+                         "value":"platform_vertical_wrap"
+                        }, 
+                        {
+                         "name":"trap_type",
+                         "propertytype":"TrapKind",
+                         "type":"string",
+                         "value":"moving_platform"
+                        }, 
+                        {
+                         "name":"visual_metatile",
+                         "type":"int",
+                         "value":6
+                        }],
+                 "rotation":0,
+                 "type":"Trap",
+                 "visible":true,
+                 "width":48,
+                 "x":1776,
+                 "y":0
+                }, 
+                {
+                 "height":16,
+                 "id":54,
+                 "name":"ref 1-2U lift downward 116,4",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"ref_vy",
+                         "type":"float",
+                         "value":300
+                        }, 
+                        {
+                         "name":"source_x",
+                         "type":"int",
+                         "value":116
+                        }, 
+                        {
+                         "name":"source_y",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"subtype",
+                         "propertytype":"TrapSubtype",
+                         "type":"string",
+                         "value":"platform_vertical_wrap"
+                        }, 
+                        {
+                         "name":"trap_type",
+                         "propertytype":"TrapKind",
+                         "type":"string",
+                         "value":"moving_platform"
+                        }, 
+                        {
+                         "name":"visual_metatile",
+                         "type":"int",
+                         "value":6
+                        }],
+                 "rotation":0,
+                 "type":"Trap",
+                 "visible":true,
+                 "width":48,
+                 "x":1856,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":55,
+                 "name":"ref 1-2U lift downward 116,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"ref_vy",
+                         "type":"float",
+                         "value":300
+                        }, 
+                        {
+                         "name":"source_x",
+                         "type":"int",
+                         "value":116
+                        }, 
+                        {
+                         "name":"source_y",
+                         "type":"int",
+                         "value":12
+                        }, 
+                        {
+                         "name":"subtype",
+                         "propertytype":"TrapSubtype",
+                         "type":"string",
+                         "value":"platform_vertical_wrap"
+                        }, 
+                        {
+                         "name":"trap_type",
+                         "propertytype":"TrapKind",
+                         "type":"string",
+                         "value":"moving_platform"
+                        }, 
+                        {
+                         "name":"visual_metatile",
+                         "type":"int",
+                         "value":6
+                        }],
+                 "rotation":0,
+                 "type":"Trap",
+                 "visible":true,
+                 "width":48,
+                 "x":1856,
+                 "y":192
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2378,7 +2558,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":52,
+ "nextobjectid":56,
  "orientation":"orthogonal",
  "properties":[
         {

@@ -32,6 +32,7 @@
 #define SPIKE_BLOCK_LEFT_TILE_INDEX 124
 #define SPIKE_BLOCK_RIGHT_TILE_INDEX 128
 #define SIDE_PIPE_TILE_INDEX 132
+#define PLATFORM_TILE_INDEX 172
 /* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
 #define FALLING_TILE_DYNAMIC_INDEX 200
 #define FALLING_TILE_DYNAMIC_SLOTS 16
@@ -40,7 +41,7 @@
 #define ITEM_PALETTE_BANK 3
 #define UNDERGROUND_TILE_PALETTE_BANK 5
 #define RGB15(r, g, b) ((uint16_t)((r) | ((g) << 5) | ((b) << 10)))
-#define TRAPS_MAX_DYNAMIC_SPRITES 32
+#define TRAPS_MAX_DYNAMIC_SPRITES 16
 
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
 #define REF_STAGE_X_TO_FIX(v) REF_POS_TO_FIX(v)
@@ -100,6 +101,7 @@
 #define QUESTION_GENERATOR_DESPAWN_LEFT 128
 #define QUESTION_GENERATOR_DESPAWN_RIGHT 384
 #define STAGE_PIPE_HAZARD 180
+#define PLATFORM_VERTICAL_WRAP 5
 #define ITEM_EMERGE_FRAMES 16
 #define ITEM_WALK_SPEED REF_VEL_TO_FIX(100)
 #define ITEM_FAST_SPEED REF_VEL_TO_FIX(200)
@@ -304,6 +306,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->y = y;
     trap->w = w;
     trap->h = h;
+    trap->vx = 0;
     trap->vy = 0;
     trap->timer = 0;
     trap->subtype = subtype;
@@ -447,6 +450,8 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
+    trap->vx = trigger->vx;
+    trap->vy = trigger->vy;
 
     apply_generated_cells(manager, level, trigger);
 
@@ -456,7 +461,8 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     }
 
     if (trigger->kind == TRAP_ENTER_PIPE || trigger->kind == TRAP_SIDE_PIPE ||
-        trigger->kind == TRAP_EVASIVE_BLOCK) {
+        trigger->kind == TRAP_EVASIVE_BLOCK ||
+        trigger->kind == TRAP_MOVING_PLATFORM) {
         add_dynamic_collider(manager, trap);
     }
 
@@ -532,6 +538,12 @@ static void load_trap_tiles(void)
         memcpy(&SPRITE_GFX[(CHECKPOINT_TILE_INDEX + i * 4) * 16],
                &tiles_16Tiles[(METATILE_CHECKPOINT_00 * 4 + i * 4) * 8],
                4 * 16 * sizeof(uint16_t));
+    }
+
+    for (uint8_t i = 0; i < 4; ++i) {
+        memcpy(&SPRITE_GFX[(PLATFORM_TILE_INDEX + i) * 16],
+               &tiles_16Tiles[(METATILE_SOLID * 4 + i) * 8],
+               16 * sizeof(uint16_t));
     }
 }
 
@@ -1367,6 +1379,58 @@ static void update_moving_item(TrapEntity *entity, const Level *level)
     }
 }
 
+static uint8_t player_can_stand_on_platform(const Trap *trap, const Player *player,
+                                            int old_platform_y)
+{
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    int player_bottom = player_y + PLAYER_HEIGHT_PX;
+    int platform_x = FIX16_TO_INT(trap->x);
+    int platform_w = FIX16_TO_INT(trap->w);
+
+    if (player->vy < -REF_VEL_TO_FIX(100)) {
+        return 0;
+    }
+
+    return player_x + PLAYER_WIDTH_PX > platform_x + 5 &&
+           player_x < platform_x + platform_w - 5 &&
+           player_bottom >= old_platform_y - 1 &&
+           player_bottom <= old_platform_y + 10;
+}
+
+static void update_moving_platform(Trap *trap, const Level *level, Player *player)
+{
+    fix16_t old_x = trap->x;
+    fix16_t old_y = trap->y;
+    int old_platform_y = FIX16_TO_INT(old_y);
+    int min_y = level_camera_min_y_px(level) - 32;
+    int max_y = level_camera_max_y_px(level) + LEVEL_SCREEN_METATILE_ROWS * 16 + 32;
+
+    trap->x += trap->vx;
+    trap->y += trap->vy;
+
+    if (trap->subtype == PLATFORM_VERTICAL_WRAP) {
+        int platform_y = FIX16_TO_INT(trap->y);
+
+        if (platform_y < min_y) {
+            trap->y = FIX16_FROM_INT(max_y);
+            old_platform_y = max_y;
+        } else if (platform_y > max_y) {
+            trap->y = FIX16_FROM_INT(min_y);
+            old_platform_y = min_y;
+        }
+    }
+
+    if (!player->alive || !player_can_stand_on_platform(trap, player, old_platform_y)) {
+        return;
+    }
+
+    player->x += trap->x - old_x;
+    player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    player->vy = 0;
+    player->on_ground = 1;
+}
+
 void traps_update(TrapManager *manager, Level *level, struct Player *player)
 {
     int player_x = FIX16_TO_INT(player->x);
@@ -1427,6 +1491,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             update_enter_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_SIDE_PIPE) {
             update_side_pipe(manager, trap, player);
+        } else if (trap->kind == TRAP_MOVING_PLATFORM) {
+            update_moving_platform(trap, level, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -1621,6 +1687,39 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
     uint8_t dynamic_index = 0;
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *trap = &manager->traps[i];
+        fix16_t cull_x = trap->x;
+        fix16_t cull_y = trap->y;
+        int cull_w = FIX16_TO_INT(trap->w);
+        int cull_h = FIX16_TO_INT(trap->h);
+
+        if (is_stage_pipe_hazard(trap)) {
+            cull_x = CELL_WORLD_X(trap->source_x > 0 ? trap->source_x - 1 : 0);
+            cull_y = CELL_WORLD_Y(trap->source_y);
+            cull_w = 32;
+            cull_h = 64;
+        } else if (trap->kind == TRAP_CHECKPOINT ||
+                   trap->kind == TRAP_SIDE_PIPE) {
+            cull_w = 32;
+            cull_h = 32;
+        } else if (trap->kind == TRAP_SPIKE_BLOCK) {
+            cull_x -= FIX16_FROM_INT(16);
+            cull_y -= FIX16_FROM_INT(16);
+            cull_w = 48;
+            cull_h = 48;
+        }
+
+        if (cull_w < 1) {
+            cull_w = LEVEL_METATILE_SIZE;
+        }
+        if (cull_h < 1) {
+            cull_h = LEVEL_METATILE_SIZE;
+        }
+
+        if (!camera_sprite_visible(camera_world_to_screen_x(camera, cull_x),
+                                   camera_world_to_screen_y(camera, cull_y),
+                                   cull_w, cull_h)) {
+            continue;
+        }
 
         if (trap->kind == TRAP_EVASIVE_BLOCK) {
             int screen_x = camera_world_to_screen_x(camera, trap->x);
@@ -1726,6 +1825,35 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
+        } else if (trap->kind == TRAP_MOVING_PLATFORM) {
+            int base_x = camera_world_to_screen_x(camera, trap->x);
+            int base_y = camera_world_to_screen_y(camera, trap->y);
+            int cols = (FIX16_TO_INT(trap->w) + LEVEL_METATILE_SIZE - 1) /
+                       LEVEL_METATILE_SIZE;
+            uint16_t palette = block_overlay_obj_palette(trap->visual_palette);
+
+            if (cols < 1) {
+                cols = 1;
+            }
+
+            for (int col = 0; col < cols && dynamic_index < TRAPS_MAX_DYNAMIC_SPRITES; ++col) {
+                int screen_x = base_x + col * LEVEL_METATILE_SIZE;
+                OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
+
+                if (!camera_sprite_visible(screen_x, base_y,
+                                           LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE)) {
+                    continue;
+                } else {
+                    obj->attr0 = (uint16_t)((base_y & 0x00ff) |
+                                            ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
+                    obj->attr2 = (uint16_t)(OBJ_CHAR(PLATFORM_TILE_INDEX) |
+                                            ATTR2_PALETTE(palette));
+                }
+
+                OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
+                dynamic_index++;
+            }
         } else if (trap->kind == TRAP_ENTER_PIPE || is_stage_pipe_hazard(trap)) {
             fix16_t draw_x = trap->x;
             fix16_t draw_y = trap->y;
@@ -1804,6 +1932,10 @@ LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, in
 
         if (trap->kind == TRAP_ENTER_PIPE || trap->kind == TRAP_SIDE_PIPE) {
             return LEVEL_COLLISION_SOLID;
+        }
+
+        if (trap->kind == TRAP_MOVING_PLATFORM) {
+            return LEVEL_COLLISION_PASS_THROUGH;
         }
     }
 

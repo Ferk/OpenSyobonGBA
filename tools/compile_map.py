@@ -18,6 +18,7 @@ TRAP_KIND_NAMES = {
     "goal": "TRAP_GOAL",
     "hint_block": "TRAP_HINT_BLOCK",
     "spike_block": "TRAP_SPIKE_BLOCK",
+    "moving_platform": "TRAP_MOVING_PLATFORM",
 }
 
 TRAP_SUBTYPE_NAMES = {
@@ -51,6 +52,7 @@ TRAP_SUBTYPE_NAMES = {
     "pipe_fake_kill": 0,
     "pipe_to_underground": 1,
     "hint_stage_1": 1,
+    "platform_vertical_wrap": 5,
 }
 
 TRAP_SPAWN_DIRECTION_NAMES = {
@@ -135,6 +137,10 @@ def c_ident(name):
 
 def fixed(value):
     return int(round(float(value) * FIX_SCALE))
+
+
+def ref_velocity_fixed(value):
+    return int(round(float(value) * 16 * FIX_SCALE / (29 * 100 * 2)))
 
 
 def prop_value(props, name, default=None):
@@ -367,6 +373,12 @@ def parse_object_layers(map_data, tile_props):
             trigger_x = fixed(prop_value(props, "trigger_x", tiled_x))
             trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
                               WORLD_Y_OFFSET_PX)
+            vx_prop = prop_value(props, "vx", tile_prop.get("vx"))
+            vy_prop = prop_value(props, "vy", tile_prop.get("vy"))
+            ref_vx_prop = prop_value(props, "ref_vx", tile_prop.get("ref_vx"))
+            ref_vy_prop = prop_value(props, "ref_vy", tile_prop.get("ref_vy"))
+            vx = ref_velocity_fixed(ref_vx_prop) if ref_vx_prop is not None else fixed(vx_prop or 0)
+            vy = ref_velocity_fixed(ref_vy_prop) if ref_vy_prop is not None else fixed(vy_prop or 0)
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
                 enemy_spawns.append({
@@ -417,6 +429,8 @@ def parse_object_layers(map_data, tile_props):
                     "y": y,
                     "w": w,
                     "h": h,
+                    "vx": vx,
+                    "vy": vy,
                     "trigger_x": trigger_x,
                     "trigger_y": trigger_y,
                 })
@@ -586,7 +600,7 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
                           trap["visual_palette"], trap["spawn_interval"],
                           trap["spawn_limit"], trap["goal_walk_frames"],
@@ -594,9 +608,10 @@ extern const uint16_t {prefix}_trap_count;
                           trap["visual_metatile"], trap["spent_metatile"],
                           trap["collision"], trap["hidden"], trap["source_x"],
                           trap["source_y"], trap["x"], trap["y"], trap["w"],
-                          trap["h"], trap["trigger_x"], trap["trigger_y"]))
+                          trap["h"], trap["vx"], trap["vy"],
+                          trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

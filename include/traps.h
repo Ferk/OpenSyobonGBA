@@ -26,6 +26,7 @@ typedef enum TrapKind {
     TRAP_GOAL,
     TRAP_HINT_BLOCK,
     TRAP_SPIKE_BLOCK,
+    TRAP_MOVING_PLATFORM,
 } TrapKind;
 
 typedef enum TrapState {
@@ -54,6 +55,7 @@ typedef struct Trap {
     fix16_t y;
     fix16_t w;
     fix16_t h;
+    fix16_t vx;
     fix16_t vy;
     uint8_t timer;
     uint8_t subtype;
@@ -101,6 +103,8 @@ typedef struct TrapTrigger {
     fix16_t y;
     fix16_t w;
     fix16_t h;
+    fix16_t vx;
+    fix16_t vy;
     fix16_t trigger_x;
     fix16_t trigger_y;
 } TrapTrigger;

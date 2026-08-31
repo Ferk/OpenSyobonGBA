@@ -25,7 +25,8 @@
         "checkpoint",
         "goal",
         "hint_block",
-        "spike_block"
+        "spike_block",
+        "moving_platform"
       ]
     },
     {
@@ -59,7 +60,8 @@
         "evasive_horizontal",
         "pipe_fake_kill",
         "pipe_to_underground",
-        "hint_stage_1"
+        "hint_stage_1",
+        "platform_vertical_wrap"
       ]
     },
     {
@@ -231,6 +233,16 @@
           "name": "hidden",
           "type": "bool",
           "value": false
+        },
+        {
+          "name": "ref_vx",
+          "type": "float",
+          "value": 0
+        },
+        {
+          "name": "ref_vy",
+          "type": "float",
+          "value": 0
         }
       ]
     },
