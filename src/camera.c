@@ -4,7 +4,6 @@
 #define CAMERA_Y_LAG_SHIFT 3
 #define CAMERA_Y_HIGH_LINE 42
 #define CAMERA_Y_LOW_LINE 104
-#define CAMERA_Y_UP_LOOKAHEAD_MAX 32
 #define CAMERA_BACKTRACK_GRACE_PX (LEVEL_METATILE_SIZE * 2)
 
 static int clamp_int(int value, int min_value, int max_value)
@@ -57,7 +56,7 @@ void camera_update(Camera *camera, const Player *player, const Level *level)
     }
 
     target_x = clamp_int(target_x, min_x > 0 ? min_x : 0, max_x);
-    target_y = clamp_int(target_y, -CAMERA_Y_UP_LOOKAHEAD_MAX,
+    target_y = clamp_int(target_y, level_camera_min_y_px(level),
                          level_camera_max_y_px(level));
 
     camera->x = approach_smooth(camera->x, FIX16_FROM_INT(target_x), CAMERA_X_LAG_SHIFT);

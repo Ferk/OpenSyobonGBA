@@ -71,6 +71,11 @@
 #define PIPE_TRANSITION_1_2_UNDERGROUND 2
 #define KEY_DOWN_MASK 0x0080
 #define FALLING_ON_PASS_UNDER 51
+#define FALLING_WHEN_APPROACHED 52
+#define STAGE_UPWARD_HAZARD 181
+#define STAGE_UPWARD_HAZARD_TOGGLE 182
+#define STAGE_UPWARD_HAZARD_LEFT 188
+#define STAGE_HINT_MESSAGE 187
 #define QUESTION_ENEMY 101
 #define QUESTION_GOOD_MUSHROOM 102
 #define QUESTION_BAD_MUSHROOM 103
@@ -311,6 +316,40 @@ static void apply_generated_cells(TrapManager *manager, Level *level,
     }
 }
 
+static void apply_falling_stage_body_cells(TrapManager *manager, Level *level,
+                                           const TrapTrigger *trigger)
+{
+    uint16_t cols = (uint16_t)(FIX16_TO_INT(trigger->w) / LEVEL_METATILE_SIZE);
+    uint16_t rows = (uint16_t)(FIX16_TO_INT(trigger->h) / LEVEL_METATILE_SIZE);
+    uint8_t visual = trigger->visual_metatile;
+
+    if (cols == 0) {
+        cols = 1;
+    }
+    if (rows == 0) {
+        rows = 1;
+    }
+    if (visual == 255 || visual == METATILE_EMPTY) {
+        visual = METATILE_BRICK;
+    }
+
+    for (uint16_t y = 0; y < rows; ++y) {
+        for (uint16_t x = 0; x < cols; ++x) {
+            uint16_t source_x = trigger->source_x + x;
+            uint16_t source_y = trigger->source_y + y;
+
+            if (source_x >= level->width || source_y >= level->height) {
+                continue;
+            }
+
+            level_set_metatile_cell_palette(level, source_x, source_y,
+                                            visual, trigger->visual_palette);
+            set_cell_collision(manager, source_x, source_y,
+                               LEVEL_COLLISION_SOLID, 0);
+        }
+    }
+}
+
 static void add_generated_trap(TrapManager *manager, Level *level,
                                const TrapTrigger *trigger)
 {
@@ -335,6 +374,11 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_count = 0;
 
     apply_generated_cells(manager, level, trigger);
+
+    if (trigger->kind == TRAP_FALLING_FLOOR &&
+        trigger->subtype == FALLING_WHEN_APPROACHED) {
+        apply_falling_stage_body_cells(manager, level, trigger);
+    }
 
     if (trigger->kind == TRAP_ENTER_PIPE || trigger->kind == TRAP_SIDE_PIPE ||
         trigger->kind == TRAP_EVASIVE_BLOCK) {
@@ -793,25 +837,50 @@ static void trigger_stage_spawner(Trap *trap)
     }
 
     trap->state = TRAP_SPENT;
-    audio_play_trap_trigger();
 
     if (trap->subtype == 100) {
+        audio_play_trap_trigger();
         enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
                              trap->x + REF_POS_TO_FIX(1000),
                              REF_STAGE_Y_TO_FIX(32000),
                              ENEMY_SPRITE_ATYPE3, -1);
     } else if (trap->subtype == 101) {
+        audio_play_trap_trigger();
         enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
                              trap->x + REF_POS_TO_FIX(6000),
                              REF_STAGE_Y_TO_FIX(-4000),
                              ENEMY_SPRITE_ATYPE3, 1);
     } else if (trap->subtype == 102) {
+        audio_play_trap_trigger();
         for (uint8_t i = 0; i < 4; ++i) {
             enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
                                  trap->x + REF_POS_TO_FIX(i * 3000),
                                  REF_STAGE_Y_TO_FIX(-3000),
                                  ENEMY_SPRITE_GHOST, -1);
         }
+    } else if (trap->subtype == STAGE_UPWARD_HAZARD) {
+        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
+                                      trap->x + REF_POS_TO_FIX(1500),
+                                      REF_STAGE_Y_TO_FIX(44000),
+                                      0, -REF_VEL_TO_FIX(2000),
+                                      ENEMY_SPRITE_HAZARD, -1);
+    } else if (trap->subtype == STAGE_UPWARD_HAZARD_TOGGLE) {
+        audio_play_trap_trigger();
+        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
+                                      trap->x + REF_POS_TO_FIX(4500),
+                                      REF_STAGE_Y_TO_FIX(30000),
+                                      0, -REF_VEL_TO_FIX(1600),
+                                      ENEMY_SPRITE_HAZARD, -1);
+    } else if (trap->subtype == STAGE_UPWARD_HAZARD_LEFT) {
+        audio_play_trap_trigger();
+        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
+                                      trap->x - REF_POS_TO_FIX(8000),
+                                      REF_STAGE_Y_TO_FIX(26000),
+                                      0, -REF_VEL_TO_FIX(1600),
+                                      ENEMY_SPRITE_HAZARD, -1);
+    } else if (trap->subtype == STAGE_HINT_MESSAGE) {
+        messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
+                                 trap->x, trap->y);
     }
 }
 
@@ -1154,6 +1223,16 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 int left_margin = FIX16_TO_INT(REF_POS_TO_FIX(3200));
                 int right_margin = FIX16_TO_INT(REF_POS_TO_FIX(200));
                 int trigger_y = trap_y + FIX16_TO_INT(REF_POS_TO_FIX(3000));
+
+                if (player_x + PLAYER_WIDTH_PX > trap_x + left_margin &&
+                    player_x < trap_x + trap_w - right_margin &&
+                    player_y + PLAYER_HEIGHT_PX > trigger_y) {
+                    trigger_falling_floor(manager, trap, level);
+                }
+            } else if (trap->subtype == FALLING_WHEN_APPROACHED) {
+                int left_margin = FIX16_TO_INT(REF_POS_TO_FIX(2200));
+                int right_margin = FIX16_TO_INT(REF_POS_TO_FIX(2700));
+                int trigger_y = trap_y - FIX16_TO_INT(REF_POS_TO_FIX(3000));
 
                 if (player_x + PLAYER_WIDTH_PX > trap_x + left_margin &&
                     player_x < trap_x + trap_w - right_margin &&

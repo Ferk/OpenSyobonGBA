@@ -22,6 +22,7 @@ Level level_current;
 static int stream_first_world_tile_x;
 static int stream_first_world_tile_y;
 static uint8_t stream_map_origin_col;
+static uint8_t stream_map_origin_row;
 static uint8_t stream_dirty = 1;
 
 static const uint16_t bg_palette_banks[16][16] = {
@@ -106,9 +107,25 @@ static uint16_t tile_id_at_world_tile(const Level *level, int world_tile_x, int 
 static void stream_draw_column(const Level *level, uint8_t map_x, int world_tile_x,
                                int first_world_tile_y)
 {
-    for (uint8_t map_y = 0; map_y < BG_MAP_HEIGHT_TILES; ++map_y) {
+    for (uint8_t row = 0; row < BG_MAP_HEIGHT_TILES; ++row) {
+        uint8_t map_y = (uint8_t)((stream_map_origin_row + row) &
+                                  (BG_MAP_HEIGHT_TILES - 1));
+
         *bg0_map_entry(map_x, map_y) =
-            tile_id_at_world_tile(level, world_tile_x, first_world_tile_y + map_y);
+            tile_id_at_world_tile(level, world_tile_x, first_world_tile_y + row);
+    }
+}
+
+static void stream_draw_row(const Level *level, uint8_t map_y, int first_world_tile_x,
+                            int world_tile_y)
+{
+    for (uint8_t col = 0; col < BG_MAP_WIDTH_TILES; ++col) {
+        uint8_t map_x = (uint8_t)((stream_map_origin_col + col) &
+                                  (BG_MAP_WIDTH_TILES - 1));
+
+        *bg0_map_entry(map_x, map_y) = (col < LEVEL_STREAM_TILE_COLS)
+            ? tile_id_at_world_tile(level, first_world_tile_x + col, world_tile_y)
+            : TILE_EMPTY;
     }
 }
 
@@ -116,6 +133,7 @@ static void stream_fill_window(const Level *level, int first_world_tile_x,
                                int first_world_tile_y)
 {
     stream_map_origin_col = 0;
+    stream_map_origin_row = 0;
 
     for (uint8_t map_x = 0; map_x < BG_MAP_WIDTH_TILES; ++map_x) {
         if (map_x < LEVEL_STREAM_TILE_COLS) {
@@ -136,6 +154,11 @@ static void stream_fill_window(const Level *level, int first_world_tile_x,
 static uint8_t wrapped_map_col(int map_x)
 {
     return (uint8_t)(map_x & (BG_MAP_WIDTH_TILES - 1));
+}
+
+static uint8_t wrapped_map_row(int map_y)
+{
+    return (uint8_t)(map_y & (BG_MAP_HEIGHT_TILES - 1));
 }
 
 static uint8_t source_to_metatile(uint8_t source)
@@ -190,6 +213,7 @@ void level_init_video(void)
     stream_first_world_tile_x = 0;
     stream_first_world_tile_y = LEVEL_STREAM_TOP_PX / 8;
     stream_map_origin_col = 0;
+    stream_map_origin_row = 0;
     stream_dirty = 1;
 }
 
@@ -198,6 +222,8 @@ void level_load_1_1(Level *level)
     memset(level, 0, sizeof(*level));
     level->width = LEVEL1_WIDTH;
     level->height = LEVEL1_HEIGHT;
+    level->camera_margin_top = LEVEL1_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_CAMERA_MARGIN_BOTTOM;
     memcpy(level->source, level1_source, sizeof(level1_source));
     memcpy(level->metatiles, level1_metatiles, sizeof(level1_metatiles));
     memcpy(level->palettes, level1_palettes, sizeof(level1_palettes));
@@ -209,6 +235,8 @@ void level_load_1_2(Level *level)
     memset(level, 0, sizeof(*level));
     level->width = LEVEL1_2_WIDTH;
     level->height = LEVEL1_2_HEIGHT;
+    level->camera_margin_top = LEVEL1_2_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_2_CAMERA_MARGIN_BOTTOM;
     memcpy(level->source, level1_2_source, sizeof(level1_2_source));
     memcpy(level->metatiles, level1_2_metatiles, sizeof(level1_2_metatiles));
     memcpy(level->palettes, level1_2_palettes, sizeof(level1_2_palettes));
@@ -220,6 +248,8 @@ void level_load_1_2_underground(Level *level)
     memset(level, 0, sizeof(*level));
     level->width = LEVEL1_2U_WIDTH;
     level->height = LEVEL1_2U_HEIGHT;
+    level->camera_margin_top = LEVEL1_2U_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_2U_CAMERA_MARGIN_BOTTOM;
     memcpy(level->source, level1_2u_source, sizeof(level1_2u_source));
     memcpy(level->metatiles, level1_2u_metatiles, sizeof(level1_2u_metatiles));
     memcpy(level->palettes, level1_2u_palettes, sizeof(level1_2u_palettes));
@@ -229,41 +259,77 @@ void level_load_1_2_underground(Level *level)
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px)
 {
     int first_world_tile_x = floor_div_int(camera_x_px + LEVEL_STREAM_LEFT_PX, 8);
-    int first_world_tile_y = LEVEL_STREAM_TOP_PX / 8;
+    int first_world_tile_y = floor_div_int(camera_y_px + LEVEL_STREAM_TOP_PX, 8);
 
     if (stream_dirty) {
         stream_fill_window(level, first_world_tile_x, first_world_tile_y);
     } else {
-        int delta = first_world_tile_x - stream_first_world_tile_x;
+        int delta_x = first_world_tile_x - stream_first_world_tile_x;
+        int delta_y = first_world_tile_y - stream_first_world_tile_y;
 
-        if (delta <= -LEVEL_STREAM_TILE_COLS || delta >= LEVEL_STREAM_TILE_COLS) {
+        if (delta_x <= -LEVEL_STREAM_TILE_COLS ||
+            delta_x >= LEVEL_STREAM_TILE_COLS ||
+            delta_y <= -BG_MAP_HEIGHT_TILES ||
+            delta_y >= BG_MAP_HEIGHT_TILES) {
             stream_fill_window(level, first_world_tile_x, first_world_tile_y);
-        } else if (delta > 0) {
+        } else {
             int old_first_world_tile_x = stream_first_world_tile_x;
+            int old_first_world_tile_y = stream_first_world_tile_y;
 
-            for (int i = 0; i < delta; ++i) {
-                uint8_t map_x = wrapped_map_col(stream_map_origin_col + LEVEL_STREAM_TILE_COLS + i);
-                stream_draw_column(level, map_x, old_first_world_tile_x + LEVEL_STREAM_TILE_COLS + i,
-                                   first_world_tile_y);
+            if (delta_x > 0) {
+                for (int i = 0; i < delta_x; ++i) {
+                    uint8_t map_x = wrapped_map_col(stream_map_origin_col +
+                                                    LEVEL_STREAM_TILE_COLS + i);
+                    stream_draw_column(level, map_x,
+                                       old_first_world_tile_x +
+                                       LEVEL_STREAM_TILE_COLS + i,
+                                       old_first_world_tile_y);
+                }
+
+                stream_map_origin_col = wrapped_map_col(stream_map_origin_col + delta_x);
+                stream_first_world_tile_x = first_world_tile_x;
+            } else if (delta_x < 0) {
+                for (int i = delta_x; i < 0; ++i) {
+                    uint8_t map_x = wrapped_map_col(stream_map_origin_col + i);
+                    stream_draw_column(level, map_x,
+                                       old_first_world_tile_x + i,
+                                       old_first_world_tile_y);
+                }
+
+                stream_map_origin_col = wrapped_map_col(stream_map_origin_col + delta_x);
+                stream_first_world_tile_x = first_world_tile_x;
             }
 
-            stream_map_origin_col = wrapped_map_col(stream_map_origin_col + delta);
-            stream_first_world_tile_x = first_world_tile_x;
-        } else if (delta < 0) {
-            for (int i = delta; i < 0; ++i) {
-                uint8_t map_x = wrapped_map_col(stream_map_origin_col + i);
-                stream_draw_column(level, map_x, stream_first_world_tile_x + i,
-                                   first_world_tile_y);
-            }
+            if (delta_y > 0) {
+                for (int i = 0; i < delta_y; ++i) {
+                    uint8_t map_y = wrapped_map_row(stream_map_origin_row +
+                                                    BG_MAP_HEIGHT_TILES + i);
+                    stream_draw_row(level, map_y,
+                                    stream_first_world_tile_x,
+                                    old_first_world_tile_y +
+                                    BG_MAP_HEIGHT_TILES + i);
+                }
 
-            stream_map_origin_col = wrapped_map_col(stream_map_origin_col + delta);
-            stream_first_world_tile_x = first_world_tile_x;
+                stream_map_origin_row = wrapped_map_row(stream_map_origin_row + delta_y);
+                stream_first_world_tile_y = first_world_tile_y;
+            } else if (delta_y < 0) {
+                for (int i = delta_y; i < 0; ++i) {
+                    uint8_t map_y = wrapped_map_row(stream_map_origin_row + i);
+                    stream_draw_row(level, map_y,
+                                    stream_first_world_tile_x,
+                                    old_first_world_tile_y + i);
+                }
+
+                stream_map_origin_row = wrapped_map_row(stream_map_origin_row + delta_y);
+                stream_first_world_tile_y = first_world_tile_y;
+            }
         }
     }
 
     REG_BG0HOFS = (uint16_t)((stream_map_origin_col * 8 +
                               camera_x_px - stream_first_world_tile_x * 8) & 511);
-    REG_BG0VOFS = (uint16_t)((camera_y_px - stream_first_world_tile_y * 8) & 255);
+    REG_BG0VOFS = (uint16_t)((stream_map_origin_row * 8 +
+                              camera_y_px - stream_first_world_tile_y * 8) & 255);
 }
 
 void level_force_stream_update(void)
@@ -341,22 +407,19 @@ int level_death_y_px(const Level *level)
 
 int level_camera_max_y_px(const Level *level)
 {
-    int bottom_source_y = LEVEL_VIEW_SOURCE_ROW_OFFSET +
-                          LEVEL_SCREEN_METATILE_ROWS - 1;
-
-    for (uint16_t y = 0; y < level->height; ++y) {
-        for (uint16_t x = 0; x < level->width; ++x) {
-            if (level->metatiles[y][x] != METATILE_EMPTY &&
-                (int)y > bottom_source_y) {
-                bottom_source_y = y;
-            }
-        }
-    }
-
-    int bottom_world_y = (bottom_source_y - LEVEL_VIEW_SOURCE_ROW_OFFSET + 1) *
+    int bottom_world_y = ((int)level->height - LEVEL_VIEW_SOURCE_ROW_OFFSET) *
                          LEVEL_METATILE_SIZE;
     int viewport_height = LEVEL_SCREEN_METATILE_ROWS * LEVEL_METATILE_SIZE;
-    int max_camera_y = bottom_world_y - viewport_height;
+    int max_camera_y = bottom_world_y - viewport_height -
+                       (int)level->camera_margin_bottom;
 
     return max_camera_y > 0 ? max_camera_y : 0;
+}
+
+int level_camera_min_y_px(const Level *level)
+{
+    int top_world_y = -LEVEL_VIEW_SOURCE_ROW_OFFSET * LEVEL_METATILE_SIZE;
+    int min_camera_y = top_world_y + (int)level->camera_margin_top;
+
+    return min_camera_y < 0 ? min_camera_y : 0;
 }

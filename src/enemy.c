@@ -44,6 +44,7 @@
 #define PIPE_SHOT_UP_SPEED (-REF_VEL_TO_FIX(800))
 #define PIPE_SHOT_DOWN_SPEED REF_VEL_TO_FIX(1200)
 #define PIPE_SHOT_GRAVITY REF_ACCEL_TO_FIX(120)
+#define PIPE_SHOT_MAX_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define PLAYER_STOMP_BOUNCE (-REF_VEL_TO_FIX(950))
 #define ENEMY_DARK_PALETTE_BANK 4
 #define FIREBAR_SEGMENT_SPACING 18
@@ -478,6 +479,11 @@ static void handle_player_collision(Enemy *enemy, Player *player)
     }
 }
 
+static uint8_t enemy_pipe_shot_uses_gravity(const Enemy *enemy)
+{
+    return enemy->sprite != ENEMY_SPRITE_ATYPE3;
+}
+
 void enemies_init_video(void)
 {
     for (uint8_t i = 0; i < ENEMY_MAX_ACTIVE; ++i) {
@@ -588,7 +594,14 @@ void enemies_update(EnemyManager *manager, const Level *level, Player *player)
         if (enemy->kind == ENEMY_PIPE_SHOT) {
             enemy->x += enemy->vx;
             enemy->y += enemy->vy;
-            enemy->vy += PIPE_SHOT_GRAVITY;
+
+            if (enemy_pipe_shot_uses_gravity(enemy)) {
+                enemy->vy += PIPE_SHOT_GRAVITY;
+                if (enemy->vy > PIPE_SHOT_MAX_FALL_SPEED) {
+                    enemy->vy = PIPE_SHOT_MAX_FALL_SPEED;
+                }
+            }
+
             if (FIX16_TO_INT(enemy->y) < -96 ||
                 FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
                 enemy->state = ENEMY_STATE_EMPTY;

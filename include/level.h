@@ -98,6 +98,8 @@ typedef enum LevelCollision {
 typedef struct Level {
     uint16_t width;
     uint16_t height;
+    uint16_t camera_margin_top;
+    uint16_t camera_margin_bottom;
     uint8_t source[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
     uint8_t metatiles[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
     uint8_t palettes[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
@@ -118,6 +120,7 @@ void level_set_metatile_cell_palette(Level *level, uint16_t source_x, uint16_t s
                                      uint8_t metatile, uint8_t palette);
 void level_restore_source_cell(Level *level, uint16_t source_x, uint16_t source_y);
 int level_death_y_px(const Level *level);
+int level_camera_min_y_px(const Level *level);
 int level_camera_max_y_px(const Level *level);
 
 #endif

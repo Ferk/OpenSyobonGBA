@@ -2,6 +2,18 @@
  "compressionlevel": -1,
  "height": 17,
  "infinite": false,
+ "properties": [
+  {
+   "name": "camera_margin_bottom",
+   "type": "int",
+   "value": 0
+  },
+  {
+   "name": "camera_margin_top",
+   "type": "int",
+   "value": 0
+  }
+ ],
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tileheight": 16,

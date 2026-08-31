@@ -28,9 +28,14 @@ TRAP_SUBTYPE_NAMES = {
     "falling_on_pass_under": 51,
     "falling_when_below": 51,
     "falling_brick_group": 51,
+    "falling_when_approached": 52,
     "stage_pipe_shot": 100,
     "stage_flying_enemy": 101,
     "stage_ghost_swarm": 102,
+    "stage_upward_hazard": 181,
+    "stage_upward_hazard_toggle": 182,
+    "stage_upward_hazard_left": 188,
+    "stage_hint_message": 187,
     "stage_pipe_hazard": 180,
     "question_enemy": 101,
     "question_good_mushroom": 102,
@@ -163,6 +168,8 @@ def c_string_literal(value):
 
 
 def default_question_spawn_interval(subtype):
+    if subtype == TRAP_SUBTYPE_NAMES["stage_pipe_hazard"]:
+        return 48
     if subtype == TRAP_SUBTYPE_NAMES["question_coin_generator"]:
         return 3
     if subtype == TRAP_SUBTYPE_NAMES["question_poison_generator"]:
@@ -240,6 +247,10 @@ def palette_from_gid(gid, props, default=0):
 
 def layer_properties(layer):
     return {p.get("name"): p.get("value") for p in layer.get("properties", [])}
+
+
+def map_properties(map_data):
+    return {p.get("name"): p.get("value") for p in map_data.get("properties", [])}
 
 
 def source_from_gid(gid, props):
@@ -436,6 +447,9 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
     map_data = json.loads(tmj_path.read_text())
     width = int(map_data["width"])
     height = int(map_data["height"])
+    map_props = map_properties(map_data)
+    camera_margin_top = max(0, min(65535, int(map_props.get("camera_margin_top", 0))))
+    camera_margin_bottom = max(0, min(65535, int(map_props.get("camera_margin_bottom", 0))))
     props = tile_properties(map_data)
 
     metatiles = [[0 for _ in range(width)] for _ in range(height)]
@@ -514,6 +528,8 @@ typedef struct GeneratedEnemySpawn {{
 
 #define {prefix.upper()}_WIDTH {width}
 #define {prefix.upper()}_HEIGHT {height}
+#define {prefix.upper()}_CAMERA_MARGIN_TOP {camera_margin_top}
+#define {prefix.upper()}_CAMERA_MARGIN_BOTTOM {camera_margin_bottom}
 
 extern const uint8_t {prefix}_metatiles[{height}][{width}];
 extern const uint8_t {prefix}_palettes[{height}][{width}];

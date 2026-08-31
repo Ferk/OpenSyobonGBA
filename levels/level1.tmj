@@ -1871,6 +1871,17 @@
  "nextlayerid":6,
  "nextobjectid":38,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"camera_margin_bottom",
+         "type":"int",
+         "value":32
+        }, 
+        {
+         "name":"camera_margin_top",
+         "type":"int",
+         "value":0
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
  "tileheight":16,

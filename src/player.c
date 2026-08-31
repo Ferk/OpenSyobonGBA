@@ -60,6 +60,15 @@ static uint16_t keys_held(void)
     return (uint16_t)(~REG_KEYINPUT & 0x03ff);
 }
 
+static int floor_div_int(int numerator, int denominator)
+{
+    if (numerator >= 0) {
+        return numerator / denominator;
+    }
+
+    return -(((-numerator) + denominator - 1) / denominator);
+}
+
 void player_sync_input(void)
 {
     previous_keys = keys_held();
@@ -193,8 +202,9 @@ static uint8_t player_blocked_right(const Level *level, const TrapManager *traps
 static uint8_t bump_level_cell(Level *level, TrapManager *traps,
                                int world_x_px, int world_y_px)
 {
-    int source_x = world_x_px / LEVEL_METATILE_SIZE;
-    int source_y = world_y_px / LEVEL_METATILE_SIZE + LEVEL_VIEW_SOURCE_ROW_OFFSET;
+    int source_x = floor_div_int(world_x_px, LEVEL_METATILE_SIZE);
+    int source_y = floor_div_int(world_y_px, LEVEL_METATILE_SIZE) +
+                   LEVEL_VIEW_SOURCE_ROW_OFFSET;
 
     if (source_x < 0 || source_x >= level->width ||
         source_y < 0 || source_y >= level->height) {
@@ -330,7 +340,7 @@ static void move_y(Player *player, Level *level, TrapManager *traps)
     player->on_ground = 0;
 
     if (player->vy < 0) {
-        int hit_y = (py / LEVEL_METATILE_SIZE) * LEVEL_METATILE_SIZE;
+        int hit_y = floor_div_int(py, LEVEL_METATILE_SIZE) * LEVEL_METATILE_SIZE;
 
         if (bump_head_points(player, level, traps, px, hit_y)) {
             player->y = FIX16_FROM_INT(hit_y + LEVEL_METATILE_SIZE);
@@ -359,7 +369,7 @@ static void move_y(Player *player, Level *level, TrapManager *traps)
         player->y = FIX16_FROM_INT(tile_bottom * LEVEL_METATILE_SIZE - PLAYER_HEIGHT_PX);
         player->on_ground = 1;
     } else if (player->vy < 0) {
-        int tile_top = py / LEVEL_METATILE_SIZE;
+        int tile_top = floor_div_int(py, LEVEL_METATILE_SIZE);
         int hit_y = tile_top * LEVEL_METATILE_SIZE;
 
         if (!bump_head_points(player, level, traps, px, hit_y)) {
