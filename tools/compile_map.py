@@ -32,6 +32,7 @@ TRAP_SUBTYPE_NAMES = {
     "falling_when_approached": 52,
     "stage_pipe_shot": 100,
     "stage_flying_enemy": 101,
+    "stage_walker_swarm": 102,
     "stage_ghost_swarm": 102,
     "stage_upward_hazard": 181,
     "stage_upward_hazard_toggle": 182,
@@ -100,7 +101,9 @@ ENTITY_KIND_NAMES = {
 
 ENEMY_KIND_NAMES = {
     "walker": "ENEMY_WALKER",
-    "jumper": "ENEMY_JUMPER",
+    "shell_walker": "ENEMY_SHELL_WALKER",
+    "jumper": "ENEMY_SHELL_WALKER",
+    "shell": "ENEMY_SHELL",
     "static_hazard": "ENEMY_STATIC_HAZARD",
     "ceiling_faller": "ENEMY_CEILING_FALLER",
     "pipe_shot": "ENEMY_PIPE_SHOT",
@@ -111,8 +114,11 @@ ENEMY_KIND_NAMES = {
 }
 
 ENEMY_SPRITE_NAMES = {
-    "ghost": "ENEMY_SPRITE_GHOST",
-    "tall": "ENEMY_SPRITE_TALL",
+    "walker": "ENEMY_SPRITE_WALKER",
+    "ghost": "ENEMY_SPRITE_WALKER",
+    "shell_walker": "ENEMY_SPRITE_SHELL_WALKER",
+    "tall": "ENEMY_SPRITE_SHELL_WALKER",
+    "shell": "ENEMY_SPRITE_SHELL",
     "hazard": "ENEMY_SPRITE_HAZARD",
     "atype3": "ENEMY_SPRITE_ATYPE3",
     "face_hidden": "ENEMY_SPRITE_FACE_HIDDEN",
@@ -121,7 +127,8 @@ ENEMY_SPRITE_NAMES = {
     "cloud_face": "ENEMY_SPRITE_FACE_GRIN",
     "nyassun": "ENEMY_SPRITE_NYASSUN",
     "nyassun_alert": "ENEMY_SPRITE_NYASSUN_ALERT",
-    "tall32": "ENEMY_SPRITE_TALL32",
+    "vertical32": "ENEMY_SPRITE_VERTICAL32",
+    "tall32": "ENEMY_SPRITE_VERTICAL32",
     "cuckoo32": "ENEMY_SPRITE_CUCKOO32",
     "fire_projectile": "ENEMY_SPRITE_FIRE_PROJECTILE",
     "superjien": "ENEMY_SPRITE_SUPERJIEN",
@@ -393,13 +400,20 @@ def parse_object_layers(map_data, tile_props):
             vy = ref_velocity_fixed(ref_vy_prop) if ref_vy_prop is not None else fixed(vy_prop or 0)
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
-                enemy_spawns.append({
-                    "kind": enum_name(prop_value(props, "enemy_kind",
-                                      tile_prop.get("enemy_kind")),
-                                      ENEMY_KIND_NAMES, "ENEMY_WALKER"),
-                    "sprite": enum_name(prop_value(props, "enemy_sprite",
+                enemy_kind = enum_name(prop_value(props, "enemy_kind",
+                                       tile_prop.get("enemy_kind")),
+                                       ENEMY_KIND_NAMES, "ENEMY_WALKER")
+                enemy_sprite = enum_name(prop_value(props, "enemy_sprite",
                                         tile_prop.get("enemy_sprite")),
-                                        ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_GHOST"),
+                                         ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER")
+
+                if (enemy_kind == "ENEMY_WALKER" and
+                        enemy_sprite == "ENEMY_SPRITE_SHELL_WALKER"):
+                    enemy_kind = "ENEMY_SHELL_WALKER"
+
+                enemy_spawns.append({
+                    "kind": enemy_kind,
+                    "sprite": enemy_sprite,
                     "dir": int(prop_value(props, "dir", tile_prop.get("dir", -1))),
                     "w": max(1, min(255, int(round(float(obj.get("width", 16)))))),
                     "h": max(1, min(255, int(round(float(obj.get("height", 16)))))),

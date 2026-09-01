@@ -42,7 +42,7 @@
     "falling_when_approached",
     "stage_pipe_shot",
     "stage_flying_enemy",
-    "stage_ghost_swarm",
+    "stage_walker_swarm",
     "stage_upward_hazard",
     "stage_upward_hazard_toggle",
     "stage_upward_hazard_left",
@@ -109,7 +109,8 @@
    "valuesAsFlags": false,
    "values": [
     "walker",
-    "jumper",
+    "shell_walker",
+    "shell",
     "static_hazard",
     "ceiling_faller",
     "pipe_shot",
@@ -125,15 +126,16 @@
    "storageType": "string",
    "valuesAsFlags": false,
    "values": [
-    "ghost",
-    "tall",
+    "walker",
+    "shell_walker",
+    "shell",
     "hazard",
     "atype3",
     "face_hidden",
     "face_grin",
     "nyassun",
     "nyassun_alert",
-    "tall32",
+    "vertical32",
     "cuckoo32",
     "fire_projectile",
     "superjien",
@@ -286,7 +288,7 @@
      "name": "enemy_sprite",
      "type": "string",
      "propertyType": "EnemySprite",
-     "value": "ghost"
+     "value": "walker"
     },
     {
      "name": "dir",

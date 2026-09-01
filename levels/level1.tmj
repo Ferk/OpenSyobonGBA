@@ -73,7 +73,7 @@
                 {
                  "height":16,
                  "id":3,
-                 "name":"ghost enemy 52,3",
+                 "name":"walker enemy 52,3",
                  "opacity":1,
                  "properties":[
                         {
@@ -91,7 +91,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -103,7 +103,7 @@
                 {
                  "height":16,
                  "id":4,
-                 "name":"ghost enemy 48,7",
+                 "name":"walker enemy 48,7",
                  "opacity":1,
                  "properties":[
                         {
@@ -121,7 +121,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -133,7 +133,7 @@
                 {
                  "height":16,
                  "id":5,
-                 "name":"ghost enemy 10,12",
+                 "name":"walker enemy 10,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -151,7 +151,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -163,7 +163,7 @@
                 {
                  "height":16,
                  "id":6,
-                 "name":"ghost enemy 16,12",
+                 "name":"walker enemy 16,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -181,7 +181,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -193,7 +193,7 @@
                 {
                  "height":16,
                  "id":7,
-                 "name":"ghost enemy 61,12",
+                 "name":"walker enemy 61,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -211,7 +211,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -223,7 +223,7 @@
                 {
                  "height":16,
                  "id":8,
-                 "name":"ghost enemy 63,12",
+                 "name":"walker enemy 63,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -241,7 +241,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -253,7 +253,7 @@
                 {
                  "height":16,
                  "id":9,
-                 "name":"tall enemy 66,12",
+                 "name":"shell enemy 66,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -265,13 +265,13 @@
                          "name":"enemy_kind",
                          "propertytype":"EnemyKind",
                          "type":"string",
-                         "value":"walker"
+                         "value":"shell_walker"
                         }, 
                         {
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"tall"
+                         "value":"shell_walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -283,7 +283,7 @@
                 {
                  "height":16,
                  "id":10,
-                 "name":"ghost enemy 101,12",
+                 "name":"walker enemy 101,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -301,7 +301,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -313,7 +313,7 @@
                 {
                  "height":16,
                  "id":11,
-                 "name":"ghost enemy 103,12",
+                 "name":"walker enemy 103,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -331,7 +331,7 @@
                          "name":"enemy_sprite",
                          "propertytype":"EnemySprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -1489,7 +1489,7 @@
                 {
                  "height":386.206896551724,
                  "id":35,
-                 "name":"ghost group trigger",
+                 "name":"walker group trigger",
                  "opacity":1,
                  "properties":[
                         {
@@ -1506,7 +1506,7 @@
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
-                         "value":"stage_ghost_swarm"
+                         "value":"stage_walker_swarm"
                         }, 
                         {
                          "name":"trap_type",

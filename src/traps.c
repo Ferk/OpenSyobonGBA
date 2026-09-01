@@ -880,7 +880,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         audio_play_trap_trigger();
         spend_question_block(manager, trap, level);
         enemies_spawn_from_block(&enemy_current, trap->x, trap->y,
-                                 ENEMY_SPRITE_GHOST,
+                                 ENEMY_SPRITE_WALKER,
                                  resolve_question_enemy_dir(trap, player));
         break;
     case QUESTION_GOOD_MUSHROOM:
@@ -954,7 +954,7 @@ static void trigger_stage_spawner(Trap *trap)
             enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
                                  trap->x + REF_POS_TO_FIX(i * 3000),
                                  REF_STAGE_Y_TO_FIX(-3000),
-                                 ENEMY_SPRITE_GHOST, -1);
+                                 ENEMY_SPRITE_WALKER, -1);
         }
     } else if (trap->subtype == STAGE_UPWARD_HAZARD) {
         enemies_spawn_direct_velocity(&enemy_current, ENEMY_SUPERJIEN,

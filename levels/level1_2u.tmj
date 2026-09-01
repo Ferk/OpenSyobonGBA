@@ -68,7 +68,7 @@
                 {
                  "height":16,
                  "id":2,
-                 "name":"tall enemy 29,10",
+                 "name":"shell enemy 29,10",
                  "opacity":1,
                  "properties":[
                         {
@@ -79,7 +79,7 @@
                         {
                          "name":"enemy_kind",
                          "type":"string",
-                         "value":"walker"
+                         "value":"shell_walker"
                         }, 
                         {
                          "name":"enemy_palette",
@@ -94,7 +94,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"tall"
+                         "value":"shell_walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -132,7 +132,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -170,7 +170,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -208,7 +208,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -246,7 +246,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -258,7 +258,7 @@
                 {
                  "height":16,
                  "id":7,
-                 "name":"ghost enemy 37,12",
+                 "name":"walker enemy 37,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -284,7 +284,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -296,7 +296,7 @@
                 {
                  "height":16,
                  "id":8,
-                 "name":"ghost enemy 38,12",
+                 "name":"walker enemy 38,12",
                  "opacity":1,
                  "properties":[
                         {
@@ -322,7 +322,7 @@
                         {
                          "name":"enemy_sprite",
                          "type":"string",
-                         "value":"ghost"
+                         "value":"walker"
                         }],
                  "rotation":0,
                  "type":"Enemy",

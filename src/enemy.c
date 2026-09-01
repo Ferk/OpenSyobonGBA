@@ -15,8 +15,9 @@
 #define FIRST_ENEMY_SPRITE 64
 #define ENEMY_TILE_INDEX 256
 #define ENEMY_WALKER_TILE ENEMY_TILE_INDEX
-#define ENEMY_JUMPER_TILE (ENEMY_TILE_INDEX + 4)
-#define ENEMY_FALLER_TILE (ENEMY_TILE_INDEX + 8)
+#define ENEMY_SHELL_WALKER_TILE (ENEMY_TILE_INDEX + 4)
+#define ENEMY_SHELL_TILE (ENEMY_TILE_INDEX + 8)
+#define ENEMY_FALLER_TILE ENEMY_SHELL_TILE
 #define ENEMY_ATYPE3_TILE (ENEMY_TILE_INDEX + 12)
 #define ENEMY_FACE_TOP_LEFT (ENEMY_TILE_INDEX + 16)
 #define ENEMY_FACE_TOP_RIGHT (ENEMY_TILE_INDEX + 20)
@@ -24,7 +25,7 @@
 #define ENEMY_FACE_BOTTOM_RIGHT (ENEMY_TILE_INDEX + 28)
 #define ENEMY_NYASSUN_TILE (ENEMY_TILE_INDEX + 32)
 #define ENEMY_NYASSUN_ALERT_TILE (ENEMY_TILE_INDEX + 48)
-#define ENEMY_TALL32_TILE (ENEMY_TILE_INDEX + 64)
+#define ENEMY_VERTICAL32_TILE (ENEMY_TILE_INDEX + 64)
 #define ENEMY_CUCKOO32_TILE (ENEMY_TILE_INDEX + 72)
 #define ENEMY_FIRE_PROJECTILE_TILE (ENEMY_TILE_INDEX + 80)
 #define ENEMY_SUPERJIEN_TILE (ENEMY_TILE_INDEX + 84)
@@ -41,13 +42,11 @@
 #define ENEMY_GRAVITY REF_ACCEL_TO_FIX(120)
 #define ENEMY_MAX_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define WALKER_SPEED REF_VEL_TO_FIX(100)
+#define SHELL_SPEED REF_VEL_TO_FIX(800)
 #define SUPERJIEN_SPEED REF_VEL_TO_FIX(120)
 #define GIANT_SPEED REF_VEL_TO_FIX(160)
-#define JUMPER_SPEED REF_VEL_TO_FIX(300)
-#define JUMPER_LAUNCH_SPEED (-REF_VEL_TO_FIX(1600))
 #define SUPERJIEN_HOP_SPEED (-REF_VEL_TO_FIX(1600))
 #define SUPERJIEN_HOP_COOLDOWN 40
-#define JUMPER_LAUNCH_DELAY 100
 #define CEILING_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define PIPE_SHOT_UP_SPEED (-REF_VEL_TO_FIX(800))
 #define PIPE_SHOT_DOWN_SPEED REF_VEL_TO_FIX(1200)
@@ -71,7 +70,10 @@ static const int8_t firebar_unit_offsets[16][2] = {
 
 static uint8_t default_enemy_width(EnemyKind kind)
 {
-    return (kind == ENEMY_WALKER || kind == ENEMY_SUPERJIEN) ? 17 : 16;
+    return (kind == ENEMY_WALKER ||
+            kind == ENEMY_SHELL_WALKER ||
+            kind == ENEMY_SHELL) ? 17 :
+           (kind == ENEMY_SUPERJIEN) ? 18 : 16;
 }
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
@@ -89,8 +91,8 @@ static uint8_t level_solid_at(const Level *level, int x, int y)
 
 static uint8_t enemy_hits_solid(const Level *level, const Enemy *enemy, int x, int y)
 {
-    int left = x + 1;
-    int right = x + enemy->w - 2;
+    int left = x;
+    int right = x + enemy->w - 1;
     int top = y + 1;
     int bottom = y + enemy->h - 1;
 
@@ -105,8 +107,8 @@ static uint8_t enemy_supported(const Level *level, const Enemy *enemy)
     int x = FIX16_TO_INT(enemy->x);
     int y = FIX16_TO_INT(enemy->y);
     int foot_y = y + enemy->h + 1;
-    int left = x + 2;
-    int right = x + enemy->w - 3;
+    int left = x;
+    int right = x + enemy->w - 1;
     LevelCollision left_collision = level_collision_at(level, left, foot_y);
     LevelCollision right_collision = level_collision_at(level, right, foot_y);
 
@@ -122,8 +124,8 @@ static uint8_t enemy_lands_on_platform(const Level *level, const Enemy *enemy,
     int old_bottom = old_y + enemy->h;
     int new_bottom = new_y + enemy->h;
     int x = FIX16_TO_INT(enemy->x);
-    int left = x + 2;
-    int right = x + enemy->w - 3;
+    int left = x;
+    int right = x + enemy->w - 1;
 
     if (new_bottom <= old_bottom) {
         return 0;
@@ -138,18 +140,6 @@ static uint8_t enemy_lands_on_platform(const Level *level, const Enemy *enemy,
     }
 
     return 0;
-}
-
-static uint8_t enemy_has_floor_ahead(const Level *level, const Enemy *enemy)
-{
-    int x = FIX16_TO_INT(enemy->x);
-    int y = FIX16_TO_INT(enemy->y);
-    int probe_x = (enemy->dir > 0) ? x + enemy->w + 2 : x - 2;
-    int probe_y = y + enemy->h + 4;
-    LevelCollision collision = level_collision_at(level, probe_x, probe_y);
-
-    return collision == LEVEL_COLLISION_SOLID ||
-           collision == LEVEL_COLLISION_PASS_THROUGH;
 }
 
 static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
@@ -170,10 +160,10 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->w = default_enemy_width(kind);
     enemy->h = 16;
     enemy->dir = dir;
-    enemy->timer = JUMPER_LAUNCH_DELAY;
+    enemy->timer = 0;
     enemy->on_ground = 0;
     enemy->launched = 0;
-    enemy->sprite = ENEMY_SPRITE_GHOST;
+    enemy->sprite = ENEMY_SPRITE_WALKER;
     enemy->palette = 0;
     enemy->param = 0;
     enemy->emerge_timer = 0;
@@ -222,7 +212,10 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
     enemy->x = spawn->x;
     enemy->y = spawn->y;
     enemy->w = spawn->w;
-    if ((spawn->kind == ENEMY_WALKER || spawn->kind == ENEMY_SUPERJIEN) &&
+    if ((spawn->kind == ENEMY_WALKER ||
+         spawn->kind == ENEMY_SHELL_WALKER ||
+         spawn->kind == ENEMY_SHELL ||
+         spawn->kind == ENEMY_SUPERJIEN) &&
         enemy->w == 16) {
         enemy->w = default_enemy_width(spawn->kind);
     }
@@ -443,28 +436,20 @@ static void update_giant(Enemy *enemy)
     enemy->x += enemy->vx;
 }
 
-static void update_jumper(Enemy *enemy, const Level *level)
+static void update_shell_walker(Enemy *enemy, const Level *level)
 {
-    if (!enemy->launched && enemy->on_ground) {
-        if (enemy->timer > 0) {
-            enemy->timer--;
-        } else {
-            enemy->vx = (enemy->dir > 0) ? JUMPER_SPEED : -JUMPER_SPEED;
-            enemy->vy = JUMPER_LAUNCH_SPEED;
-            enemy->y -= FIX16_FROM_INT(1);
-            enemy->launched = 1;
-        }
-    }
+    enemy->vx = (enemy->dir > 0) ? WALKER_SPEED : -WALKER_SPEED;
+    move_enemy_x(enemy, level);
+}
 
-    if (enemy->launched && enemy->on_ground) {
+static void update_shell(Enemy *enemy, const Level *level)
+{
+    if (enemy->param == 0) {
         enemy->vx = 0;
+        return;
     }
 
-    if (enemy->vx != 0 && enemy->on_ground && !enemy_has_floor_ahead(level, enemy)) {
-        enemy->dir = (int8_t)-enemy->dir;
-        enemy->vx = -enemy->vx;
-    }
-
+    enemy->vx = (enemy->dir > 0) ? SHELL_SPEED : -SHELL_SPEED;
     move_enemy_x(enemy, level);
 }
 
@@ -500,6 +485,36 @@ static uint8_t firebar_segment_count(const Enemy *enemy)
     uint8_t count = enemy->param % 100;
 
     return (count == 0) ? 5 : count;
+}
+
+static void moving_shell_hit_enemies(EnemyManager *manager, Enemy *shell)
+{
+    if (shell->kind != ENEMY_SHELL || shell->param == 0 ||
+        shell->state != ENEMY_STATE_ACTIVE) {
+        return;
+    }
+
+    int shell_x = FIX16_TO_INT(shell->x);
+    int shell_y = FIX16_TO_INT(shell->y);
+
+    for (uint8_t i = 0; i < manager->count; ++i) {
+        Enemy *enemy = &manager->enemies[i];
+
+        if (enemy == shell || enemy->state != ENEMY_STATE_ACTIVE ||
+            enemy->kind == ENEMY_SHELL || enemy->kind == ENEMY_STATIC_HAZARD ||
+            enemy->kind == ENEMY_FIREBAR) {
+            continue;
+        }
+
+        if (aabb_overlap(shell_x, shell_y, shell->w, shell->h,
+                         FIX16_TO_INT(enemy->x), FIX16_TO_INT(enemy->y),
+                         enemy->w, enemy->h)) {
+            enemy->state = ENEMY_STATE_DEAD;
+            enemy->timer = 8;
+            enemy->vx = 0;
+            enemy->vy = 0;
+        }
+    }
 }
 
 static void firebar_segment_position(const Enemy *enemy, uint8_t segment,
@@ -543,6 +558,41 @@ static void update_firebar(Enemy *enemy, Player *player)
     }
 }
 
+static void stomp_shell_walker(Enemy *enemy, Player *player)
+{
+    int enemy_y = FIX16_TO_INT(enemy->y);
+
+    enemy->kind = ENEMY_SHELL;
+    enemy->sprite = ENEMY_SPRITE_SHELL;
+    enemy->h = 16;
+    enemy->param = 0;
+    enemy->vx = 0;
+    enemy->vy = 0;
+    player->y = FIX16_FROM_INT(enemy_y - PLAYER_HEIGHT_PX - 1);
+    player->vy = PLAYER_STOMP_BOUNCE;
+    player->on_ground = 0;
+}
+
+static void stomp_shell(Enemy *enemy, Player *player)
+{
+    int enemy_x = FIX16_TO_INT(enemy->x);
+    int enemy_y = FIX16_TO_INT(enemy->y);
+    int player_center = FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX / 2;
+    int enemy_center = enemy_x + enemy->w / 2;
+
+    if (enemy->param != 0) {
+        enemy->param = 0;
+        enemy->vx = 0;
+    } else {
+        enemy->param = 1;
+        enemy->dir = (player_center <= enemy_center) ? 1 : -1;
+    }
+
+    player->y = FIX16_FROM_INT(enemy_y - PLAYER_HEIGHT_PX - 1);
+    player->vy = PLAYER_STOMP_BOUNCE;
+    player->on_ground = 0;
+}
+
 static void handle_player_collision(Enemy *enemy, Player *player)
 {
     int enemy_x = FIX16_TO_INT(enemy->x);
@@ -562,6 +612,15 @@ static void handle_player_collision(Enemy *enemy, Player *player)
         enemy->kind != ENEMY_PIPE_SHOT &&
         enemy->kind != ENEMY_SUPERJIEN &&
         enemy->kind != ENEMY_GIANT) {
+        if (enemy->kind == ENEMY_SHELL_WALKER) {
+            stomp_shell_walker(enemy, player);
+            return;
+        }
+        if (enemy->kind == ENEMY_SHELL) {
+            stomp_shell(enemy, player);
+            return;
+        }
+
         enemy->state = ENEMY_STATE_DEAD;
         enemy->timer = 18;
         enemy->vx = 0;
@@ -570,6 +629,10 @@ static void handle_player_collision(Enemy *enemy, Player *player)
         player->vy = PLAYER_STOMP_BOUNCE;
         player->on_ground = 0;
     } else {
+        if (enemy->kind == ENEMY_SHELL && enemy->param == 0) {
+            return;
+        }
+
         MessageId message = MESSAGE_ENEMY_TAUNT;
 
         if (enemy->sprite == ENEMY_SPRITE_FACE_HIDDEN ||
@@ -600,7 +663,7 @@ uint8_t enemies_transform_near_good_mushroom(EnemyManager *manager,
             continue;
         }
         if (!((enemy->kind == ENEMY_WALKER &&
-               enemy->sprite == ENEMY_SPRITE_GHOST) ||
+               enemy->sprite == ENEMY_SPRITE_WALKER) ||
               enemy->kind == ENEMY_SUPERJIEN)) {
             continue;
         }
@@ -792,8 +855,10 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             update_superjien(enemy, level, player);
         } else if (enemy->kind == ENEMY_GIANT) {
             update_giant(enemy);
-        } else if (enemy->kind == ENEMY_JUMPER) {
-            update_jumper(enemy, level);
+        } else if (enemy->kind == ENEMY_SHELL_WALKER) {
+            update_shell_walker(enemy, level);
+        } else if (enemy->kind == ENEMY_SHELL) {
+            update_shell(enemy, level);
         }
 
         if (enemy->kind != ENEMY_CEILING_FALLER) {
@@ -803,6 +868,9 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
 
         if (enemy->kind == ENEMY_GIANT) {
             break_giant_overlap_bricks(enemy, level, traps);
+        }
+        if (enemy->kind == ENEMY_SHELL) {
+            moving_shell_hit_enemies(manager, enemy);
         }
 
         if (FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
@@ -937,10 +1005,10 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                 continue;
             }
 
-            if (enemy->sprite == ENEMY_SPRITE_TALL32 ||
+            if (enemy->sprite == ENEMY_SPRITE_VERTICAL32 ||
                 enemy->sprite == ENEMY_SPRITE_CUCKOO32) {
-                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_TALL32)
-                    ? ENEMY_TALL32_TILE
+                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_VERTICAL32)
+                    ? ENEMY_VERTICAL32_TILE
                     : ENEMY_CUCKOO32_TILE;
 
                 if (extra_index + 1 > ENEMY_MAX_ACTIVE) {
@@ -965,14 +1033,17 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                 continue;
             }
 
-            if (enemy->sprite == ENEMY_SPRITE_TALL || enemy->kind == ENEMY_JUMPER) {
-                tile = ENEMY_JUMPER_TILE;
+            if (enemy->sprite == ENEMY_SPRITE_SHELL_WALKER ||
+                enemy->kind == ENEMY_SHELL_WALKER) {
+                tile = ENEMY_SHELL_WALKER_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_ATYPE3) {
                 tile = ENEMY_ATYPE3_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_NYASSUN) {
                 tile = ENEMY_NYASSUN_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_NYASSUN_ALERT) {
                 tile = ENEMY_NYASSUN_ALERT_TILE;
+            } else if (enemy->sprite == ENEMY_SPRITE_SHELL) {
+                tile = ENEMY_SHELL_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_FIRE_PROJECTILE) {
                 tile = ENEMY_FIRE_PROJECTILE_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_SUPERJIEN) {
