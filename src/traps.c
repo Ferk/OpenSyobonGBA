@@ -8,6 +8,7 @@
 #include "enemy.h"
 #include "generated/level1_data.h"
 #include "generated/level1_2_data.h"
+#include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "messages.h"
 #include "player.h"
@@ -76,6 +77,7 @@
 #define SIDE_PIPE_KILL_FRAME 48
 #define PIPE_TRANSITION_1_2 1
 #define PIPE_TRANSITION_1_2_UNDERGROUND 2
+#define PIPE_TRANSITION_1_2B 3
 #define KEY_DOWN_MASK 0x0080
 #define KEY_LEFT_MASK 0x0020
 #define KEY_RIGHT_MASK 0x0010
@@ -1219,7 +1221,7 @@ static void update_side_pipe(TrapManager *manager, Trap *trap, struct Player *pl
         }
         if (trap->timer == PIPE_TRANSITION_FRAME) {
             manager->stage_transition_requested = 1;
-            manager->stage_transition_target = PIPE_TRANSITION_1_2;
+            manager->stage_transition_target = PIPE_TRANSITION_1_2B;
             trap->state = TRAP_SPENT;
         } else if (trap->timer < 255) {
             trap->timer++;
@@ -1294,6 +1296,15 @@ void traps_load_1_2_underground(TrapManager *manager, Level *level)
 
     for (uint16_t i = 0; i < level1_2u_trap_count; ++i) {
         add_generated_trap(manager, level, &level1_2u_traps[i]);
+    }
+}
+
+void traps_load_1_2b(TrapManager *manager, Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+
+    for (uint16_t i = 0; i < level1_2b_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_2b_traps[i]);
     }
 }
 

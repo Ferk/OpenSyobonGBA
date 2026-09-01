@@ -11,7 +11,7 @@ struct Camera;
 
 #define TRAPS_MAX_TRAPS 48
 #define TRAPS_MAX_ENTITIES 32
-#define TRAPS_MAX_DYNAMIC_COLLIDERS 8
+#define TRAPS_MAX_DYNAMIC_COLLIDERS 16
 
 typedef enum TrapKind {
     TRAP_INVISIBLE_BLOCK = 0,
@@ -128,6 +128,7 @@ void traps_init_video(void);
 void traps_load_1_1(TrapManager *manager, Level *level);
 void traps_load_1_2(TrapManager *manager, Level *level);
 void traps_load_1_2_underground(TrapManager *manager, Level *level);
+void traps_load_1_2b(TrapManager *manager, Level *level);
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
 void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);

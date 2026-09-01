@@ -93,6 +93,9 @@ ENTITY_KIND_NAMES = {
     "Goal Flag": 3,
     "GoalFlag": 3,
     "goal_flag": 3,
+    "Pipe Exit": 4,
+    "PipeExit": 4,
+    "pipe_exit": 4,
 }
 
 ENEMY_KIND_NAMES = {
@@ -526,6 +529,7 @@ enum {{
     GENERATED_OBJECT_PLAYER_START = 1,
     GENERATED_OBJECT_ENEMY = 2,
     GENERATED_OBJECT_GOAL_FLAG = 3,
+    GENERATED_OBJECT_PIPE_EXIT = 4,
 }};
 
 typedef struct GeneratedEnemySpawn {{

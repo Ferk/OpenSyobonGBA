@@ -55,6 +55,10 @@ void camera_update(Camera *camera, const Player *player, const Level *level)
         target_y = player_bottom_y - CAMERA_Y_LOW_LINE;
     }
 
+    if (max_x < 0) {
+        max_x = 0;
+    }
+
     target_x = clamp_int(target_x, min_x > 0 ? min_x : 0, max_x);
     target_y = clamp_int(target_y, level_camera_min_y_px(level),
                          level_camera_max_y_px(level));

@@ -5,6 +5,7 @@
 
 #include "generated/level1_data.h"
 #include "generated/level1_2_data.h"
+#include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "tiles_16.h"
 
@@ -200,6 +201,20 @@ static uint8_t source_to_palette(uint8_t source)
     return 0;
 }
 
+static void copy_generated_level_data(Level *level,
+                                      const uint8_t *source,
+                                      const uint8_t *metatiles,
+                                      const uint8_t *palettes,
+                                      uint16_t width,
+                                      uint16_t height)
+{
+    for (uint16_t y = 0; y < height; ++y) {
+        memcpy(level->source[y], source + y * width, width);
+        memcpy(level->metatiles[y], metatiles + y * width, width);
+        memcpy(level->palettes[y], palettes + y * width, width);
+    }
+}
+
 void level_init_video(void)
 {
     memcpy(BG_PALETTE, bg_palette_banks, sizeof(bg_palette_banks));
@@ -224,9 +239,10 @@ void level_load_1_1(Level *level)
     level->height = LEVEL1_HEIGHT;
     level->camera_margin_top = LEVEL1_CAMERA_MARGIN_TOP;
     level->camera_margin_bottom = LEVEL1_CAMERA_MARGIN_BOTTOM;
-    memcpy(level->source, level1_source, sizeof(level1_source));
-    memcpy(level->metatiles, level1_metatiles, sizeof(level1_metatiles));
-    memcpy(level->palettes, level1_palettes, sizeof(level1_palettes));
+    copy_generated_level_data(level, (const uint8_t *)level1_source,
+                              (const uint8_t *)level1_metatiles,
+                              (const uint8_t *)level1_palettes,
+                              LEVEL1_WIDTH, LEVEL1_HEIGHT);
     level_force_stream_update();
 }
 
@@ -237,9 +253,10 @@ void level_load_1_2(Level *level)
     level->height = LEVEL1_2_HEIGHT;
     level->camera_margin_top = LEVEL1_2_CAMERA_MARGIN_TOP;
     level->camera_margin_bottom = LEVEL1_2_CAMERA_MARGIN_BOTTOM;
-    memcpy(level->source, level1_2_source, sizeof(level1_2_source));
-    memcpy(level->metatiles, level1_2_metatiles, sizeof(level1_2_metatiles));
-    memcpy(level->palettes, level1_2_palettes, sizeof(level1_2_palettes));
+    copy_generated_level_data(level, (const uint8_t *)level1_2_source,
+                              (const uint8_t *)level1_2_metatiles,
+                              (const uint8_t *)level1_2_palettes,
+                              LEVEL1_2_WIDTH, LEVEL1_2_HEIGHT);
     level_force_stream_update();
 }
 
@@ -250,9 +267,24 @@ void level_load_1_2_underground(Level *level)
     level->height = LEVEL1_2U_HEIGHT;
     level->camera_margin_top = LEVEL1_2U_CAMERA_MARGIN_TOP;
     level->camera_margin_bottom = LEVEL1_2U_CAMERA_MARGIN_BOTTOM;
-    memcpy(level->source, level1_2u_source, sizeof(level1_2u_source));
-    memcpy(level->metatiles, level1_2u_metatiles, sizeof(level1_2u_metatiles));
-    memcpy(level->palettes, level1_2u_palettes, sizeof(level1_2u_palettes));
+    copy_generated_level_data(level, (const uint8_t *)level1_2u_source,
+                              (const uint8_t *)level1_2u_metatiles,
+                              (const uint8_t *)level1_2u_palettes,
+                              LEVEL1_2U_WIDTH, LEVEL1_2U_HEIGHT);
+    level_force_stream_update();
+}
+
+void level_load_1_2b(Level *level)
+{
+    memset(level, 0, sizeof(*level));
+    level->width = LEVEL1_2B_WIDTH;
+    level->height = LEVEL1_2B_HEIGHT;
+    level->camera_margin_top = LEVEL1_2B_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_2B_CAMERA_MARGIN_BOTTOM;
+    copy_generated_level_data(level, (const uint8_t *)level1_2b_source,
+                              (const uint8_t *)level1_2b_metatiles,
+                              (const uint8_t *)level1_2b_palettes,
+                              LEVEL1_2B_WIDTH, LEVEL1_2B_HEIGHT);
     level_force_stream_update();
 }
 

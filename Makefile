@@ -53,7 +53,8 @@ MAP_SOURCES := $(wildcard $(LEVELS)/*.tmj)
 MAP_C       := $(patsubst $(LEVELS)/%.tmj,$(SOURCES)/generated/%_data.c,$(MAP_SOURCES))
 MAP_H       := $(patsubst $(LEVELS)/%.tmj,$(INCLUDES)/generated/%_data.h,$(MAP_SOURCES))
 
-CFILES      := $(wildcard $(SOURCES)/*.c) $(MAP_C)
+ROOT_CFILES := $(wildcard $(SOURCES)/*.c)
+CFILES      := $(ROOT_CFILES) $(MAP_C)
 SFILES      := $(wildcard $(SOURCES)/*.s)
 PNGFILES    := $(DATA)/player_16.png $(DATA)/tiles_16.png $(DATA)/traps_16.png \
                $(DATA)/items_16.png $(DATA)/enemies_16.png $(DATA)/spike_block_16.png
@@ -62,6 +63,7 @@ AUDIOFILES  := $(AUDIO)/block_hit.wav $(AUDIO)/brick_break.wav \
                $(AUDIO)/trap_trigger.wav $(AUDIO)/bgm1-1.xm
 GFX_HEADERS := $(patsubst $(DATA)/%.png,$(BUILD)/%.h,$(PNGFILES))
 
+ROOT_OFILES := $(patsubst $(SOURCES)/%.c,$(BUILD)/%.o,$(ROOT_CFILES))
 OFILES      := $(patsubst $(SOURCES)/%.c,$(BUILD)/%.o,$(CFILES)) \
                $(patsubst $(SOURCES)/%.s,$(BUILD)/%.o,$(SFILES)) \
                $(patsubst $(DATA)/%.png,$(BUILD)/%.o,$(PNGFILES))
@@ -98,6 +100,7 @@ endif
 DEPS        := $(OFILES:.o=.d)
 
 .PHONY: all clean assets dirs prepare-assets prepare-audio
+.SECONDARY: $(MAP_C) $(MAP_H)
 
 all: dirs $(TARGET).gba
 
@@ -130,7 +133,7 @@ $(BUILD)/%.o: $(SOURCES)/%.c | dirs
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(BUILD)/level.o $(BUILD)/player.o $(BUILD)/traps.o $(BUILD)/enemy.o: $(GFX_HEADERS)
-$(BUILD)/level.o $(BUILD)/traps.o: $(MAP_H)
+$(ROOT_OFILES): $(MAP_H)
 $(BUILD)/audio.o: $(SOUND_HEADERS)
 
 $(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py | dirs

@@ -247,6 +247,17 @@
       ]
     },
     {
+      "id": 10,
+      "name": "Pipe Exit",
+      "type": "class",
+      "color": "#ff70ffff",
+      "drawFill": true,
+      "useAs": [
+        "object"
+      ],
+      "members": []
+    },
+    {
       "id": 9,
       "name": "Enemy",
       "type": "class",

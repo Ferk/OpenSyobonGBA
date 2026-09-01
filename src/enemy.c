@@ -7,6 +7,7 @@
 #include "enemies_16.h"
 #include "generated/level1_data.h"
 #include "generated/level1_2_data.h"
+#include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "messages.h"
 
@@ -545,6 +546,14 @@ void enemies_load_1_2_underground(EnemyManager *manager, const Level *level)
     memset(manager, 0, sizeof(*manager));
     load_generated_spawns(manager, level1_2u_enemy_spawns,
                           level1_2u_enemy_spawn_count);
+}
+
+void enemies_load_1_2b(EnemyManager *manager, const Level *level)
+{
+    (void)level;
+    memset(manager, 0, sizeof(*manager));
+    load_generated_spawns(manager, level1_2b_enemy_spawns,
+                          level1_2b_enemy_spawn_count);
 }
 
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,

@@ -8,6 +8,7 @@
 #include "font4x6.h"
 #include "generated/level1_data.h"
 #include "generated/level1_2_data.h"
+#include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "level.h"
 #include "messages.h"
@@ -35,6 +36,7 @@ typedef enum StageId {
     STAGE_ID_1_1 = 0,
     STAGE_ID_1_2,
     STAGE_ID_1_2_UNDERGROUND,
+    STAGE_ID_1_2B,
     STAGE_ID_COUNT,
 } StageId;
 
@@ -163,6 +165,10 @@ static const char *stage_label(StageId stage)
         return "1-2U ";
     }
 
+    if (stage == STAGE_ID_1_2B) {
+        return "1-2B ";
+    }
+
     if (stage == STAGE_ID_1_2) {
         return "1-2 ";
     }
@@ -270,6 +276,10 @@ static void load_stage(StageId stage)
         level_load_1_2_underground(&level_current);
         traps_load_1_2_underground(&traps_current, &level_current);
         enemies_load_1_2_underground(&enemy_current, &level_current);
+    } else if (stage == STAGE_ID_1_2B) {
+        level_load_1_2b(&level_current);
+        traps_load_1_2b(&traps_current, &level_current);
+        enemies_load_1_2b(&enemy_current, &level_current);
     } else if (stage == STAGE_ID_1_2) {
         level_load_1_2(&level_current);
         traps_load_1_2(&traps_current, &level_current);
@@ -281,7 +291,7 @@ static void load_stage(StageId stage)
     }
 }
 
-static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
+static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, fix16_t *y)
 {
     const GeneratedMapObject *objects = level1_objects;
     uint16_t object_count = level1_object_count;
@@ -292,10 +302,13 @@ static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
     } else if (stage == STAGE_ID_1_2_UNDERGROUND) {
         objects = level1_2u_objects;
         object_count = level1_2u_object_count;
+    } else if (stage == STAGE_ID_1_2B) {
+        objects = level1_2b_objects;
+        object_count = level1_2b_object_count;
     }
 
     for (uint16_t i = 0; i < object_count; ++i) {
-        if (objects[i].kind == GENERATED_OBJECT_PLAYER_START) {
+        if (objects[i].kind == kind) {
             *x = objects[i].x;
             *y = objects[i].y;
             return 1;
@@ -303,6 +316,16 @@ static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
     }
 
     return 0;
+}
+
+static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
+{
+    return generated_stage_object(stage, GENERATED_OBJECT_PLAYER_START, x, y);
+}
+
+static uint8_t generated_pipe_exit(StageId stage, fix16_t *x, fix16_t *y)
+{
+    return generated_stage_object(stage, GENERATED_OBJECT_PIPE_EXIT, x, y);
 }
 
 static void start_stage(Player *player, Camera *camera, StageId stage)
@@ -325,6 +348,20 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
     messages_init();
     audio_play_bgm();
     REG_DISPCNT = MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP;
+}
+
+static void start_stage_from_pipe(Player *player, Camera *camera, StageId stage)
+{
+    start_stage(player, camera, stage);
+
+    fix16_t exit_x = 0;
+    fix16_t exit_y = 0;
+    if (generated_pipe_exit(stage, &exit_x, &exit_y)) {
+        player->x = exit_x;
+        player->y = exit_y;
+        camera_init(camera);
+        level_force_stream_update();
+    }
 }
 
 int main(void)
@@ -487,7 +524,7 @@ int main(void)
             current_stage = target;
             memset(&player, 0, sizeof(player));
             player.death_count = death_count;
-            start_stage(&player, &camera, current_stage);
+            start_stage_from_pipe(&player, &camera, current_stage);
             game_state = GAME_STATE_PLAYING;
 #ifdef DEBUG_STAGE_SELECT
             menu_previous_keys = 0;
