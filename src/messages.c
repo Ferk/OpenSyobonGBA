@@ -60,6 +60,8 @@ static const char *message_text(MessageId id)
     switch (id) {
     case MESSAGE_PLAYER_TASTY:
         return TXT_MSG_TASTY;
+    case MESSAGE_PLAYER_NOT_POISON:
+        return TXT_MSG_NOT_POISON;
     case MESSAGE_PLAYER_BAD_MUSHROOM:
         return TXT_MSG_BAD_MUSHROOM;
     case MESSAGE_PLAYER_STABBED:

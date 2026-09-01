@@ -411,6 +411,7 @@ void player_spawn(Player *player)
     player->jump_timer = 0;
     player->control_locked = 0;
     player->hidden = 0;
+    player->powered_up = 0;
     player->blocked_left = 0;
     player->blocked_right = 0;
     player->goal_clear_done = 0;
@@ -423,6 +424,7 @@ void player_spawn(Player *player)
     player->checkpoint_x = checkpoint_x;
     player->checkpoint_y = checkpoint_y;
     player->death_count = death_count;
+    player->powered_up = 0;
     previous_keys = 0;
 }
 
@@ -489,6 +491,7 @@ void player_kill(Player *player)
     player->goal_timer = 0;
     player->goal_walk_frames = PLAYER_GOAL_DEFAULT_WALK_FRAMES;
     player->goal_clear_done = 0;
+    player->powered_up = 0;
     player->jump_buffer = 0;
     player->coyote_timer = 0;
     player->jump_timer = 0;
@@ -497,6 +500,17 @@ void player_kill(Player *player)
     player->hidden = 0;
     player->walk_frame = 0;
     player->walk_distance = 0;
+}
+
+void player_power_up(Player *player)
+{
+    if (!player->alive) {
+        return;
+    }
+
+    player->powered_up = 1;
+    player->x -= REF_POS_TO_FIX(1100);
+    player->y -= REF_POS_TO_FIX(4000);
 }
 
 uint16_t player_death_count(const Player *player)

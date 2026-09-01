@@ -26,6 +26,7 @@ typedef struct Player {
     uint8_t jump_timer;
     uint8_t control_locked;
     uint8_t hidden;
+    uint8_t powered_up;
     uint8_t blocked_left;
     uint8_t blocked_right;
     uint8_t goal_clear_done;
@@ -45,6 +46,7 @@ void player_spawn(Player *player);
 void player_spawn_at(Player *player, fix16_t x, fix16_t y);
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
+void player_power_up(Player *player);
 uint8_t player_goal_clear_done(const Player *player);
 void player_update(Player *player, Level *level, struct TrapManager *traps);
 void player_sync_input(void);

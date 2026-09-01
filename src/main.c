@@ -465,7 +465,7 @@ int main(void)
 
         player_update(&player, &level_current, &traps_current);
         traps_update(&traps_current, &level_current, &player);
-        enemies_update(&enemy_current, &level_current, &player);
+        enemies_update(&enemy_current, &level_current, &player, &traps_current);
         messages_update();
 
 #ifdef DEBUG_STAGE_SELECT

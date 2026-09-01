@@ -21,10 +21,13 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_NYASSUN_ALERT,
     ENEMY_SPRITE_TALL32,
     ENEMY_SPRITE_CUCKOO32,
-    ENEMY_SPRITE_SPIKY_SOLDIER,
+    ENEMY_SPRITE_FIRE_PROJECTILE,
+    ENEMY_SPRITE_SUPERJIEN,
+    ENEMY_SPRITE_GIANT,
 } EnemySprite;
 
 struct Camera;
+struct TrapManager;
 
 typedef enum EnemyKind {
     ENEMY_NONE = 0,
@@ -34,6 +37,8 @@ typedef enum EnemyKind {
     ENEMY_CEILING_FALLER,
     ENEMY_PIPE_SHOT,
     ENEMY_FIREBAR,
+    ENEMY_SUPERJIEN,
+    ENEMY_GIANT,
 } EnemyKind;
 
 typedef enum EnemyState {
@@ -97,7 +102,10 @@ void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
                                    uint8_t sprite, int8_t dir);
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir);
-void enemies_update(EnemyManager *manager, const Level *level, Player *player);
+uint8_t enemies_transform_near_good_mushroom(EnemyManager *manager,
+                                             fix16_t x, fix16_t y);
+void enemies_update(EnemyManager *manager, Level *level, Player *player,
+                    struct TrapManager *traps);
 void enemies_draw(EnemyManager *manager, const struct Camera *camera);
 
 #endif

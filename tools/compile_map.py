@@ -105,6 +105,9 @@ ENEMY_KIND_NAMES = {
     "ceiling_faller": "ENEMY_CEILING_FALLER",
     "pipe_shot": "ENEMY_PIPE_SHOT",
     "firebar": "ENEMY_FIREBAR",
+    "superjien": "ENEMY_SUPERJIEN",
+    "super_jien": "ENEMY_SUPERJIEN",
+    "giant": "ENEMY_GIANT",
 }
 
 ENEMY_SPRITE_NAMES = {
@@ -120,7 +123,10 @@ ENEMY_SPRITE_NAMES = {
     "nyassun_alert": "ENEMY_SPRITE_NYASSUN_ALERT",
     "tall32": "ENEMY_SPRITE_TALL32",
     "cuckoo32": "ENEMY_SPRITE_CUCKOO32",
-    "spiky_soldier": "ENEMY_SPRITE_SPIKY_SOLDIER",
+    "fire_projectile": "ENEMY_SPRITE_FIRE_PROJECTILE",
+    "superjien": "ENEMY_SPRITE_SUPERJIEN",
+    "spiky_soldier": "ENEMY_SPRITE_SUPERJIEN",
+    "giant": "ENEMY_SPRITE_GIANT",
 }
 
 FLIP_MASK = 0xE0000000
@@ -363,6 +369,9 @@ def parse_object_layers(map_data, tile_props):
                 props, "spawn_limit",
                 tile_prop.get("spawn_limit",
                               default_question_spawn_limit(subtype))))
+            item_variant = int(prop_value(
+                props, "item_variant",
+                tile_prop.get("item_variant", 0)))
             goal_walk_frames = int(prop_value(
                 props, "goal_walk_frames",
                 tile_prop.get("goal_walk_frames",
@@ -416,6 +425,7 @@ def parse_object_layers(map_data, tile_props):
                                                BG_PALETTE_NAMES, 0),
                     "spawn_interval": max(0, min(255, spawn_interval)),
                     "spawn_limit": max(0, min(255, spawn_limit)),
+                    "item_variant": max(0, min(255, item_variant)),
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
@@ -604,18 +614,18 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (trap["kind"], trap["subtype"], trap["spawn_dir"],
                           trap["visual_palette"], trap["spawn_interval"],
-                          trap["spawn_limit"], trap["goal_walk_frames"],
-                          trap["hint_text"],
+                          trap["spawn_limit"], trap["item_variant"],
+                          trap["goal_walk_frames"], trap["hint_text"],
                           trap["visual_metatile"], trap["spent_metatile"],
                           trap["collision"], trap["hidden"], trap["source_x"],
                           trap["source_y"], trap["x"], trap["y"], trap["w"],
                           trap["h"], trap["vx"], trap["vy"],
                           trap["trigger_x"], trap["trigger_y"]))
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

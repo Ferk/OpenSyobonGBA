@@ -318,6 +318,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spent_metatile = 255;
     trap->spawn_interval = 0;
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
+    trap->item_variant = 0;
     trap->goal_walk_frames = 0;
     trap->hint_text = 0;
     trap->spawn_count = 0;
@@ -449,6 +450,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spent_metatile = trigger->spent_metatile;
     trap->spawn_interval = trigger->spawn_interval;
     trap->spawn_limit = trigger->spawn_limit;
+    trap->item_variant = trigger->item_variant;
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
@@ -493,6 +495,7 @@ static TrapEntity *spawn_entity(TrapManager *manager, TrapEntityKind kind,
             entity->timer = 0;
             entity->frame = 0;
             entity->palette = 0;
+            entity->param = 0;
             return entity;
         }
     }
@@ -844,6 +847,7 @@ static void spawn_block_item(TrapManager *manager, Trap *trap,
 
     if (entity) {
         entity->timer = ITEM_EMERGE_FRAMES;
+        entity->param = trap->item_variant;
     }
 }
 
@@ -953,11 +957,11 @@ static void trigger_stage_spawner(Trap *trap)
                                  ENEMY_SPRITE_GHOST, -1);
         }
     } else if (trap->subtype == STAGE_UPWARD_HAZARD) {
-        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
+        enemies_spawn_direct_velocity(&enemy_current, ENEMY_SUPERJIEN,
                                       trap->x + REF_POS_TO_FIX(1500),
                                       REF_STAGE_Y_TO_FIX(44000),
                                       0, -REF_VEL_TO_FIX(2000),
-                                      ENEMY_SPRITE_HAZARD, -1);
+                                      ENEMY_SPRITE_SUPERJIEN, -1);
     } else if (trap->subtype == STAGE_UPWARD_HAZARD_TOGGLE) {
         audio_play_trap_trigger();
         enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
@@ -1000,7 +1004,7 @@ static void update_stage_pipe_hazard(Trap *trap, const Player *player)
                                   REF_STAGE_Y_TO_FIX(30000),
                                   REF_VEL_TO_FIX((int16_t)trap_random(600) - 300),
                                   -REF_VEL_TO_FIX(1600 + trap_random(900)),
-                                  ENEMY_SPRITE_SPIKY_SOLDIER, -1);
+                                  ENEMY_SPRITE_FIRE_PROJECTILE, -1);
 }
 
 static void trigger_checkpoint(Trap *trap, Level *level, Player *player)
@@ -1604,6 +1608,14 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             continue;
         }
 
+        if (entity->kind == TRAP_ENTITY_GOOD_ITEM && entity->param == 2 &&
+            enemies_transform_near_good_mushroom(&enemy_current,
+                                                 entity->x, entity->y)) {
+            entity->active = 0;
+            audio_play_trap_trigger();
+            continue;
+        }
+
         if (entity_y > level_death_y_px(level) + 64 || entity_y < -96) {
             entity->active = 0;
             continue;
@@ -1620,7 +1632,12 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             } else if (entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                 entity->kind == TRAP_ENTITY_COIN_POPUP) {
                 if (entity->kind == TRAP_ENTITY_GOOD_ITEM) {
-                    messages_show(MESSAGE_PLAYER_TASTY,
+                    if (entity->param == 2) {
+                        player_power_up(player);
+                    }
+                    messages_show(entity->param == 1
+                                      ? MESSAGE_PLAYER_NOT_POISON
+                                      : MESSAGE_PLAYER_TASTY,
                                   player->x + FIX16_FROM_INT(PLAYER_WIDTH_PX),
                                   player->y, 45);
                 }
