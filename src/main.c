@@ -29,6 +29,8 @@
 #define KEY_SELECT_MASK KEY_SELECT
 #define KEY_LEFT_MASK KEY_LEFT
 #define KEY_RIGHT_MASK KEY_RIGHT
+#define KEY_UP_MASK KEY_UP
+#define KEY_DOWN_MASK KEY_DOWN
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
 #define REF_STAGE_Y_TO_FIX(v) REF_POS_TO_FIX((v) + 12 * 100 - (LEVEL_VIEW_SOURCE_ROW_OFFSET * 29 * 100))
 
@@ -532,7 +534,21 @@ int main(void)
             continue;
         }
 
-        camera_update(&camera, &player, &level_current);
+        {
+            uint16_t keys = keys_held();
+            int8_t vertical_look = 0;
+
+            if (player.alive && !player.control_locked && player.goal_phase == 0) {
+                if ((keys & KEY_UP_MASK) != 0) {
+                    vertical_look = -1;
+                } else if ((keys & KEY_DOWN_MASK) != 0 &&
+                           !traps_player_can_enter_pipe(&traps_current, &player)) {
+                    vertical_look = 1;
+                }
+            }
+
+            camera_update(&camera, &player, &level_current, vertical_look);
+        }
         apply_camera_left_limit(&player, &camera);
 
         VBlankIntrWait();

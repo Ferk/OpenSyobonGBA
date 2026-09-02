@@ -100,6 +100,7 @@ ENTITY_KIND_NAMES = {
 }
 
 ENEMY_KIND_NAMES = {
+    "none": "ENEMY_NONE",
     "walker": "ENEMY_WALKER",
     "shell_walker": "ENEMY_SHELL_WALKER",
     "jumper": "ENEMY_SHELL_WALKER",
@@ -127,8 +128,7 @@ ENEMY_SPRITE_NAMES = {
     "cloud_face": "ENEMY_SPRITE_FACE_GRIN",
     "nyassun": "ENEMY_SPRITE_NYASSUN",
     "nyassun_alert": "ENEMY_SPRITE_NYASSUN_ALERT",
-    "vertical32": "ENEMY_SPRITE_VERTICAL32",
-    "tall32": "ENEMY_SPRITE_VERTICAL32",
+    "kuma": "ENEMY_SPRITE_KUMA",
     "cuckoo32": "ENEMY_SPRITE_CUCKOO32",
     "fire_projectile": "ENEMY_SPRITE_FIRE_PROJECTILE",
     "superjien": "ENEMY_SPRITE_SUPERJIEN",
@@ -157,6 +157,15 @@ def fixed(value):
 
 def ref_velocity_fixed(value):
     return int(round(float(value) * 16 * FIX_SCALE / (29 * 100 * 2)))
+
+
+def ref_position_fixed(value):
+    return int(round(float(value) * 16 * FIX_SCALE / (29 * 100)))
+
+
+def ref_stage_y_fixed(value):
+    adjusted = float(value) + 12 * 100 - (SOURCE_ROW_OFFSET * 29 * 100)
+    return ref_position_fixed(adjusted)
 
 
 def prop_value(props, name, default=None):
@@ -379,6 +388,15 @@ def parse_object_layers(map_data, tile_props):
             item_variant = int(prop_value(
                 props, "item_variant",
                 tile_prop.get("item_variant", 0)))
+            trigger_channel = int(prop_value(
+                props, "trigger_channel",
+                tile_prop.get("trigger_channel", 0)))
+            listen_channel = int(prop_value(
+                props, "listen_channel",
+                tile_prop.get("listen_channel", 0)))
+            trigger_delay = int(prop_value(
+                props, "trigger_delay",
+                tile_prop.get("trigger_delay", 0)))
             goal_walk_frames = int(prop_value(
                 props, "goal_walk_frames",
                 tile_prop.get("goal_walk_frames",
@@ -398,6 +416,96 @@ def parse_object_layers(map_data, tile_props):
             ref_vy_prop = prop_value(props, "ref_vy", tile_prop.get("ref_vy"))
             vx = ref_velocity_fixed(ref_vx_prop) if ref_vx_prop is not None else fixed(vx_prop or 0)
             vy = ref_velocity_fixed(ref_vy_prop) if ref_vy_prop is not None else fixed(vy_prop or 0)
+            spawn_enemy_kind = enum_name(prop_value(
+                props, "spawn_enemy_kind", tile_prop.get("spawn_enemy_kind")),
+                ENEMY_KIND_NAMES, "ENEMY_NONE")
+            spawn_enemy_sprite = enum_name(prop_value(
+                props, "spawn_enemy_sprite", tile_prop.get("spawn_enemy_sprite")),
+                ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER")
+            spawn_enemy_palette = int(prop_value(
+                props, "spawn_enemy_palette",
+                tile_prop.get("spawn_enemy_palette",
+                              tile_prop.get("enemy_palette", 0))))
+            spawn_enemy_param = int(prop_value(
+                props, "spawn_enemy_param",
+                tile_prop.get("spawn_enemy_param",
+                              tile_prop.get("enemy_param", 0))))
+            spawn_enemy_count = int(prop_value(
+                props, "spawn_enemy_count",
+                tile_prop.get("spawn_enemy_count", 1)))
+            spawn_sound = int(prop_value(
+                props, "spawn_sound", tile_prop.get("spawn_sound", 1)))
+
+            spawn_offset_x_prop = prop_value(
+                props, "spawn_offset_x", tile_prop.get("spawn_offset_x"))
+            spawn_offset_y_prop = prop_value(
+                props, "spawn_offset_y", tile_prop.get("spawn_offset_y"))
+            ref_spawn_offset_x_prop = prop_value(
+                props, "ref_spawn_offset_x", tile_prop.get("ref_spawn_offset_x"))
+            ref_spawn_offset_y_prop = prop_value(
+                props, "ref_spawn_offset_y", tile_prop.get("ref_spawn_offset_y"))
+            spawn_vx_prop = prop_value(
+                props, "spawn_vx", tile_prop.get("spawn_vx"))
+            spawn_vy_prop = prop_value(
+                props, "spawn_vy", tile_prop.get("spawn_vy"))
+            spawn_random_vx_prop = prop_value(
+                props, "spawn_random_vx", tile_prop.get("spawn_random_vx"))
+            spawn_random_vy_prop = prop_value(
+                props, "spawn_random_vy", tile_prop.get("spawn_random_vy"))
+            ref_spawn_vx_prop = prop_value(
+                props, "ref_spawn_vx", tile_prop.get("ref_spawn_vx"))
+            ref_spawn_vy_prop = prop_value(
+                props, "ref_spawn_vy", tile_prop.get("ref_spawn_vy"))
+            ref_spawn_random_vx_prop = prop_value(
+                props, "ref_spawn_random_vx", tile_prop.get("ref_spawn_random_vx"))
+            ref_spawn_random_vy_prop = prop_value(
+                props, "ref_spawn_random_vy", tile_prop.get("ref_spawn_random_vy"))
+            spawn_spacing_x_prop = prop_value(
+                props, "spawn_spacing_x", tile_prop.get("spawn_spacing_x"))
+            spawn_spacing_y_prop = prop_value(
+                props, "spawn_spacing_y", tile_prop.get("spawn_spacing_y"))
+            ref_spawn_spacing_x_prop = prop_value(
+                props, "ref_spawn_spacing_x", tile_prop.get("ref_spawn_spacing_x"))
+            ref_spawn_spacing_y_prop = prop_value(
+                props, "ref_spawn_spacing_y", tile_prop.get("ref_spawn_spacing_y"))
+
+            spawn_offset_x = (ref_position_fixed(ref_spawn_offset_x_prop)
+                              if ref_spawn_offset_x_prop is not None
+                              else fixed(spawn_offset_x_prop or 0))
+            spawn_offset_y = (ref_position_fixed(ref_spawn_offset_y_prop)
+                              if ref_spawn_offset_y_prop is not None
+                              else fixed(spawn_offset_y_prop or 0))
+            spawn_vx = (ref_velocity_fixed(ref_spawn_vx_prop)
+                        if ref_spawn_vx_prop is not None
+                        else fixed(spawn_vx_prop or 0))
+            spawn_vy = (ref_velocity_fixed(ref_spawn_vy_prop)
+                        if ref_spawn_vy_prop is not None
+                        else fixed(spawn_vy_prop or 0))
+            spawn_random_vx = (ref_velocity_fixed(ref_spawn_random_vx_prop)
+                               if ref_spawn_random_vx_prop is not None
+                               else fixed(spawn_random_vx_prop or 0))
+            spawn_random_vy = (ref_velocity_fixed(ref_spawn_random_vy_prop)
+                               if ref_spawn_random_vy_prop is not None
+                               else fixed(spawn_random_vy_prop or 0))
+            spawn_spacing_x = (ref_position_fixed(ref_spawn_spacing_x_prop)
+                               if ref_spawn_spacing_x_prop is not None
+                               else fixed(spawn_spacing_x_prop or 0))
+            spawn_spacing_y = (ref_position_fixed(ref_spawn_spacing_y_prop)
+                               if ref_spawn_spacing_y_prop is not None
+                               else fixed(spawn_spacing_y_prop or 0))
+
+            spawn_x_prop = prop_value(props, "spawn_x", tile_prop.get("spawn_x"))
+            spawn_y_prop = prop_value(props, "spawn_y", tile_prop.get("spawn_y"))
+            ref_spawn_x_prop = prop_value(props, "ref_spawn_x", tile_prop.get("ref_spawn_x"))
+            ref_spawn_y_prop = prop_value(props, "ref_spawn_y", tile_prop.get("ref_spawn_y"))
+            if ref_spawn_x_prop is not None:
+                spawn_offset_x = ref_position_fixed(ref_spawn_x_prop) - x
+            elif spawn_x_prop is not None:
+                spawn_offset_x = fixed(spawn_x_prop) - x
+            if ref_spawn_y_prop is not None:
+                spawn_offset_y = ref_stage_y_fixed(ref_spawn_y_prop) - y
+            elif spawn_y_prop is not None:
+                spawn_offset_y = fixed(float(spawn_y_prop) - WORLD_Y_OFFSET_PX) - y
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
                 enemy_kind = enum_name(prop_value(props, "enemy_kind",
@@ -440,6 +548,23 @@ def parse_object_layers(map_data, tile_props):
                     "spawn_interval": max(0, min(255, spawn_interval)),
                     "spawn_limit": max(0, min(255, spawn_limit)),
                     "item_variant": max(0, min(255, item_variant)),
+                    "spawn_enemy_kind": spawn_enemy_kind,
+                    "spawn_enemy_sprite": spawn_enemy_sprite,
+                    "spawn_enemy_palette": max(0, min(15, spawn_enemy_palette)),
+                    "spawn_enemy_param": max(0, min(255, spawn_enemy_param)),
+                    "spawn_enemy_count": max(0, min(255, spawn_enemy_count)),
+                    "spawn_sound": max(0, min(1, spawn_sound)),
+                    "trigger_channel": max(0, min(255, trigger_channel)),
+                    "listen_channel": max(0, min(255, listen_channel)),
+                    "trigger_delay": max(0, min(255, trigger_delay)),
+                    "spawn_offset_x": spawn_offset_x,
+                    "spawn_offset_y": spawn_offset_y,
+                    "spawn_vx": spawn_vx,
+                    "spawn_vy": spawn_vy,
+                    "spawn_random_vx": spawn_random_vx,
+                    "spawn_random_vy": spawn_random_vy,
+                    "spawn_spacing_x": spawn_spacing_x,
+                    "spawn_spacing_y": spawn_spacing_y,
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
@@ -628,18 +753,30 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if traps:
         for trap in traps:
-            lines.append("    { %s, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }," %
-                         (trap["kind"], trap["subtype"], trap["spawn_dir"],
-                          trap["visual_palette"], trap["spawn_interval"],
-                          trap["spawn_limit"], trap["item_variant"],
-                          trap["goal_walk_frames"], trap["hint_text"],
-                          trap["visual_metatile"], trap["spent_metatile"],
-                          trap["collision"], trap["hidden"], trap["source_x"],
-                          trap["source_y"], trap["x"], trap["y"], trap["w"],
-                          trap["h"], trap["vx"], trap["vy"],
-                          trap["trigger_x"], trap["trigger_y"]))
+            lines.extend([
+                "    {",
+                f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .spawn_dir = {trap['spawn_dir']},",
+                f"        .visual_palette = {trap['visual_palette']}, .spawn_interval = {trap['spawn_interval']},",
+                f"        .spawn_limit = {trap['spawn_limit']}, .item_variant = {trap['item_variant']},",
+                f"        .spawn_enemy_kind = {trap['spawn_enemy_kind']}, .spawn_enemy_sprite = {trap['spawn_enemy_sprite']},",
+                f"        .spawn_enemy_palette = {trap['spawn_enemy_palette']}, .spawn_enemy_param = {trap['spawn_enemy_param']},",
+                f"        .spawn_enemy_count = {trap['spawn_enemy_count']}, .spawn_sound = {trap['spawn_sound']},",
+                f"        .trigger_channel = {trap['trigger_channel']}, .listen_channel = {trap['listen_channel']},",
+                f"        .trigger_delay = {trap['trigger_delay']}, .goal_walk_frames = {trap['goal_walk_frames']},",
+                f"        .hint_text = {trap['hint_text']}, .visual_metatile = {trap['visual_metatile']},",
+                f"        .spent_metatile = {trap['spent_metatile']}, .collision = {trap['collision']}, .hidden = {trap['hidden']},",
+                f"        .source_x = {trap['source_x']}, .source_y = {trap['source_y']},",
+                f"        .x = {trap['x']}, .y = {trap['y']}, .w = {trap['w']}, .h = {trap['h']},",
+                f"        .vx = {trap['vx']}, .vy = {trap['vy']},",
+                f"        .trigger_x = {trap['trigger_x']}, .trigger_y = {trap['trigger_y']},",
+                f"        .spawn_offset_x = {trap['spawn_offset_x']}, .spawn_offset_y = {trap['spawn_offset_y']},",
+                f"        .spawn_vx = {trap['spawn_vx']}, .spawn_vy = {trap['spawn_vy']},",
+                f"        .spawn_random_vx = {trap['spawn_random_vx']}, .spawn_random_vy = {trap['spawn_random_vy']},",
+                f"        .spawn_spacing_x = {trap['spawn_spacing_x']}, .spawn_spacing_y = {trap['spawn_spacing_y']},",
+                "    },",
+            ])
     else:
-        lines.append("    { TRAP_INVISIBLE_BLOCK, 0, 0, 0, 0, 1, 0, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { .kind = TRAP_INVISIBLE_BLOCK },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",

@@ -25,7 +25,7 @@
 #define ENEMY_FACE_BOTTOM_RIGHT (ENEMY_TILE_INDEX + 28)
 #define ENEMY_NYASSUN_TILE (ENEMY_TILE_INDEX + 32)
 #define ENEMY_NYASSUN_ALERT_TILE (ENEMY_TILE_INDEX + 48)
-#define ENEMY_VERTICAL32_TILE (ENEMY_TILE_INDEX + 64)
+#define ENEMY_KUMA_TILE (ENEMY_TILE_INDEX + 64)
 #define ENEMY_CUCKOO32_TILE (ENEMY_TILE_INDEX + 72)
 #define ENEMY_FIRE_PROJECTILE_TILE (ENEMY_TILE_INDEX + 80)
 #define ENEMY_SUPERJIEN_TILE (ENEMY_TILE_INDEX + 84)
@@ -252,6 +252,15 @@ void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
                                    fix16_t vx, fix16_t vy,
                                    uint8_t sprite, int8_t dir)
 {
+    enemies_spawn_direct_config(manager, kind, x, y, vx, vy, sprite, 0, 0, dir);
+}
+
+void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
+                                 fix16_t x, fix16_t y,
+                                 fix16_t vx, fix16_t vy,
+                                 uint8_t sprite, uint8_t palette,
+                                 uint8_t param, int8_t dir)
+{
     Enemy *enemy = add_enemy(manager, kind, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
 
     if (!enemy) {
@@ -264,7 +273,8 @@ void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
     enemy->vx = vx;
     enemy->vy = vy;
     enemy->sprite = sprite;
-    enemy->param = 0;
+    enemy->palette = palette;
+    enemy->param = param;
     enemy->emerge_timer = 0;
 }
 
@@ -1005,10 +1015,10 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                 continue;
             }
 
-            if (enemy->sprite == ENEMY_SPRITE_VERTICAL32 ||
+            if (enemy->sprite == ENEMY_SPRITE_KUMA ||
                 enemy->sprite == ENEMY_SPRITE_CUCKOO32) {
-                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_VERTICAL32)
-                    ? ENEMY_VERTICAL32_TILE
+                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_KUMA)
+                    ? ENEMY_KUMA_TILE
                     : ENEMY_CUCKOO32_TILE;
 
                 if (extra_index + 1 > ENEMY_MAX_ACTIVE) {

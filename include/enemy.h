@@ -20,7 +20,7 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_FACE_GRIN,
     ENEMY_SPRITE_NYASSUN,
     ENEMY_SPRITE_NYASSUN_ALERT,
-    ENEMY_SPRITE_VERTICAL32,
+    ENEMY_SPRITE_KUMA,
     ENEMY_SPRITE_CUCKOO32,
     ENEMY_SPRITE_FIRE_PROJECTILE,
     ENEMY_SPRITE_SUPERJIEN,
@@ -102,6 +102,11 @@ void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
                                    fix16_t x, fix16_t y,
                                    fix16_t vx, fix16_t vy,
                                    uint8_t sprite, int8_t dir);
+void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
+                                 fix16_t x, fix16_t y,
+                                 fix16_t vx, fix16_t vy,
+                                 uint8_t sprite, uint8_t palette,
+                                 uint8_t param, int8_t dir);
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir);
 uint8_t enemies_transform_near_good_mushroom(EnemyManager *manager,

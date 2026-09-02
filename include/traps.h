@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "enemy.h"
 #include "fixed.h"
 #include "level.h"
 
@@ -66,9 +67,27 @@ typedef struct Trap {
     uint8_t spawn_interval;
     uint8_t spawn_limit;
     uint8_t item_variant;
+    uint8_t spawn_enemy_kind;
+    uint8_t spawn_enemy_sprite;
+    uint8_t spawn_enemy_palette;
+    uint8_t spawn_enemy_param;
+    uint8_t spawn_enemy_count;
+    uint8_t spawn_sound;
+    uint8_t trigger_channel;
+    uint8_t listen_channel;
+    uint8_t trigger_delay;
+    fix16_t spawn_offset_x;
+    fix16_t spawn_offset_y;
+    fix16_t spawn_vx;
+    fix16_t spawn_vy;
+    fix16_t spawn_random_vx;
+    fix16_t spawn_random_vy;
+    fix16_t spawn_spacing_x;
+    fix16_t spawn_spacing_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t spawn_count;
+    uint8_t trigger_pending;
 } Trap;
 
 typedef struct TrapEntity {
@@ -94,6 +113,23 @@ typedef struct TrapTrigger {
     uint8_t spawn_interval;
     uint8_t spawn_limit;
     uint8_t item_variant;
+    uint8_t spawn_enemy_kind;
+    uint8_t spawn_enemy_sprite;
+    uint8_t spawn_enemy_palette;
+    uint8_t spawn_enemy_param;
+    uint8_t spawn_enemy_count;
+    uint8_t spawn_sound;
+    uint8_t trigger_channel;
+    uint8_t listen_channel;
+    uint8_t trigger_delay;
+    fix16_t spawn_offset_x;
+    fix16_t spawn_offset_y;
+    fix16_t spawn_vx;
+    fix16_t spawn_vy;
+    fix16_t spawn_random_vx;
+    fix16_t spawn_random_vy;
+    fix16_t spawn_spacing_x;
+    fix16_t spawn_spacing_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t visual_metatile;
@@ -145,5 +181,7 @@ void traps_ack_stage_clear(TrapManager *manager);
 uint8_t traps_stage_transition_requested(const TrapManager *manager);
 uint8_t traps_stage_transition_target(const TrapManager *manager);
 void traps_ack_stage_transition(TrapManager *manager);
+uint8_t traps_player_can_enter_pipe(const TrapManager *manager,
+                                    const struct Player *player);
 
 #endif

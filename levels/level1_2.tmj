@@ -1,435 +1,733 @@
-{ "compressionlevel":-1,
- "height":15,
- "infinite":false,
- "layers":[
-        {
-         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 32, 33, 4,
-            1, 40, 41, 42, 43, 44, 45, 1, 1, 1, 1, 1, 1, 1, 34, 35, 4,
-            1, 46, 47, 48, 49, 50, 51, 1, 1, 1, 1, 1, 1, 1, 34, 35, 4,
-            1, 52, 53, 54, 55, 56, 57, 1, 1, 1, 1, 1, 1, 1, 34, 35, 4,
-            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-         "height":15,
-         "id":1,
-         "name":"Background",
-         "opacity":1,
-         "type":"tilelayer",
-         "visible":true,
-         "width":17,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":2,
-         "name":"Objects",
-         "objects":[
-                {
-                 "height":20,
-                 "id":1,
-                 "name":"Player Start",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"Player Start",
-                 "visible":true,
-                 "width":16,
-                 "x":31,
-                 "y":183
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":3,
-         "name":"Enemies",
-         "objects":[],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":4,
-         "name":"Traps",
-         "objects":[
-                {
-                 "height":16,
-                 "id":2,
-                 "name":"invisible block 11,8",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":11
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":176,
-                 "y":128
-                }, 
-                {
-                 "height":16,
-                 "id":3,
-                 "name":"invisible block 16,8",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":16
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":256,
-                 "y":128
-                }, 
-                {
-                 "height":16,
-                 "id":4,
-                 "name":"poison generator hidden block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"spent_metatile",
-                         "type":"int",
-                         "value":3
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_hidden_poison"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":208,
-                 "y":128
-                }, 
-                {
-                 "height":16,
-                 "id":5,
-                 "name":"hint block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"hint_text",
-                         "type":"string",
-                         "value":"FROM STAGE 1\\nSPECIAL TRICKS SHOW UP NOW.\\nPLEASE BE CAREFUL.\\nSOME ITEMS MAY BE USEFUL...\\n\\n                    - CHIKU"
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":4
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"hint_stage_1"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"hint_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":7
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":64,
-                 "y":144
-                }, 
-                {
-                 "height":65.1034482758621,
-                 "id":6,
-                 "name":"entry pipe to underground",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":14
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"pipe_to_underground"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"enter_pipe"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":32,
-                 "x":224,
-                 "y":144
-                }, 
-                {
-                 "height":32,
-                 "id":7,
-                 "name":"side pipe collider",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":12
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":11
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"pipe_fake_kill"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"side_pipe"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":32,
-                 "x":192,
-                 "y":176
-                }, 
-                {
-                 "height":240,
-                 "id":8,
-                 "name":"pipe shot spawner",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":14
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"stage_pipe_shot"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"stage_spawner"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":32,
-                 "x":224,
-                 "y":0
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }],
- "nextlayerid":5,
- "nextobjectid":9,
- "orientation":"orthogonal",
- "properties":[
-        {
-         "name":"camera_margin_bottom",
-         "type":"int",
-         "value":0
-        }, 
-        {
-         "name":"camera_margin_top",
-         "type":"int",
-         "value":0
-        }],
- "renderorder":"right-down",
- "tiledversion":"1.12.2",
- "tileheight":16,
- "tilesets":[
-        {
-         "columns":1,
-         "firstgid":1,
-         "image":"..\/gfx\/tiles_16.png",
-         "imageheight":1280,
-         "imagewidth":16,
-         "margin":0,
-         "name":"tiles_16",
-         "spacing":0,
-         "tilecount":80,
-         "tileheight":16,
-         "tilewidth":16
-        }],
- "tilewidth":16,
- "type":"map",
- "version":"1.11",
- "width":17
+{
+ "compressionlevel": -1,
+ "height": 15,
+ "infinite": false,
+ "layers": [
+  {
+   "data": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    32,
+    33,
+    4,
+    1,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    4,
+    1,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    4,
+    1,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+   ],
+   "height": 15,
+   "id": 1,
+   "name": "Background",
+   "opacity": 1,
+   "type": "tilelayer",
+   "visible": true,
+   "width": 17,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 2,
+   "name": "Objects",
+   "objects": [
+    {
+     "height": 20,
+     "id": 1,
+     "name": "Player Start",
+     "opacity": 1,
+     "rotation": 0,
+     "type": "Player Start",
+     "visible": true,
+     "width": 16,
+     "x": 31,
+     "y": 183
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 3,
+   "name": "Enemies",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 4,
+   "name": "Traps",
+   "objects": [
+    {
+     "height": 16,
+     "id": 2,
+     "name": "invisible block 11,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 11
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 8
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 176,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 3,
+     "name": "invisible block 16,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 8
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 256,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 4,
+     "name": "poison generator hidden block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 13
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 8
+      },
+      {
+       "name": "spent_metatile",
+       "type": "int",
+       "value": 3
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_hidden_poison"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 208,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 5,
+     "name": "hint block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "hint_text",
+       "type": "string",
+       "value": "FROM STAGE 1\\nSPECIAL TRICKS SHOW UP NOW.\\nPLEASE BE CAREFUL.\\nSOME ITEMS MAY BE USEFUL...\\n\\n                    - CHIKU"
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 4
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "hint_stage_1"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "hint_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 7
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 64,
+     "y": 144
+    },
+    {
+     "height": 65.1034482758621,
+     "id": 6,
+     "name": "entry pipe to underground",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 14
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "pipe_to_underground"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "enter_pipe"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 32,
+     "x": 224,
+     "y": 144
+    },
+    {
+     "height": 32,
+     "id": 7,
+     "name": "side pipe collider",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 12
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 11
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "pipe_fake_kill"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "side_pipe"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 32,
+     "x": 192,
+     "y": 176
+    },
+    {
+     "height": 240,
+     "id": 8,
+     "name": "pipe shot spawner",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 14
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "stage_pipe_shot"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "stage_spawner"
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "value": "pipe_shot",
+       "propertytype": "EnemyKind"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "value": "atype3",
+       "propertytype": "EnemySprite"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "value": "left",
+       "propertytype": "TrapSpawnDirection"
+      },
+      {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 1000.0
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 32000.0
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -800.0
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 32,
+     "x": 224,
+     "y": 0
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "nextlayerid": 5,
+ "nextobjectid": 9,
+ "orientation": "orthogonal",
+ "properties": [
+  {
+   "name": "camera_margin_bottom",
+   "type": "int",
+   "value": 0
+  },
+  {
+   "name": "camera_margin_top",
+   "type": "int",
+   "value": 0
+  }
+ ],
+ "renderorder": "right-down",
+ "tiledversion": "1.12.2",
+ "tileheight": 16,
+ "tilesets": [
+  {
+   "columns": 1,
+   "firstgid": 1,
+   "image": "../gfx/tiles_16.png",
+   "imageheight": 1280,
+   "imagewidth": 16,
+   "margin": 0,
+   "name": "tiles_16",
+   "spacing": 0,
+   "tilecount": 80,
+   "tileheight": 16,
+   "tilewidth": 16
+  }
+ ],
+ "tilewidth": 16,
+ "type": "map",
+ "version": "1.11",
+ "width": 17
 }

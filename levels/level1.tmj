@@ -1,1906 +1,4655 @@
-{ "compressionlevel":-1,
- "height":17,
- "infinite":false,
- "layers":[
-        {
-         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 24, 25, 26, 27, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 28, 29, 30, 31, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 24, 25, 26, 27, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 65, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 28, 29, 30, 31, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 24, 25, 26, 27, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 66, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 28, 29, 30, 31, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 24, 25, 26, 27, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 1, 1, 67, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 28, 29, 30, 31, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 2, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 1, 1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 9, 10, 11, 12, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 32, 33, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 10, 11, 12, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 4, 1, 0, 0, 0, 0, 0, 32, 33, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 41, 42, 43, 44, 45, 46, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 14, 15, 16, 17, 18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 34, 35, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 14, 15, 16, 17, 18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 1, 4, 4, 1, 1, 1, 1, 1, 34, 35, 1, 1, 1, 1, 1, 1, 1, 1, 1, 32, 33, 1, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 68, 1, 1, 1, 1, 47, 48, 49, 50, 51, 52, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            1, 19, 20, 21, 22, 23, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 37, 34, 35, 40, 1, 1, 1, 37, 38, 39, 40, 1, 1, 1, 19, 20, 21, 22, 23, 1, 1, 1, 1, 1, 1, 1, 1, 37, 38, 39, 40, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 37, 38, 39, 40, 4, 4, 4, 1, 1, 1, 4, 4, 1, 1, 1, 1, 1, 34, 35, 1, 1, 1, 1, 1, 1, 1, 1, 1, 34, 35, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 37, 38, 39, 40, 53, 54, 55, 56, 57, 58, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 5, 5, 5, 5, 5, 5, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0,
-            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 1, 1, 6, 6, 6, 6, 6, 6, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         "height":17,
-         "id":1,
-         "name":"Background",
-         "opacity":1,
-         "type":"tilelayer",
-         "visible":true,
-         "width":150,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":3,
-         "name":"Objects",
-         "objects":[
-                {
-                 "height":20,
-                 "id":1,
-                 "name":"Player Start",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"Player Start",
-                 "visible":true,
-                 "width":16,
-                 "x":31,
-                 "y":183
-                }, 
-                {
-                 "height":144,
-                 "id":2,
-                 "name":"Goal Flag",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"Goal Flag",
-                 "visible":true,
-                 "width":16,
-                 "x":1968,
-                 "y":48
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":4,
-         "name":"Enemies",
-         "objects":[
-                {
-                 "height":16,
-                 "id":3,
-                 "name":"walker enemy 52,3",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":832,
-                 "y":48
-                }, 
-                {
-                 "height":16,
-                 "id":4,
-                 "name":"walker enemy 48,7",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":768,
-                 "y":112
-                }, 
-                {
-                 "height":16,
-                 "id":5,
-                 "name":"walker enemy 10,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":160,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":6,
-                 "name":"walker enemy 16,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":256,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":7,
-                 "name":"walker enemy 61,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":976,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":8,
-                 "name":"walker enemy 63,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":1008,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":9,
-                 "name":"shell enemy 66,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"shell_walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"shell_walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":1056,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":10,
-                 "name":"walker enemy 101,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":1616,
-                 "y":192
-                }, 
-                {
-                 "height":16,
-                 "id":11,
-                 "name":"walker enemy 103,12",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"walker"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"walker"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":1648,
-                 "y":192
-                }, 
-                {
-                 "height":32,
-                 "id":12,
-                 "name":"enemy cloud hazard",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"dir",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"enemy_kind",
-                         "propertytype":"EnemyKind",
-                         "type":"string",
-                         "value":"static_hazard"
-                        }, 
-                        {
-                         "name":"enemy_sprite",
-                         "propertytype":"EnemySprite",
-                         "type":"string",
-                         "value":"cloud"
-                        }],
-                 "rotation":0,
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":64,
-                 "x":1648,
-                 "y":80
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":5,
-         "name":"Traps",
-         "objects":[
-                {
-                 "height":16,
-                 "id":13,
-                 "name":"invisible block 89,6",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":89
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":6
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1424,
-                 "y":96
-                }, 
-                {
-                 "height":16,
-                 "id":14,
-                 "name":"invisible block 40,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":40
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":640,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":15,
-                 "name":"invisible block 13,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":208,
-                 "y":160
-                }, 
-                {
-                 "height":16,
-                 "id":16,
-                 "name":"invisible block 90,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":90
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1440,
-                 "y":160
-                }, 
-                {
-                 "height":16,
-                 "id":17,
-                 "name":"invisible block 91,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":91
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1456,
-                 "y":160
-                }, 
-                {
-                 "height":16,
-                 "id":18,
-                 "name":"invisible block 92,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":92
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1472,
-                 "y":160
-                }, 
-                {
-                 "height":16,
-                 "id":19,
-                 "name":"invisible block 93,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":93
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1488,
-                 "y":160
-                }, 
-                {
-                 "height":16,
-                 "id":20,
-                 "name":"invisible block 94,10",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":94
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"invisible_reveal"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"invisible_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1504,
-                 "y":160
-                }, 
-                {
-                 "height":137,
-                 "id":21,
-                 "name":"goal trigger",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"goal_walk_frames",
-                         "type":"int",
-                         "value":207
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":123
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":2
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"goal"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1968,
-                 "y":55
-                }, 
-                {
-                 "height":32,
-                 "id":22,
-                 "name":"checkpoint",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":255
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":66
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":7
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"checkpoint"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1056,
-                 "y":112
-                }, 
-                {
-                 "height":32,
-                 "id":23,
-                 "name":"falling floor bridge",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":2
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":72
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"falling_floor"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":80,
-                 "x":1152,
-                 "y":208
-                }, 
-                {
-                 "height":16,
-                 "id":24,
-                 "name":"falling brick trio",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":49
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":5
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"falling_on_pass_under"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"falling_floor"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":48,
-                 "x":784,
-                 "y":80
-                }, 
-                {
-                 "height":16,
-                 "id":25,
-                 "name":"vertical evasive question block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":255
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"evasive_vertical"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"evasive_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":128,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":26,
-                 "name":"good mushroom block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_good_mushroom"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":208,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":27,
-                 "name":"enemy block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":14
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":5
-                        }, 
-                        {
-                         "name":"spawn_dir",
-                         "propertytype":"TrapSpawnDirection",
-                         "type":"string",
-                         "value":"right"
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_enemy"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":224,
-                 "y":80
-                }, 
-                {
-                 "height":16,
-                 "id":28,
-                 "name":"poison generator hidden block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":35
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"spawn_interval",
-                         "type":"int",
-                         "value":32
-                        }, 
-                        {
-                         "name":"spawn_limit",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_poison_generator"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":560,
-                 "y":128
-                }, 
-                {
-                 "height":16,
-                 "id":29,
-                 "name":"good mushroom block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":47
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_good_mushroom"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":752,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":30,
-                 "name":"coin generator block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":59
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"spawn_interval",
-                         "type":"int",
-                         "value":4
-                        }, 
-                        {
-                         "name":"spawn_limit",
-                         "type":"int",
-                         "value":20
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_coin_generator"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":944,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":31,
-                 "name":"star brick block",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":67
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"question_star"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1072,
-                 "y":144
-                }, 
-                {
-                 "height":65.1034482758621,
-                 "id":32,
-                 "name":"1-1 fake enter pipe",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":29
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"pipe_fake_kill"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"enter_pipe"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":33.1034482758621,
-                 "x":466.758620689655,
-                 "y":144
-                }, 
-                {
-                 "height":386.206896551724,
-                 "id":33,
-                 "name":"pipe shot trigger near first pipe",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"stage_pipe_shot"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"stage_spawner"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":27.5862068965517,
-                 "x":322.758620689655,
-                 "y":-26.4827586206897
-                }, 
-                {
-                 "height":386.206896551724,
-                 "id":34,
-                 "name":"upward enemy trigger 1",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"stage_flying_enemy"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"stage_spawner"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":38.6206896551724,
-                 "x":861.241379310345,
-                 "y":-26.4827586206897
-                }, 
-                {
-                 "height":386.206896551724,
-                 "id":35,
-                 "name":"walker group trigger",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"stage_walker_swarm"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"stage_spawner"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16.551724137931,
-                 "x":1792.24451410658,
-                 "y":-26.6645768025079
-                }, 
-                {
-                 "height":386.206896551724,
-                 "id":36,
-                 "name":"upward enemy trigger 2",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"stage_flying_enemy"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"stage_spawner"
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":49.6551724137931,
-                 "x":2000,
-                 "y":-26.4827586206897
-                }, 
-                {
-                 "height":16,
-                 "id":37,
-                 "name":"default coin question 74,5",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":74
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":5
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1184,
-                 "y":80
-                }, 
-                {
-                 "height":16,
-                 "id":38,
-                 "name":"default coin question 15,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":15
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":240,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":39,
-                 "name":"default coin question 71,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":71
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1136,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":40,
-                 "name":"default coin question 74,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":74
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1184,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":41,
-                 "name":"default coin question 77,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":77
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1232,
-                 "y":144
-                }, 
-                {
-                 "height":16,
-                 "id":42,
-                 "name":"default coin question 101,9",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"collision",
-                         "propertytype":"LevelCollision",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":101
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"subtype",
-                         "propertytype":"TrapSubtype",
-                         "type":"string",
-                         "value":"none"
-                        }, 
-                        {
-                         "name":"trap_type",
-                         "propertytype":"TrapKind",
-                         "type":"string",
-                         "value":"question_block"
-                        }, 
-                        {
-                         "name":"visual_metatile",
-                         "type":"int",
-                         "value":255
-                        }],
-                 "rotation":0,
-                 "type":"Trap",
-                 "visible":true,
-                 "width":16,
-                 "x":1616,
-                 "y":144
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }],
- "nextlayerid":6,
- "nextobjectid":38,
- "orientation":"orthogonal",
- "properties":[
-        {
-         "name":"camera_margin_bottom",
-         "type":"int",
-         "value":32
-        }, 
-        {
-         "name":"camera_margin_top",
-         "type":"int",
-         "value":0
-        }],
- "renderorder":"right-down",
- "tiledversion":"1.12.2",
- "tileheight":16,
- "tilesets":[
-        {
-         "columns":1,
-         "firstgid":1,
-         "image":"..\/gfx\/tiles_16.png",
-         "imageheight":1280,
-         "imagewidth":16,
-         "margin":0,
-         "name":"tiles_16",
-         "spacing":0,
-         "tilecount":80,
-         "tileheight":16,
-         "tilewidth":16
-        }],
- "tilewidth":16,
- "type":"map",
- "version":"1.11",
- "width":150
+{
+ "compressionlevel": -1,
+ "height": 17,
+ "infinite": false,
+ "layers": [
+  {
+   "data": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    24,
+    25,
+    26,
+    27,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    28,
+    29,
+    30,
+    31,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    24,
+    25,
+    26,
+    27,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    65,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    28,
+    29,
+    30,
+    31,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    24,
+    25,
+    26,
+    27,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    66,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    28,
+    29,
+    30,
+    31,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    3,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    24,
+    25,
+    26,
+    27,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    67,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    28,
+    29,
+    30,
+    31,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    0,
+    2,
+    3,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    0,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    0,
+    1,
+    1,
+    1,
+    3,
+    1,
+    1,
+    3,
+    1,
+    1,
+    3,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    3,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    9,
+    10,
+    11,
+    12,
+    13,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    32,
+    33,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    9,
+    10,
+    11,
+    12,
+    13,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    1,
+    1,
+    4,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    32,
+    33,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    14,
+    15,
+    16,
+    17,
+    18,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    14,
+    15,
+    16,
+    17,
+    18,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    4,
+    1,
+    1,
+    1,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    32,
+    33,
+    1,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    68,
+    1,
+    1,
+    1,
+    1,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    19,
+    20,
+    21,
+    22,
+    23,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    37,
+    34,
+    35,
+    40,
+    1,
+    1,
+    1,
+    37,
+    38,
+    39,
+    40,
+    1,
+    1,
+    1,
+    19,
+    20,
+    21,
+    22,
+    23,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    37,
+    38,
+    39,
+    40,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    37,
+    38,
+    39,
+    40,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    4,
+    37,
+    38,
+    39,
+    40,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    1,
+    1,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    1,
+    1,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    1,
+    1,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    1,
+    1,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    1,
+    1,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    1,
+    1,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "height": 17,
+   "id": 1,
+   "name": "Background",
+   "opacity": 1,
+   "type": "tilelayer",
+   "visible": true,
+   "width": 150,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 3,
+   "name": "Objects",
+   "objects": [
+    {
+     "height": 20,
+     "id": 1,
+     "name": "Player Start",
+     "opacity": 1,
+     "rotation": 0,
+     "type": "Player Start",
+     "visible": true,
+     "width": 16,
+     "x": 31,
+     "y": 183
+    },
+    {
+     "height": 144,
+     "id": 2,
+     "name": "Goal Flag",
+     "opacity": 1,
+     "rotation": 0,
+     "type": "Goal Flag",
+     "visible": true,
+     "width": 16,
+     "x": 1968,
+     "y": 48
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 4,
+   "name": "Enemies",
+   "objects": [
+    {
+     "height": 16,
+     "id": 3,
+     "name": "walker enemy 52,3",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 832,
+     "y": 48
+    },
+    {
+     "height": 16,
+     "id": 4,
+     "name": "walker enemy 48,7",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 768,
+     "y": 112
+    },
+    {
+     "height": 16,
+     "id": 5,
+     "name": "walker enemy 10,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 160,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 6,
+     "name": "walker enemy 16,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 256,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 7,
+     "name": "walker enemy 61,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 976,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 8,
+     "name": "walker enemy 63,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 1008,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 9,
+     "name": "shell enemy 66,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "shell_walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "shell_walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 1056,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 10,
+     "name": "walker enemy 101,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 1616,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 11,
+     "name": "walker enemy 103,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 1648,
+     "y": 192
+    },
+    {
+     "height": 32,
+     "id": 12,
+     "name": "enemy cloud hazard",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "static_hazard"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "cloud"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 64,
+     "x": 1648,
+     "y": 80
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 5,
+   "name": "Traps",
+   "objects": [
+    {
+     "height": 16,
+     "id": 13,
+     "name": "invisible block 89,6",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 89
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 6
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1424,
+     "y": 96
+    },
+    {
+     "height": 16,
+     "id": 14,
+     "name": "invisible block 40,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 40
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 640,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 15,
+     "name": "invisible block 13,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 13
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 208,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 16,
+     "name": "invisible block 90,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 90
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1440,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 17,
+     "name": "invisible block 91,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 91
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1456,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 18,
+     "name": "invisible block 92,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 92
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1472,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 19,
+     "name": "invisible block 93,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 93
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1488,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 20,
+     "name": "invisible block 94,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 94
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 10
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "invisible_reveal"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "invisible_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1504,
+     "y": 160
+    },
+    {
+     "height": 137,
+     "id": 21,
+     "name": "goal trigger",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "goal_walk_frames",
+       "type": "int",
+       "value": 207
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 123
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 2
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "goal"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1968,
+     "y": 55
+    },
+    {
+     "height": 32,
+     "id": 22,
+     "name": "checkpoint",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 255
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 66
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 7
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "checkpoint"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1056,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 23,
+     "name": "falling floor bridge",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 2
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 72
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 13
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "falling_floor"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 80,
+     "x": 1152,
+     "y": 208
+    },
+    {
+     "height": 16,
+     "id": 24,
+     "name": "falling brick trio",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 49
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 5
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "falling_on_pass_under"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "falling_floor"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 48,
+     "x": 784,
+     "y": 80
+    },
+    {
+     "height": 16,
+     "id": 25,
+     "name": "vertical evasive question block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 255
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 8
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "evasive_vertical"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "evasive_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 128,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 26,
+     "name": "good mushroom block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 13
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_good_mushroom"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 2
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 208,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 27,
+     "name": "enemy block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 14
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 5
+      },
+      {
+       "name": "spawn_dir",
+       "propertytype": "TrapSpawnDirection",
+       "type": "string",
+       "value": "right"
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_enemy"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 2
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 224,
+     "y": 80
+    },
+    {
+     "height": 16,
+     "id": 28,
+     "name": "poison generator hidden block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 35
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 8
+      },
+      {
+       "name": "spawn_interval",
+       "type": "int",
+       "value": 32
+      },
+      {
+       "name": "spawn_limit",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_poison_generator"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 0
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 560,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 29,
+     "name": "good mushroom block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 47
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_good_mushroom"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 2
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 752,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 30,
+     "name": "coin generator block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 59
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "spawn_interval",
+       "type": "int",
+       "value": 4
+      },
+      {
+       "name": "spawn_limit",
+       "type": "int",
+       "value": 20
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_coin_generator"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 2
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 944,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 31,
+     "name": "star brick block",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 67
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_star"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1072,
+     "y": 144
+    },
+    {
+     "height": 65.1034482758621,
+     "id": 32,
+     "name": "1-1 fake enter pipe",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 29
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "pipe_fake_kill"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "enter_pipe"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 33.1034482758621,
+     "x": 466.758620689655,
+     "y": 144
+    },
+    {
+     "height": 386.206896551724,
+     "id": 33,
+     "name": "pipe shot trigger near first pipe",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "stage_pipe_shot"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "stage_spawner"
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "value": "pipe_shot",
+       "propertytype": "EnemyKind"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "value": "atype3",
+       "propertytype": "EnemySprite"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "value": "left",
+       "propertytype": "TrapSpawnDirection"
+      },
+      {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 1000.0
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 32000.0
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -800.0
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 27.5862068965517,
+     "x": 322.758620689655,
+     "y": -26.4827586206897
+    },
+    {
+     "height": 386.206896551724,
+     "id": 34,
+     "name": "upward enemy trigger 1",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "stage_flying_enemy"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "stage_spawner"
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "value": "pipe_shot",
+       "propertytype": "EnemyKind"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "value": "atype3",
+       "propertytype": "EnemySprite"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "value": "right",
+       "propertytype": "TrapSpawnDirection"
+      },
+      {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 6000.0
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": -4000.0
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": 1200.0
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 38.6206896551724,
+     "x": 861.241379310345,
+     "y": -26.4827586206897
+    },
+    {
+     "height": 386.206896551724,
+     "id": 35,
+     "name": "walker group trigger",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "stage_walker_swarm"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "stage_spawner"
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "value": "walker",
+       "propertytype": "EnemyKind"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "value": "walker",
+       "propertytype": "EnemySprite"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "value": "left",
+       "propertytype": "TrapSpawnDirection"
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": -3000.0
+      },
+      {
+       "name": "ref_spawn_spacing_x",
+       "type": "float",
+       "value": 3000.0
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 4
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16.551724137931,
+     "x": 1792.24451410658,
+     "y": -26.6645768025079
+    },
+    {
+     "height": 386.206896551724,
+     "id": 36,
+     "name": "upward enemy trigger 2",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 0
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "stage_flying_enemy"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "stage_spawner"
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "value": "pipe_shot",
+       "propertytype": "EnemyKind"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "value": "atype3",
+       "propertytype": "EnemySprite"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "value": "right",
+       "propertytype": "TrapSpawnDirection"
+      },
+      {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 6000.0
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": -4000.0
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": 1200.0
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 49.6551724137931,
+     "x": 2000,
+     "y": -26.4827586206897
+    },
+    {
+     "height": 16,
+     "id": 37,
+     "name": "default coin question 74,5",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 74
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 5
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1184,
+     "y": 80
+    },
+    {
+     "height": 16,
+     "id": 38,
+     "name": "default coin question 15,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 15
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 240,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 39,
+     "name": "default coin question 71,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 71
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1136,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 40,
+     "name": "default coin question 74,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 74
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1184,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 41,
+     "name": "default coin question 77,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 77
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1232,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 42,
+     "name": "default coin question 101,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "source_x",
+       "type": "int",
+       "value": 101
+      },
+      {
+       "name": "source_y",
+       "type": "int",
+       "value": 9
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 1616,
+     "y": 144
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "nextlayerid": 6,
+ "nextobjectid": 38,
+ "orientation": "orthogonal",
+ "properties": [
+  {
+   "name": "camera_margin_bottom",
+   "type": "int",
+   "value": 32
+  },
+  {
+   "name": "camera_margin_top",
+   "type": "int",
+   "value": 0
+  }
+ ],
+ "renderorder": "right-down",
+ "tiledversion": "1.12.2",
+ "tileheight": 16,
+ "tilesets": [
+  {
+   "columns": 1,
+   "firstgid": 1,
+   "image": "../gfx/tiles_16.png",
+   "imageheight": 1280,
+   "imagewidth": 16,
+   "margin": 0,
+   "name": "tiles_16",
+   "spacing": 0,
+   "tilecount": 80,
+   "tileheight": 16,
+   "tilewidth": 16
+  }
+ ],
+ "tilewidth": 16,
+ "type": "map",
+ "version": "1.11",
+ "width": 150
 }

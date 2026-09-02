@@ -108,6 +108,7 @@
 #define ITEM_WALK_SPEED REF_VEL_TO_FIX(100)
 #define ITEM_FAST_SPEED REF_VEL_TO_FIX(200)
 #define BRICK_FRAGMENT_LIFETIME 44
+#define TRAP_CHANNEL_NONE 0
 TrapManager traps_current;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
@@ -120,6 +121,9 @@ static const uint16_t underground_tile_obj_palette[16] = {
     RGB15(31, 31, 31), RGB15(0, 28, 0), RGB15(0, 18, 0), RGB15(0, 0, 0),
 };
 static OBJATTR dynamic_trap_oam[TRAPS_MAX_DYNAMIC_SPRITES];
+
+static void emit_trap_channel(TrapManager *manager, Level *level,
+                              Player *player, uint8_t channel);
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
                             int bx, int by, int bw, int bh)
@@ -319,9 +323,27 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_interval = 0;
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
     trap->item_variant = 0;
+    trap->spawn_enemy_kind = ENEMY_NONE;
+    trap->spawn_enemy_sprite = ENEMY_SPRITE_WALKER;
+    trap->spawn_enemy_palette = 0;
+    trap->spawn_enemy_param = 0;
+    trap->spawn_enemy_count = 1;
+    trap->spawn_sound = 1;
+    trap->trigger_channel = 0;
+    trap->listen_channel = 0;
+    trap->trigger_delay = 0;
+    trap->spawn_offset_x = 0;
+    trap->spawn_offset_y = 0;
+    trap->spawn_vx = 0;
+    trap->spawn_vy = 0;
+    trap->spawn_random_vx = 0;
+    trap->spawn_random_vy = 0;
+    trap->spawn_spacing_x = 0;
+    trap->spawn_spacing_y = 0;
     trap->goal_walk_frames = 0;
     trap->hint_text = 0;
     trap->spawn_count = 0;
+    trap->trigger_pending = 0;
 
     return trap;
 }
@@ -451,9 +473,27 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_interval = trigger->spawn_interval;
     trap->spawn_limit = trigger->spawn_limit;
     trap->item_variant = trigger->item_variant;
+    trap->spawn_enemy_kind = trigger->spawn_enemy_kind;
+    trap->spawn_enemy_sprite = trigger->spawn_enemy_sprite;
+    trap->spawn_enemy_palette = trigger->spawn_enemy_palette;
+    trap->spawn_enemy_param = trigger->spawn_enemy_param;
+    trap->spawn_enemy_count = trigger->spawn_enemy_count;
+    trap->spawn_sound = trigger->spawn_sound;
+    trap->trigger_channel = trigger->trigger_channel;
+    trap->listen_channel = trigger->listen_channel;
+    trap->trigger_delay = trigger->trigger_delay;
+    trap->spawn_offset_x = trigger->spawn_offset_x;
+    trap->spawn_offset_y = trigger->spawn_offset_y;
+    trap->spawn_vx = trigger->spawn_vx;
+    trap->spawn_vy = trigger->spawn_vy;
+    trap->spawn_random_vx = trigger->spawn_random_vx;
+    trap->spawn_random_vy = trigger->spawn_random_vy;
+    trap->spawn_spacing_x = trigger->spawn_spacing_x;
+    trap->spawn_spacing_y = trigger->spawn_spacing_y;
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
+    trap->trigger_pending = 0;
     trap->vx = trigger->vx;
     trap->vy = trigger->vy;
 
@@ -686,16 +726,19 @@ static void reveal_hidden_block(TrapManager *manager, Trap *trap, Level *level)
                        LEVEL_COLLISION_SOLID, 0);
 }
 
-static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level)
+static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level,
+                                  Player *player)
 {
     if (trap->state != TRAP_IDLE) {
         return;
     }
 
     trap->state = TRAP_ACTIVE;
+    trap->trigger_pending = 0;
     trap->timer = 16;
     trap->vy = 0;
     audio_play_trap_trigger();
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
 
     uint16_t cols = (uint16_t)FIX16_TO_INT(trap->w) / LEVEL_METATILE_SIZE;
     uint16_t rows = (uint16_t)FIX16_TO_INT(trap->h) / LEVEL_METATILE_SIZE;
@@ -764,19 +807,22 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
     }
 }
 
-static void trigger_bump_shooter(TrapManager *manager, Trap *trap)
+static void trigger_bump_shooter(TrapManager *manager, Trap *trap, Level *level,
+                                 Player *player)
 {
     if (trap->state != TRAP_IDLE) {
         return;
     }
 
     trap->state = TRAP_SPENT;
+    trap->trigger_pending = 0;
     audio_play_block_hit();
     audio_play_trap_trigger();
     spawn_entity(manager, TRAP_ENTITY_PROJECTILE,
                  trap->x + FIX16_FROM_INT(4),
                  trap->y - FIX16_FROM_INT(8),
                  0, -PROJECTILE_SPEED, 8, 8);
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
 void traps_break_brick(TrapManager *manager, Level *level,
@@ -874,6 +920,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
     }
 
     audio_play_block_hit();
+    trap->trigger_pending = 0;
 
     switch (trap->subtype) {
     case QUESTION_ENEMY:
@@ -926,60 +973,77 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         spend_question_block(manager, trap, level);
         break;
     }
+
+    emit_trap_channel(manager, level, (Player *)player, trap->trigger_channel);
 }
 
-static void trigger_stage_spawner(Trap *trap)
+static fix16_t random_fixed_positive(fix16_t range)
+{
+    if (range <= 0) {
+        return 0;
+    }
+
+    uint32_t units = (uint32_t)(range >> 8);
+    if (units == 0) {
+        units = 1;
+    }
+
+    return (fix16_t)(trap_random((uint16_t)units) << 8);
+}
+
+static fix16_t random_fixed_centered(fix16_t range)
+{
+    return random_fixed_positive(range) - range / 2;
+}
+
+static void spawn_trap_enemy_recipe(Trap *trap)
+{
+    if (trap->spawn_enemy_kind == ENEMY_NONE || trap->spawn_enemy_count == 0) {
+        return;
+    }
+
+    for (uint8_t i = 0; i < trap->spawn_enemy_count; ++i) {
+        fix16_t vx = trap->spawn_vx;
+        fix16_t vy = trap->spawn_vy;
+
+        if (trap->spawn_random_vx > 0) {
+            vx += random_fixed_centered(trap->spawn_random_vx);
+        }
+        if (trap->spawn_random_vy > 0) {
+            fix16_t random_vy = random_fixed_positive(trap->spawn_random_vy);
+            vy += (vy < 0) ? -random_vy : random_vy;
+        }
+
+        enemies_spawn_direct_config(
+            &enemy_current, (EnemyKind)trap->spawn_enemy_kind,
+            trap->x + trap->spawn_offset_x + trap->spawn_spacing_x * i,
+            trap->y + trap->spawn_offset_y + trap->spawn_spacing_y * i,
+            vx, vy, trap->spawn_enemy_sprite, trap->spawn_enemy_palette,
+            trap->spawn_enemy_param, trap->spawn_dir);
+    }
+}
+
+static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level,
+                                  Player *player)
 {
     if (trap->state != TRAP_IDLE) {
         return;
     }
 
     trap->state = TRAP_SPENT;
+    trap->trigger_pending = 0;
 
-    if (trap->subtype == 100) {
-        audio_play_trap_trigger();
-        enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
-                             trap->x + REF_POS_TO_FIX(1000),
-                             REF_STAGE_Y_TO_FIX(32000),
-                             ENEMY_SPRITE_ATYPE3, -1);
-    } else if (trap->subtype == 101) {
-        audio_play_trap_trigger();
-        enemies_spawn_direct(&enemy_current, ENEMY_PIPE_SHOT,
-                             trap->x + REF_POS_TO_FIX(6000),
-                             REF_STAGE_Y_TO_FIX(-4000),
-                             ENEMY_SPRITE_ATYPE3, 1);
-    } else if (trap->subtype == 102) {
-        audio_play_trap_trigger();
-        for (uint8_t i = 0; i < 4; ++i) {
-            enemies_spawn_direct(&enemy_current, ENEMY_WALKER,
-                                 trap->x + REF_POS_TO_FIX(i * 3000),
-                                 REF_STAGE_Y_TO_FIX(-3000),
-                                 ENEMY_SPRITE_WALKER, -1);
+    if (trap->spawn_enemy_kind != ENEMY_NONE) {
+        if (trap->spawn_sound) {
+            audio_play_trap_trigger();
         }
-    } else if (trap->subtype == STAGE_UPWARD_HAZARD) {
-        enemies_spawn_direct_velocity(&enemy_current, ENEMY_SUPERJIEN,
-                                      trap->x + REF_POS_TO_FIX(1500),
-                                      REF_STAGE_Y_TO_FIX(44000),
-                                      0, -REF_VEL_TO_FIX(2000),
-                                      ENEMY_SPRITE_SUPERJIEN, -1);
-    } else if (trap->subtype == STAGE_UPWARD_HAZARD_TOGGLE) {
-        audio_play_trap_trigger();
-        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
-                                      trap->x + REF_POS_TO_FIX(4500),
-                                      REF_STAGE_Y_TO_FIX(30000),
-                                      0, -REF_VEL_TO_FIX(1600),
-                                      ENEMY_SPRITE_HAZARD, -1);
-    } else if (trap->subtype == STAGE_UPWARD_HAZARD_LEFT) {
-        audio_play_trap_trigger();
-        enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
-                                      trap->x - REF_POS_TO_FIX(8000),
-                                      REF_STAGE_Y_TO_FIX(26000),
-                                      0, -REF_VEL_TO_FIX(1600),
-                                      ENEMY_SPRITE_HAZARD, -1);
+        spawn_trap_enemy_recipe(trap);
     } else if (trap->subtype == STAGE_HINT_MESSAGE) {
         messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
                                  trap->x, trap->y);
     }
+
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
 static void update_stage_pipe_hazard(Trap *trap, const Player *player)
@@ -999,15 +1063,11 @@ static void update_stage_pipe_hazard(Trap *trap, const Player *player)
     }
 
     trap->timer = 0;
-    enemies_spawn_direct_velocity(&enemy_current, ENEMY_PIPE_SHOT,
-                                  trap->x,
-                                  REF_STAGE_Y_TO_FIX(30000),
-                                  REF_VEL_TO_FIX((int16_t)trap_random(600) - 300),
-                                  -REF_VEL_TO_FIX(1600 + trap_random(900)),
-                                  ENEMY_SPRITE_FIRE_PROJECTILE, -1);
+    spawn_trap_enemy_recipe(trap);
 }
 
-static void trigger_checkpoint(Trap *trap, Level *level, Player *player)
+static void trigger_checkpoint(TrapManager *manager, Trap *trap, Level *level,
+                               Player *player)
 {
     if (trap->state != TRAP_IDLE) {
         return;
@@ -1015,19 +1075,23 @@ static void trigger_checkpoint(Trap *trap, Level *level, Player *player)
 
     (void)level;
     trap->state = TRAP_SPENT;
+    trap->trigger_pending = 0;
     player_set_checkpoint(player,
                           trap->x - FIX16_FROM_INT(PLAYER_WIDTH_PX),
                           trap->y + trap->h - FIX16_FROM_INT(PLAYER_HEIGHT_PX));
     audio_play_trap_trigger();
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
-static void trigger_goal(Trap *trap, Player *player)
+static void trigger_goal(TrapManager *manager, Trap *trap, Level *level,
+                         Player *player)
 {
     if (trap->state != TRAP_IDLE || !player->alive) {
         return;
     }
 
     trap->state = TRAP_ACTIVE;
+    trap->trigger_pending = 0;
     player_begin_goal(player, trap->x, trap->goal_walk_frames);
     audio_stop_bgm();
     audio_play_goal();
@@ -1035,14 +1099,97 @@ static void trigger_goal(Trap *trap, Player *player)
                   player->x - FIX16_FROM_INT(8),
                   player->y - FIX16_FROM_INT(12),
                   90);
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
-static void trigger_hint_block(Trap *trap)
+static void trigger_hint_block(TrapManager *manager, Trap *trap, Level *level,
+                               Player *player)
 {
     audio_play_trap_trigger();
+    trap->trigger_pending = 0;
     messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
                              trap->x - FIX16_FROM_INT(24),
                              trap->y - FIX16_FROM_INT(8));
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
+}
+
+static void activate_linked_trap(TrapManager *manager, Level *level,
+                                 Player *player, Trap *trap)
+{
+    switch (trap->kind) {
+    case TRAP_FALLING_FLOOR:
+        trigger_falling_floor(manager, trap, level, player);
+        break;
+    case TRAP_BUMP_SHOOTER:
+        trigger_bump_shooter(manager, trap, level, player);
+        break;
+    case TRAP_QUESTION_BLOCK:
+        trigger_question_block(manager, trap, level, player);
+        break;
+    case TRAP_STAGE_SPAWNER:
+        trigger_stage_spawner(manager, trap, level, player);
+        break;
+    case TRAP_CHECKPOINT:
+        if (player) {
+            trigger_checkpoint(manager, trap, level, player);
+        }
+        break;
+    case TRAP_GOAL:
+        if (player) {
+            trigger_goal(manager, trap, level, player);
+        }
+        break;
+    case TRAP_HINT_BLOCK:
+        trigger_hint_block(manager, trap, level, player);
+        break;
+    default:
+        break;
+    }
+}
+
+static void emit_trap_channel(TrapManager *manager, Level *level,
+                              Player *player, uint8_t channel)
+{
+    if (channel == TRAP_CHANNEL_NONE) {
+        return;
+    }
+
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        Trap *listener = &manager->traps[i];
+
+        if (listener->state != TRAP_IDLE ||
+            listener->listen_channel != channel ||
+            listener->trigger_pending) {
+            continue;
+        }
+
+        if (listener->trigger_delay == 0) {
+            activate_linked_trap(manager, level, player, listener);
+        } else {
+            listener->timer = listener->trigger_delay;
+            listener->trigger_pending = 1;
+        }
+    }
+}
+
+static void update_linked_traps(TrapManager *manager, Level *level,
+                                Player *player)
+{
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        Trap *trap = &manager->traps[i];
+
+        if (!trap->trigger_pending) {
+            continue;
+        }
+
+        if (trap->timer > 0) {
+            trap->timer--;
+            continue;
+        }
+
+        trap->trigger_pending = 0;
+        activate_linked_trap(manager, level, player, trap);
+    }
 }
 
 static void update_evasive_block(Trap *trap, const struct Player *player)
@@ -1176,6 +1323,21 @@ static void update_enter_pipe(TrapManager *manager, Trap *trap, struct Player *p
     } else if (trap->timer < 255) {
         trap->timer++;
     }
+}
+
+uint8_t traps_player_can_enter_pipe(const TrapManager *manager,
+                                    const struct Player *player)
+{
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        const Trap *trap = &manager->traps[i];
+
+        if (trap->kind == TRAP_ENTER_PIPE && trap->state == TRAP_IDLE &&
+            player_on_enter_pipe(trap, player)) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 static uint8_t player_on_side_pipe(const Trap *trap, const struct Player *player)
@@ -1451,6 +1613,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
     int player_x = FIX16_TO_INT(player->x);
     int player_y = FIX16_TO_INT(player->y);
 
+    update_linked_traps(manager, level, player);
+
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *trap = &manager->traps[i];
 
@@ -1467,7 +1631,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 if (player_x + PLAYER_WIDTH_PX > trap_x + left_margin &&
                     player_x < trap_x + trap_w - right_margin &&
                     player_y + PLAYER_HEIGHT_PX > trigger_y) {
-                    trigger_falling_floor(manager, trap, level);
+                    trigger_falling_floor(manager, trap, level, player);
                 }
             } else if (trap->subtype == FALLING_WHEN_APPROACHED) {
                 int left_margin = FIX16_TO_INT(REF_POS_TO_FIX(2200));
@@ -1477,14 +1641,14 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 if (player_x + PLAYER_WIDTH_PX > trap_x + left_margin &&
                     player_x < trap_x + trap_w - right_margin &&
                     player_y + PLAYER_HEIGHT_PX > trigger_y) {
-                    trigger_falling_floor(manager, trap, level);
+                    trigger_falling_floor(manager, trap, level, player);
                 }
             } else if (player->on_ground &&
                        player_x + PLAYER_WIDTH_PX > trap_x + 4 &&
                        player_x < trap_x + trap_w - 4 &&
                        player_y + PLAYER_HEIGHT_PX >= trap_y &&
                        player_y + PLAYER_HEIGHT_PX <= trap_y + 4) {
-                trigger_falling_floor(manager, trap, level);
+                trigger_falling_floor(manager, trap, level, player);
             }
         } else if (trap->kind == TRAP_STAGE_SPAWNER && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
@@ -1494,7 +1658,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
 
             if (aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
                              trap_x, trap_y, trap_w, trap_h)) {
-                trigger_stage_spawner(trap);
+                trigger_stage_spawner(manager, trap, level, player);
             }
         } else if (trap->kind == TRAP_STAGE_SPAWNER &&
                    trap->state == TRAP_ACTIVE &&
@@ -1516,11 +1680,11 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
 
             if (aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
                              trap_x, trap_y, trap_w, trap_h)) {
-                trigger_checkpoint(trap, level, player);
+                trigger_checkpoint(manager, trap, level, player);
             }
         } else if (trap->kind == TRAP_GOAL && trap->state == TRAP_IDLE) {
             if (player_hits_goal_trigger(trap, player)) {
-                trigger_goal(trap, player);
+                trigger_goal(manager, trap, level, player);
             }
         } else if (trap->kind == TRAP_GOAL && trap->state == TRAP_ACTIVE &&
                    !player->alive) {
@@ -1616,7 +1780,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             continue;
         }
 
-        if (entity_y > level_death_y_px(level) + 64 || entity_y < -96) {
+        int offscreen_top = entity->kind == TRAP_ENTITY_FALLING_TILE ? -192 : -96;
+        if (entity_y > level_death_y_px(level) + 64 || entity_y < offscreen_top) {
             entity->active = 0;
             continue;
         }
@@ -1998,7 +2163,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
             reveal_hidden_block(manager, trap, level);
             triggered = 1;
         } else if (trap->kind == TRAP_BUMP_SHOOTER) {
-            trigger_bump_shooter(manager, trap);
+            trigger_bump_shooter(manager, trap, level, (Player *)player);
             triggered = 1;
         } else if (trap->kind == TRAP_QUESTION_BLOCK) {
             trigger_question_block(manager, trap, level, player);
@@ -2006,7 +2171,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
             bump_evasive_block(trap, world_x_px, world_y_px);
         } else if (trap->kind == TRAP_HINT_BLOCK) {
-            trigger_hint_block(trap);
+            trigger_hint_block(manager, trap, level, (Player *)player);
             triggered = 1;
         }
     }

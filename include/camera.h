@@ -21,7 +21,8 @@ typedef struct Camera {
 } Camera;
 
 void camera_init(Camera *camera);
-void camera_update(Camera *camera, const Player *player, const Level *level);
+void camera_update(Camera *camera, const Player *player, const Level *level,
+                   int8_t vertical_look);
 int camera_x_px(const Camera *camera);
 int camera_y_px(const Camera *camera);
 int camera_player_left_limit_px(const Camera *camera);

@@ -4,6 +4,7 @@
 #define CAMERA_Y_LAG_SHIFT 3
 #define CAMERA_Y_HIGH_LINE 42
 #define CAMERA_Y_LOW_LINE 104
+#define CAMERA_VERTICAL_LOOK_PLAYER_MARGIN_PX 8
 #define CAMERA_BACKTRACK_GRACE_PX (LEVEL_METATILE_SIZE * 2)
 
 static int clamp_int(int value, int min_value, int max_value)
@@ -39,7 +40,8 @@ void camera_init(Camera *camera)
     camera->screen_y = 0;
 }
 
-void camera_update(Camera *camera, const Player *player, const Level *level)
+void camera_update(Camera *camera, const Player *player, const Level *level,
+                   int8_t vertical_look)
 {
     int player_center_x = FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX / 2;
     int player_top_y = FIX16_TO_INT(player->y);
@@ -59,9 +61,32 @@ void camera_update(Camera *camera, const Player *player, const Level *level)
         max_x = 0;
     }
 
+    int min_camera_y = level_camera_min_y_px(level);
+    int max_camera_y = level_camera_max_y_px(level);
+
     target_x = clamp_int(target_x, min_x > 0 ? min_x : 0, max_x);
-    target_y = clamp_int(target_y, level_camera_min_y_px(level),
-                         level_camera_max_y_px(level));
+
+    if (vertical_look != 0) {
+        int keep_player_min_y = player_bottom_y -
+                                (CAMERA_VIEW_HEIGHT -
+                                 CAMERA_VERTICAL_LOOK_PLAYER_MARGIN_PX);
+        int keep_player_max_y = player_top_y -
+                                CAMERA_VERTICAL_LOOK_PLAYER_MARGIN_PX;
+
+        if (min_camera_y < keep_player_min_y) {
+            min_camera_y = keep_player_min_y;
+        }
+        if (max_camera_y > keep_player_max_y) {
+            max_camera_y = keep_player_max_y;
+        }
+        if (min_camera_y > max_camera_y) {
+            min_camera_y = max_camera_y;
+        }
+
+        target_y = vertical_look < 0 ? min_camera_y : max_camera_y;
+    }
+
+    target_y = clamp_int(target_y, min_camera_y, max_camera_y);
 
     camera->x = approach_smooth(camera->x, FIX16_FROM_INT(target_x), CAMERA_X_LAG_SHIFT);
     camera->y = approach_smooth(camera->y, FIX16_FROM_INT(target_y), CAMERA_Y_LAG_SHIFT);

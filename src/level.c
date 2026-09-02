@@ -442,10 +442,11 @@ int level_camera_max_y_px(const Level *level)
     int bottom_world_y = ((int)level->height - LEVEL_VIEW_SOURCE_ROW_OFFSET) *
                          LEVEL_METATILE_SIZE;
     int viewport_height = LEVEL_SCREEN_METATILE_ROWS * LEVEL_METATILE_SIZE;
+    int min_camera_y = level_camera_min_y_px(level);
     int max_camera_y = bottom_world_y - viewport_height -
                        (int)level->camera_margin_bottom;
 
-    return max_camera_y > 0 ? max_camera_y : 0;
+    return max_camera_y > min_camera_y ? max_camera_y : min_camera_y;
 }
 
 int level_camera_min_y_px(const Level *level)

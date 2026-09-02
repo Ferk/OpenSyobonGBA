@@ -107,8 +107,9 @@
    "type": "enum",
    "storageType": "string",
    "valuesAsFlags": false,
-   "values": [
-    "walker",
+	   "values": [
+	    "none",
+	    "walker",
     "shell_walker",
     "shell",
     "static_hazard",
@@ -135,7 +136,7 @@
     "face_grin",
     "nyassun",
     "nyassun_alert",
-    "vertical32",
+    "kuma",
     "cuckoo32",
     "fire_projectile",
     "superjien",
@@ -193,8 +194,135 @@
      "type": "int",
      "value": 1
     },
+	    {
+	     "name": "item_variant",
+	     "type": "int",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_enemy_kind",
+	     "type": "string",
+	     "propertyType": "EnemyKind",
+	     "value": "none"
+	    },
+	    {
+	     "name": "spawn_enemy_sprite",
+	     "type": "string",
+	     "propertyType": "EnemySprite",
+	     "value": "walker"
+	    },
+	    {
+	     "name": "spawn_enemy_palette",
+	     "type": "int",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_enemy_param",
+	     "type": "int",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_enemy_count",
+	     "type": "int",
+	     "value": 1
+	    },
+	    {
+	     "name": "spawn_sound",
+	     "type": "bool",
+	     "value": true
+	    },
+	    {
+	     "name": "spawn_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_offset_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_offset_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_vx",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_vy",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_spacing_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "spawn_spacing_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_offset_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_offset_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_vx",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_vy",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_spacing_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_spawn_spacing_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
     {
-     "name": "item_variant",
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
      "type": "int",
      "value": 0
     },
