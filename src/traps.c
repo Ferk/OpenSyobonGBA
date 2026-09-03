@@ -35,10 +35,11 @@
 #define SPIKE_BLOCK_RIGHT_TILE_INDEX 132
 #define SIDE_PIPE_TILE_INDEX 136
 #define PLATFORM_TILE_INDEX 176
+#define PLATFORM_VISUAL_SLOTS 4
 /* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
-#define FALLING_TILE_DYNAMIC_INDEX 208
+#define FALLING_TILE_DYNAMIC_INDEX 224
 #define FALLING_TILE_DYNAMIC_SLOTS 16
-#define CHECKPOINT_TILE_INDEX 180
+#define CHECKPOINT_TILE_INDEX 192
 #define EVASIVE_BLOCK_PALETTE_BANK 1
 #define ITEM_PALETTE_BANK 3
 #define UNDERGROUND_TILE_PALETTE_BANK 5
@@ -115,6 +116,8 @@ TrapManager traps_current;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
 static uint16_t trap_rng = 0xace1;
+static uint8_t platform_visual_metatiles[PLATFORM_VISUAL_SLOTS];
+static uint8_t platform_visual_count;
 
 static const uint16_t underground_tile_obj_palette[16] = {
     RGB15(31, 0, 31), RGB15(20, 27, 31), RGB15(11, 11, 12), RGB15(23, 23, 24),
@@ -202,6 +205,42 @@ static void build_side_pipe_tiles(void)
             set_pipe_32_pixel(SIDE_PIPE_TILE_INDEX, x, y, color);
         }
     }
+}
+
+static void copy_metatile_to_obj_tiles(uint16_t obj_tile_index, uint8_t metatile)
+{
+    memcpy(&SPRITE_GFX[obj_tile_index * 16],
+           &tiles_16Tiles[metatile * 4 * 8],
+           4 * 16 * sizeof(uint16_t));
+}
+
+static void reset_platform_visual_cache(void)
+{
+    platform_visual_count = 0;
+    memset(platform_visual_metatiles, 0xff, sizeof(platform_visual_metatiles));
+}
+
+static uint16_t platform_tile_index_for_metatile(uint8_t metatile)
+{
+    if (metatile == 255 || metatile == METATILE_EMPTY) {
+        metatile = METATILE_SOLID;
+    }
+
+    for (uint8_t i = 0; i < platform_visual_count; ++i) {
+        if (platform_visual_metatiles[i] == metatile) {
+            return PLATFORM_TILE_INDEX + i * 4;
+        }
+    }
+
+    if (platform_visual_count < PLATFORM_VISUAL_SLOTS) {
+        uint8_t slot = platform_visual_count++;
+
+        platform_visual_metatiles[slot] = metatile;
+        copy_metatile_to_obj_tiles(PLATFORM_TILE_INDEX + slot * 4, metatile);
+        return PLATFORM_TILE_INDEX + slot * 4;
+    }
+
+    return PLATFORM_TILE_INDEX;
 }
 
 static uint8_t trap_contains_point(const Trap *trap, int world_x_px, int world_y_px)
@@ -423,7 +462,8 @@ static void apply_generated_cells(TrapManager *manager, Level *level,
                 continue;
             }
 
-            if (trigger->visual_metatile != 255) {
+            if (trigger->kind != TRAP_MOVING_PLATFORM &&
+                trigger->visual_metatile != 255) {
                 uint8_t palette = (trigger->visual_metatile == METATILE_EMPTY) ?
                     0 : trigger->visual_palette;
 
@@ -597,6 +637,8 @@ static void load_trap_tiles(void)
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
     memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
            spike_block_16Tiles, spike_block_16TilesLen);
+    reset_platform_visual_cache();
+    platform_tile_index_for_metatile(METATILE_SOLID);
 
     for (uint8_t i = 0; i < 4; ++i) {
         memcpy(&SPRITE_GFX[(BRICK_FRAGMENT_TILE_INDEX + i) * 16],
@@ -610,11 +652,6 @@ static void load_trap_tiles(void)
                4 * 16 * sizeof(uint16_t));
     }
 
-    for (uint8_t i = 0; i < 4; ++i) {
-        memcpy(&SPRITE_GFX[(PLATFORM_TILE_INDEX + i) * 16],
-               &tiles_16Tiles[(METATILE_SOLID * 4 + i) * 8],
-               16 * sizeof(uint16_t));
-    }
 }
 
 static uint16_t rendered_metatile_tile_index(uint8_t metatile, uint8_t sub_x, uint8_t sub_y)
@@ -2188,6 +2225,7 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             int cols = (FIX16_TO_INT(trap->w) + LEVEL_METATILE_SIZE - 1) /
                        LEVEL_METATILE_SIZE;
             uint16_t palette = block_overlay_obj_palette(trap->visual_palette);
+            uint16_t tile_index = platform_tile_index_for_metatile(trap->visual_metatile);
 
             if (cols < 1) {
                 cols = 1;
@@ -2204,7 +2242,7 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     obj->attr0 = (uint16_t)((base_y & 0x00ff) |
                                             ATTR0_COLOR_16 | ATTR0_SQUARE);
                     obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
-                    obj->attr2 = (uint16_t)(OBJ_CHAR(PLATFORM_TILE_INDEX) |
+                    obj->attr2 = (uint16_t)(OBJ_CHAR(tile_index) |
                                             ATTR2_PALETTE(palette));
                 }
 
