@@ -19,6 +19,7 @@ TRAP_KIND_NAMES = {
     "hint_block": "TRAP_HINT_BLOCK",
     "spike_block": "TRAP_SPIKE_BLOCK",
     "moving_platform": "TRAP_MOVING_PLATFORM",
+    "pickup_item": "TRAP_PICKUP_ITEM",
 }
 
 TRAP_SUBTYPE_NAMES = {
@@ -395,6 +396,9 @@ def parse_object_layers(map_data, tile_props):
             listen_channel = int(prop_value(
                 props, "listen_channel",
                 tile_prop.get("listen_channel", 0)))
+            channel_spawn_interval = int(prop_value(
+                props, "channel_spawn_interval",
+                tile_prop.get("channel_spawn_interval", 0)))
             trigger_delay = int(prop_value(
                 props, "trigger_delay",
                 tile_prop.get("trigger_delay", 0)))
@@ -570,6 +574,7 @@ def parse_object_layers(map_data, tile_props):
                     "spawn_sound": max(0, min(1, spawn_sound)),
                     "trigger_channel": max(0, min(255, trigger_channel)),
                     "listen_channel": max(0, min(255, listen_channel)),
+                    "channel_spawn_interval": max(0, min(255, channel_spawn_interval)),
                     "trigger_delay": max(0, min(255, trigger_delay)),
                     "spawn_offset_x": spawn_offset_x,
                     "spawn_offset_y": spawn_offset_y,
@@ -778,7 +783,8 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .spawn_enemy_palette = {trap['spawn_enemy_palette']}, .spawn_enemy_param = {trap['spawn_enemy_param']},",
                 f"        .spawn_enemy_count = {trap['spawn_enemy_count']}, .spawn_sound = {trap['spawn_sound']},",
                 f"        .trigger_channel = {trap['trigger_channel']}, .listen_channel = {trap['listen_channel']},",
-                f"        .trigger_delay = {trap['trigger_delay']}, .goal_walk_frames = {trap['goal_walk_frames']},",
+                f"        .channel_spawn_interval = {trap['channel_spawn_interval']}, .trigger_delay = {trap['trigger_delay']},",
+                f"        .goal_walk_frames = {trap['goal_walk_frames']},",
                 f"        .hint_text = {trap['hint_text']}, .visual_metatile = {trap['visual_metatile']},",
                 f"        .spent_metatile = {trap['spent_metatile']}, .collision = {trap['collision']}, .hidden = {trap['hidden']},",
                 f"        .source_x = {trap['source_x']}, .source_y = {trap['source_y']},",

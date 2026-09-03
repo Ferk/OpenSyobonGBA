@@ -28,6 +28,7 @@ typedef enum TrapKind {
     TRAP_HINT_BLOCK,
     TRAP_SPIKE_BLOCK,
     TRAP_MOVING_PLATFORM,
+    TRAP_PICKUP_ITEM,
 } TrapKind;
 
 typedef enum TrapState {
@@ -45,6 +46,7 @@ typedef enum TrapEntityKind {
     TRAP_ENTITY_BAD_ITEM,
     TRAP_ENTITY_STAR_ITEM,
     TRAP_ENTITY_BRICK_FRAGMENT,
+    TRAP_ENTITY_HURT_ITEM,
 } TrapEntityKind;
 
 typedef struct Trap {
@@ -75,6 +77,7 @@ typedef struct Trap {
     uint8_t spawn_sound;
     uint8_t trigger_channel;
     uint8_t listen_channel;
+    uint8_t channel_spawn_interval;
     uint8_t trigger_delay;
     fix16_t spawn_offset_x;
     fix16_t spawn_offset_y;
@@ -123,6 +126,7 @@ typedef struct TrapTrigger {
     uint8_t spawn_sound;
     uint8_t trigger_channel;
     uint8_t listen_channel;
+    uint8_t channel_spawn_interval;
     uint8_t trigger_delay;
     fix16_t spawn_offset_x;
     fix16_t spawn_offset_y;

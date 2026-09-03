@@ -28,16 +28,17 @@
 #define GOOD_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 4)
 #define BAD_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 8)
 #define STAR_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 12)
-#define BRICK_FRAGMENT_TILE_INDEX 116
-#define SPIKE_BLOCK_TOP_TILE_INDEX 120
-#define SPIKE_BLOCK_LEFT_TILE_INDEX 124
-#define SPIKE_BLOCK_RIGHT_TILE_INDEX 128
-#define SIDE_PIPE_TILE_INDEX 132
-#define PLATFORM_TILE_INDEX 172
+#define QUESTION_BALL_TILE_INDEX (ITEM_TILE_INDEX + 16)
+#define BRICK_FRAGMENT_TILE_INDEX 120
+#define SPIKE_BLOCK_TOP_TILE_INDEX 124
+#define SPIKE_BLOCK_LEFT_TILE_INDEX 128
+#define SPIKE_BLOCK_RIGHT_TILE_INDEX 132
+#define SIDE_PIPE_TILE_INDEX 136
+#define PLATFORM_TILE_INDEX 176
 /* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
-#define FALLING_TILE_DYNAMIC_INDEX 200
+#define FALLING_TILE_DYNAMIC_INDEX 208
 #define FALLING_TILE_DYNAMIC_SLOTS 16
-#define CHECKPOINT_TILE_INDEX 176
+#define CHECKPOINT_TILE_INDEX 180
 #define EVASIVE_BLOCK_PALETTE_BANK 1
 #define ITEM_PALETTE_BANK 3
 #define UNDERGROUND_TILE_PALETTE_BANK 5
@@ -107,6 +108,7 @@
 #define ITEM_EMERGE_FRAMES 16
 #define ITEM_WALK_SPEED REF_VEL_TO_FIX(100)
 #define ITEM_FAST_SPEED REF_VEL_TO_FIX(200)
+#define HURT_ITEM_TILE_INDEX BAD_ITEM_TILE_INDEX
 #define BRICK_FRAGMENT_LIFETIME 44
 #define TRAP_CHANNEL_NONE 0
 TrapManager traps_current;
@@ -331,6 +333,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_sound = 1;
     trap->trigger_channel = 0;
     trap->listen_channel = 0;
+    trap->channel_spawn_interval = 0;
     trap->trigger_delay = 0;
     trap->spawn_offset_x = 0;
     trap->spawn_offset_y = 0;
@@ -500,6 +503,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_sound = trigger->spawn_sound;
     trap->trigger_channel = trigger->trigger_channel;
     trap->listen_channel = trigger->listen_channel;
+    trap->channel_spawn_interval = trigger->channel_spawn_interval;
     trap->trigger_delay = trigger->trigger_delay;
     trap->spawn_offset_x = trigger->spawn_offset_x;
     trap->spawn_offset_y = trigger->spawn_offset_y;
@@ -918,6 +922,53 @@ static void spawn_block_item(TrapManager *manager, Trap *trap,
     }
 }
 
+static void spawn_hurt_item_at(TrapManager *manager, fix16_t x, fix16_t y)
+{
+    TrapEntity *entity = spawn_entity(manager, TRAP_ENTITY_HURT_ITEM,
+                                      x, y, 0, 0, 16, 16);
+
+    if (entity) {
+        entity->timer = 0;
+    }
+}
+
+static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap)
+{
+    static const int16_t ref_offsets[][2] = {
+        { -8 * 3000 - 1000, -4 * 3000 },
+        { -10 * 3000 + 1000, -1 * 3000 },
+        { 4 * 3000 + 1000, -2 * 3000 },
+        { 5 * 3000 - 1000, -3 * 3000 },
+        { 6 * 3000 + 1000, -4 * 3000 },
+        { 7 * 3000 - 1000, -2 * 3000 },
+        { 8 * 3000 + 1000, -2 * 3000 - 1000 },
+    };
+
+    for (uint8_t i = 0; i < sizeof(ref_offsets) / sizeof(ref_offsets[0]); ++i) {
+        spawn_hurt_item_at(manager,
+                           trap->x + REF_POS_TO_FIX(ref_offsets[i][0]),
+                           trap->y + REF_POS_TO_FIX(ref_offsets[i][1]));
+    }
+}
+
+static void trigger_pickup_item(TrapManager *manager, Trap *trap, Level *level,
+                                Player *player)
+{
+    if (trap->state != TRAP_IDLE) {
+        return;
+    }
+
+    trap->state = TRAP_SPENT;
+    trap->trigger_pending = 0;
+    audio_play_trap_trigger();
+
+    if (trap->item_variant == 1) {
+        spawn_question_ball_burst(manager, trap);
+    }
+
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
+}
+
 static int8_t resolve_question_enemy_dir(const Trap *trap, const Player *player)
 {
     if (trap->spawn_dir < 0) {
@@ -1191,6 +1242,11 @@ static void activate_linked_trap(TrapManager *manager, Level *level,
     case TRAP_HINT_BLOCK:
         trigger_hint_block(manager, trap, level, player);
         break;
+    case TRAP_PICKUP_ITEM:
+        if (player) {
+            trigger_pickup_item(manager, trap, level, player);
+        }
+        break;
     default:
         break;
     }
@@ -1206,9 +1262,17 @@ static void emit_trap_channel(TrapManager *manager, Level *level,
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *listener = &manager->traps[i];
 
-        if (listener->state != TRAP_IDLE ||
-            listener->listen_channel != channel ||
+        if (listener->listen_channel != channel ||
             listener->trigger_pending) {
+            continue;
+        }
+
+        if (listener->channel_spawn_interval != 0) {
+            listener->spawn_interval = listener->channel_spawn_interval;
+            listener->timer = 0;
+        }
+
+        if (listener->state != TRAP_IDLE) {
             continue;
         }
 
@@ -1756,6 +1820,16 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
         } else if (trap->kind == TRAP_GOAL && trap->state == TRAP_ACTIVE &&
                    !player->alive) {
             trap->state = TRAP_IDLE;
+        } else if (trap->kind == TRAP_PICKUP_ITEM && trap->state == TRAP_IDLE) {
+            int trap_x = FIX16_TO_INT(trap->x);
+            int trap_y = FIX16_TO_INT(trap->y);
+            int trap_w = FIX16_TO_INT(trap->w);
+            int trap_h = FIX16_TO_INT(trap->h);
+
+            if (aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                             trap_x, trap_y, trap_w, trap_h)) {
+                trigger_pickup_item(manager, trap, level, player);
+            }
         } else if (trap->kind == TRAP_QUESTION_BLOCK && trap->state == TRAP_ACTIVE) {
             if (trap->subtype == QUESTION_COIN_GENERATOR) {
                 if (trap->timer == 0) {
@@ -1810,7 +1884,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
 
         if (entity->kind == TRAP_ENTITY_GOOD_ITEM ||
             entity->kind == TRAP_ENTITY_BAD_ITEM ||
-            entity->kind == TRAP_ENTITY_STAR_ITEM) {
+            entity->kind == TRAP_ENTITY_STAR_ITEM ||
+            entity->kind == TRAP_ENTITY_HURT_ITEM) {
             update_moving_item(entity, level);
         } else {
             entity->x += entity->vx;
@@ -1879,6 +1954,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 MessageId message = MESSAGE_PLAYER_BAD_MUSHROOM;
                 if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
                     message = MESSAGE_PLAYER_STABBED;
+                } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
+                    message = MESSAGE_PLAYER_TASTY;
                 }
                 entity->active = 0;
                 messages_show(message,
@@ -1915,6 +1992,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                 tile = BAD_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
                 tile = STAR_ITEM_TILE_INDEX;
+            } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
+                tile = HURT_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
                 tile = BRICK_FRAGMENT_TILE_INDEX + entity->frame;
             }
@@ -1932,7 +2011,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             } else if (entity->kind == TRAP_ENTITY_COIN_POPUP ||
                        entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                        entity->kind == TRAP_ENTITY_BAD_ITEM ||
-                       entity->kind == TRAP_ENTITY_STAR_ITEM) {
+                       entity->kind == TRAP_ENTITY_STAR_ITEM ||
+                       entity->kind == TRAP_ENTITY_HURT_ITEM) {
                 palette = ITEM_PALETTE_BANK;
             }
 
@@ -2032,6 +2112,23 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                 OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
                 dynamic_index++;
             }
+        } else if (trap->kind == TRAP_PICKUP_ITEM && trap->state == TRAP_IDLE) {
+            int screen_x = camera_world_to_screen_x(camera, trap->x);
+            int screen_y = camera_world_to_screen_y(camera, trap->y);
+            OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
+
+            if (!camera_sprite_visible(screen_x, screen_y,
+                                       LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE)) {
+                obj->attr0 = ATTR0_DISABLED;
+            } else {
+                obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
+                obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
+                obj->attr2 = (uint16_t)(OBJ_CHAR(QUESTION_BALL_TILE_INDEX) |
+                                        ATTR2_PALETTE(ITEM_PALETTE_BANK));
+            }
+
+            OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
+            dynamic_index++;
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
             int base_y = camera_world_to_screen_y(camera, trap->y);

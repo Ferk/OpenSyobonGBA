@@ -26,7 +26,8 @@
     "goal",
     "hint_block",
     "spike_block",
-    "moving_platform"
+    "moving_platform",
+    "pickup_item"
    ]
   },
   {
@@ -339,6 +340,11 @@
     },
     {
      "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "channel_spawn_interval",
      "type": "int",
      "value": 0
     },
