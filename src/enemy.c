@@ -44,6 +44,7 @@
 #define WALKER_SPEED REF_VEL_TO_FIX(100)
 #define SHELL_SPEED REF_VEL_TO_FIX(800)
 #define SUPERJIEN_SPEED REF_VEL_TO_FIX(120)
+#define KUMA_SPEED REF_VEL_TO_FIX(160)
 #define GIANT_SPEED REF_VEL_TO_FIX(160)
 #define SUPERJIEN_HOP_SPEED (-REF_VEL_TO_FIX(1600))
 #define SUPERJIEN_HOP_COOLDOWN 40
@@ -74,6 +75,11 @@ static uint8_t default_enemy_width(EnemyKind kind)
             kind == ENEMY_SHELL_WALKER ||
             kind == ENEMY_SHELL) ? 17 :
            (kind == ENEMY_SUPERJIEN) ? 18 : 16;
+}
+
+static uint8_t default_enemy_height(EnemyKind kind)
+{
+    return (kind == ENEMY_KUMA) ? 32 : 16;
 }
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
@@ -158,7 +164,7 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->vx = 0;
     enemy->vy = 0;
     enemy->w = default_enemy_width(kind);
-    enemy->h = 16;
+    enemy->h = default_enemy_height(kind);
     enemy->dir = dir;
     enemy->timer = 0;
     enemy->on_ground = 0;
@@ -220,6 +226,9 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
         enemy->w = default_enemy_width(spawn->kind);
     }
     enemy->h = spawn->h;
+    if (spawn->kind == ENEMY_KUMA && enemy->h == 16) {
+        enemy->h = default_enemy_height(spawn->kind);
+    }
     enemy->sprite = spawn->sprite;
     enemy->palette = spawn->palette;
     enemy->param = spawn->param;
@@ -381,6 +390,31 @@ static void update_superjien(Enemy *enemy, const Level *level,
 
     enemy->vx = (enemy->dir > 0) ? SUPERJIEN_SPEED : -SUPERJIEN_SPEED;
     move_enemy_x(enemy, level);
+}
+
+static void update_kuma(Enemy *enemy, const Level *level, const Player *player)
+{
+    fix16_t speed = KUMA_SPEED;
+
+    if (player) {
+        int enemy_x = FIX16_TO_INT(enemy->x);
+        int enemy_y = FIX16_TO_INT(enemy->y);
+        int player_x = FIX16_TO_INT(player->x);
+        int player_y = FIX16_TO_INT(player->y);
+
+        if (player_x + PLAYER_WIDTH_PX >= enemy_x &&
+            player_x <= enemy_x + enemy->w &&
+            player_y + PLAYER_HEIGHT_PX + 1 < enemy_y) {
+            speed = REF_VEL_TO_FIX(300);
+        }
+    }
+
+    enemy->vx = (enemy->dir > 0) ? speed : -speed;
+    if (enemy->param > 0) {
+        enemy->x += enemy->vx;
+    } else {
+        move_enemy_x(enemy, level);
+    }
 }
 
 static uint8_t giant_can_break_cell(const Level *level, uint16_t source_x,
@@ -863,6 +897,8 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             update_walker(enemy, level);
         } else if (enemy->kind == ENEMY_SUPERJIEN) {
             update_superjien(enemy, level, player);
+        } else if (enemy->kind == ENEMY_KUMA) {
+            update_kuma(enemy, level, player);
         } else if (enemy->kind == ENEMY_GIANT) {
             update_giant(enemy);
         } else if (enemy->kind == ENEMY_SHELL_WALKER) {
@@ -871,10 +907,23 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             update_shell(enemy, level);
         }
 
+        uint8_t moved_before_gravity = 0;
+
+        if (enemy->kind == ENEMY_KUMA && enemy->param > 0) {
+            enemy->y += enemy->vy;
+            enemy->param--;
+            moved_before_gravity = 1;
+        } else if (enemy->kind == ENEMY_KUMA && enemy->vy < 0) {
+            move_enemy_y(enemy, level);
+            moved_before_gravity = 1;
+        }
+
         if (enemy->kind != ENEMY_CEILING_FALLER) {
             apply_gravity(enemy);
         }
-        move_enemy_y(enemy, level);
+        if (!moved_before_gravity) {
+            move_enemy_y(enemy, level);
+        }
 
         if (enemy->kind == ENEMY_GIANT) {
             break_giant_overlap_bricks(enemy, level, traps);

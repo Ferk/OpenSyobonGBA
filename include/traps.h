@@ -84,6 +84,8 @@ typedef struct Trap {
     fix16_t spawn_random_vy;
     fix16_t spawn_spacing_x;
     fix16_t spawn_spacing_y;
+    fix16_t repeat_rearm_offset_x;
+    fix16_t repeat_rearm_offset_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t spawn_count;
@@ -130,6 +132,8 @@ typedef struct TrapTrigger {
     fix16_t spawn_random_vy;
     fix16_t spawn_spacing_x;
     fix16_t spawn_spacing_y;
+    fix16_t repeat_rearm_offset_x;
+    fix16_t repeat_rearm_offset_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t visual_metatile;

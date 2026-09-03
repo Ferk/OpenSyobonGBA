@@ -117,6 +117,7 @@
     "pipe_shot",
     "firebar",
     "superjien",
+    "kuma",
     "giant"
    ]
   },
@@ -308,6 +309,26 @@
 	    },
 	    {
 	     "name": "ref_spawn_spacing_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "repeat_rearm_offset_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "repeat_rearm_offset_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_repeat_rearm_offset_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_repeat_rearm_offset_y",
 	     "type": "float",
 	     "value": 0
 	    },

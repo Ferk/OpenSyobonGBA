@@ -111,6 +111,7 @@ ENEMY_KIND_NAMES = {
     "firebar": "ENEMY_FIREBAR",
     "superjien": "ENEMY_SUPERJIEN",
     "super_jien": "ENEMY_SUPERJIEN",
+    "kuma": "ENEMY_KUMA",
     "giant": "ENEMY_GIANT",
 }
 
@@ -435,7 +436,6 @@ def parse_object_layers(map_data, tile_props):
                 tile_prop.get("spawn_enemy_count", 1)))
             spawn_sound = int(prop_value(
                 props, "spawn_sound", tile_prop.get("spawn_sound", 1)))
-
             spawn_offset_x_prop = prop_value(
                 props, "spawn_offset_x", tile_prop.get("spawn_offset_x"))
             spawn_offset_y_prop = prop_value(
@@ -468,6 +468,14 @@ def parse_object_layers(map_data, tile_props):
                 props, "ref_spawn_spacing_x", tile_prop.get("ref_spawn_spacing_x"))
             ref_spawn_spacing_y_prop = prop_value(
                 props, "ref_spawn_spacing_y", tile_prop.get("ref_spawn_spacing_y"))
+            repeat_rearm_offset_x_prop = prop_value(
+                props, "repeat_rearm_offset_x", tile_prop.get("repeat_rearm_offset_x"))
+            repeat_rearm_offset_y_prop = prop_value(
+                props, "repeat_rearm_offset_y", tile_prop.get("repeat_rearm_offset_y"))
+            ref_repeat_rearm_offset_x_prop = prop_value(
+                props, "ref_repeat_rearm_offset_x", tile_prop.get("ref_repeat_rearm_offset_x"))
+            ref_repeat_rearm_offset_y_prop = prop_value(
+                props, "ref_repeat_rearm_offset_y", tile_prop.get("ref_repeat_rearm_offset_y"))
 
             spawn_offset_x = (ref_position_fixed(ref_spawn_offset_x_prop)
                               if ref_spawn_offset_x_prop is not None
@@ -493,6 +501,12 @@ def parse_object_layers(map_data, tile_props):
             spawn_spacing_y = (ref_position_fixed(ref_spawn_spacing_y_prop)
                                if ref_spawn_spacing_y_prop is not None
                                else fixed(spawn_spacing_y_prop or 0))
+            repeat_rearm_offset_x = (ref_position_fixed(ref_repeat_rearm_offset_x_prop)
+                                     if ref_repeat_rearm_offset_x_prop is not None
+                                     else fixed(repeat_rearm_offset_x_prop or 0))
+            repeat_rearm_offset_y = (ref_position_fixed(ref_repeat_rearm_offset_y_prop)
+                                     if ref_repeat_rearm_offset_y_prop is not None
+                                     else fixed(repeat_rearm_offset_y_prop or 0))
 
             spawn_x_prop = prop_value(props, "spawn_x", tile_prop.get("spawn_x"))
             spawn_y_prop = prop_value(props, "spawn_y", tile_prop.get("spawn_y"))
@@ -565,6 +579,8 @@ def parse_object_layers(map_data, tile_props):
                     "spawn_random_vy": spawn_random_vy,
                     "spawn_spacing_x": spawn_spacing_x,
                     "spawn_spacing_y": spawn_spacing_y,
+                    "repeat_rearm_offset_x": repeat_rearm_offset_x,
+                    "repeat_rearm_offset_y": repeat_rearm_offset_y,
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
@@ -773,6 +789,7 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .spawn_vx = {trap['spawn_vx']}, .spawn_vy = {trap['spawn_vy']},",
                 f"        .spawn_random_vx = {trap['spawn_random_vx']}, .spawn_random_vy = {trap['spawn_random_vy']},",
                 f"        .spawn_spacing_x = {trap['spawn_spacing_x']}, .spawn_spacing_y = {trap['spawn_spacing_y']},",
+                f"        .repeat_rearm_offset_x = {trap['repeat_rearm_offset_x']}, .repeat_rearm_offset_y = {trap['repeat_rearm_offset_y']},",
                 "    },",
             ])
     else:

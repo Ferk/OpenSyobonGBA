@@ -4330,6 +4330,26 @@
        "value": ""
       },
       {
+       "name": "ref_spawn_random_vx",
+       "type": "float",
+       "value": 600
+      },
+      {
+       "name": "ref_spawn_random_vy",
+       "type": "float",
+       "value": 900
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -1600
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 30000
+      },
+      {
        "name": "source_x",
        "type": "int",
        "value": 103
@@ -4341,9 +4361,26 @@
       },
       {
        "name": "spawn_dir",
+       "propertytype": "TrapSpawnDirection",
        "type": "string",
-       "value": "left",
-       "propertytype": "TrapSpawnDirection"
+       "value": "left"
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "pipe_shot"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "fire_projectile"
       },
       {
        "name": "spawn_interval",
@@ -4353,7 +4390,12 @@
       {
        "name": "spawn_limit",
        "type": "int",
-       "value": 0
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": false
       },
       {
        "name": "subtype",
@@ -4374,48 +4416,6 @@
        "name": "visual_palette",
        "type": "string",
        "value": "underground"
-      },
-      {
-       "name": "spawn_enemy_kind",
-       "type": "string",
-       "value": "pipe_shot",
-       "propertytype": "EnemyKind"
-      },
-      {
-       "name": "spawn_enemy_sprite",
-       "type": "string",
-       "value": "fire_projectile",
-       "propertytype": "EnemySprite"
-      },
-      {
-       "name": "ref_spawn_y",
-       "type": "float",
-       "value": 30000.0
-      },
-      {
-       "name": "ref_spawn_vy",
-       "type": "float",
-       "value": -1600.0
-      },
-      {
-       "name": "ref_spawn_random_vx",
-       "type": "float",
-       "value": 600.0
-      },
-      {
-       "name": "ref_spawn_random_vy",
-       "type": "float",
-       "value": 900.0
-      },
-      {
-       "name": "spawn_enemy_count",
-       "type": "int",
-       "value": 1
-      },
-      {
-       "name": "spawn_sound",
-       "type": "bool",
-       "value": false
       }
      ],
      "rotation": 0,
@@ -4600,6 +4600,21 @@
        "value": ""
       },
       {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 1500
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -2000
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 44000
+      },
+      {
        "name": "source_x",
        "type": "int",
        "value": 43
@@ -4616,6 +4631,23 @@
        "value": "left"
       },
       {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "superjien"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "superjien"
+      },
+      {
        "name": "spawn_interval",
        "type": "int",
        "value": 0
@@ -4624,6 +4656,11 @@
        "name": "spawn_limit",
        "type": "int",
        "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": false
       },
       {
        "name": "subtype",
@@ -4647,43 +4684,6 @@
        "propertytype": "BgPalette",
        "type": "string",
        "value": "underground"
-      },
-      {
-       "name": "spawn_enemy_kind",
-       "type": "string",
-       "value": "superjien",
-       "propertytype": "EnemyKind"
-      },
-      {
-       "name": "spawn_enemy_sprite",
-       "type": "string",
-       "value": "superjien",
-       "propertytype": "EnemySprite"
-      },
-      {
-       "name": "ref_spawn_offset_x",
-       "type": "float",
-       "value": 1500.0
-      },
-      {
-       "name": "ref_spawn_y",
-       "type": "float",
-       "value": 44000.0
-      },
-      {
-       "name": "ref_spawn_vy",
-       "type": "float",
-       "value": -2000.0
-      },
-      {
-       "name": "spawn_enemy_count",
-       "type": "int",
-       "value": 1
-      },
-      {
-       "name": "spawn_sound",
-       "type": "bool",
-       "value": false
       }
      ],
      "rotation": 0,
@@ -4716,6 +4716,21 @@
        "value": ""
       },
       {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 4500
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -1600
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 24200
+      },
+      {
        "name": "source_x",
        "type": "int",
        "value": 53
@@ -4732,6 +4747,28 @@
        "value": "left"
       },
       {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "kuma"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "kuma"
+      },
+      {
+       "name": "spawn_enemy_param",
+       "type": "int",
+       "value": 24
+      },
+      {
        "name": "spawn_interval",
        "type": "int",
        "value": 0
@@ -4740,6 +4777,11 @@
        "name": "spawn_limit",
        "type": "int",
        "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
       },
       {
        "name": "subtype",
@@ -4765,41 +4807,14 @@
        "value": "underground"
       },
       {
-       "name": "spawn_enemy_kind",
-       "type": "string",
-       "value": "pipe_shot",
-       "propertytype": "EnemyKind"
-      },
-      {
-       "name": "spawn_enemy_sprite",
-       "type": "string",
-       "value": "hazard",
-       "propertytype": "EnemySprite"
-      },
-      {
-       "name": "ref_spawn_offset_x",
+       "name": "ref_repeat_rearm_offset_x",
        "type": "float",
-       "value": 4500.0
+       "value": -12000
       },
       {
-       "name": "ref_spawn_y",
+       "name": "ref_repeat_rearm_offset_y",
        "type": "float",
-       "value": 30000.0
-      },
-      {
-       "name": "ref_spawn_vy",
-       "type": "float",
-       "value": -1600.0
-      },
-      {
-       "name": "spawn_enemy_count",
-       "type": "int",
-       "value": 1
-      },
-      {
-       "name": "spawn_sound",
-       "type": "bool",
-       "value": true
+       "value": 0
       }
      ],
      "rotation": 0,

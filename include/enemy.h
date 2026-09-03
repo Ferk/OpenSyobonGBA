@@ -40,6 +40,7 @@ typedef enum EnemyKind {
     ENEMY_PIPE_SHOT,
     ENEMY_FIREBAR,
     ENEMY_SUPERJIEN,
+    ENEMY_KUMA,
     ENEMY_GIANT,
 } EnemyKind;
 

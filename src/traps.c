@@ -340,6 +340,8 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_random_vy = 0;
     trap->spawn_spacing_x = 0;
     trap->spawn_spacing_y = 0;
+    trap->repeat_rearm_offset_x = 0;
+    trap->repeat_rearm_offset_y = 0;
     trap->goal_walk_frames = 0;
     trap->hint_text = 0;
     trap->spawn_count = 0;
@@ -358,7 +360,24 @@ static uint8_t question_spawn_limit_reached(const Trap *trap)
     return trap->spawn_limit != 0 && trap->spawn_count >= trap->spawn_limit;
 }
 
+static uint8_t trap_spawn_limit_reached(const Trap *trap)
+{
+    return trap->spawn_limit != 0 && trap->spawn_count >= trap->spawn_limit;
+}
+
+static uint8_t trap_has_repeat_rearm_offset(const Trap *trap)
+{
+    return trap->repeat_rearm_offset_x != 0 || trap->repeat_rearm_offset_y != 0;
+}
+
 static void mark_question_spawned(Trap *trap)
+{
+    if (trap->spawn_count < 255) {
+        trap->spawn_count++;
+    }
+}
+
+static void mark_trap_spawned(Trap *trap)
 {
     if (trap->spawn_count < 255) {
         trap->spawn_count++;
@@ -490,6 +509,8 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_random_vy = trigger->spawn_random_vy;
     trap->spawn_spacing_x = trigger->spawn_spacing_x;
     trap->spawn_spacing_y = trigger->spawn_spacing_y;
+    trap->repeat_rearm_offset_x = trigger->repeat_rearm_offset_x;
+    trap->repeat_rearm_offset_y = trigger->repeat_rearm_offset_y;
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
@@ -996,7 +1017,7 @@ static fix16_t random_fixed_centered(fix16_t range)
     return random_fixed_positive(range) - range / 2;
 }
 
-static void spawn_trap_enemy_recipe(Trap *trap)
+static void spawn_trap_enemy_recipe(Trap *trap, const Player *player)
 {
     if (trap->spawn_enemy_kind == ENEMY_NONE || trap->spawn_enemy_count == 0) {
         return;
@@ -1014,12 +1035,25 @@ static void spawn_trap_enemy_recipe(Trap *trap)
             vy += (vy < 0) ? -random_vy : random_vy;
         }
 
+        int8_t spawn_dir = trap->spawn_dir;
+        fix16_t spawn_x = trap->x + trap->spawn_offset_x + trap->spawn_spacing_x * i;
+        fix16_t spawn_y = trap->y + trap->spawn_offset_y + trap->spawn_spacing_y * i;
+
+        if (spawn_dir == 0 && player) {
+            int player_center = FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX / 2;
+            int spawn_center = FIX16_TO_INT(spawn_x) + 8;
+
+            spawn_dir = (spawn_center <= player_center) ? 1 : -1;
+        }
+        if (spawn_dir == 0) {
+            spawn_dir = -1;
+        }
+
         enemies_spawn_direct_config(
             &enemy_current, (EnemyKind)trap->spawn_enemy_kind,
-            trap->x + trap->spawn_offset_x + trap->spawn_spacing_x * i,
-            trap->y + trap->spawn_offset_y + trap->spawn_spacing_y * i,
+            spawn_x, spawn_y,
             vx, vy, trap->spawn_enemy_sprite, trap->spawn_enemy_palette,
-            trap->spawn_enemy_param, trap->spawn_dir);
+            trap->spawn_enemy_param, spawn_dir);
     }
 }
 
@@ -1027,6 +1061,12 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
                                   Player *player)
 {
     if (trap->state != TRAP_IDLE) {
+        return;
+    }
+    uint8_t has_rearm_offset = trap_has_repeat_rearm_offset(trap);
+
+    if (!has_rearm_offset && trap_spawn_limit_reached(trap)) {
+        trap->state = TRAP_SPENT;
         return;
     }
 
@@ -1037,7 +1077,11 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
         if (trap->spawn_sound) {
             audio_play_trap_trigger();
         }
-        spawn_trap_enemy_recipe(trap);
+        spawn_trap_enemy_recipe(trap, player);
+        mark_trap_spawned(trap);
+        if (has_rearm_offset) {
+            trap->state = TRAP_ACTIVE;
+        }
     } else if (trap->subtype == STAGE_HINT_MESSAGE) {
         messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
                                  trap->x, trap->y);
@@ -1062,8 +1106,13 @@ static void update_stage_pipe_hazard(Trap *trap, const Player *player)
         return;
     }
 
+    if (trap_spawn_limit_reached(trap)) {
+        return;
+    }
+
     trap->timer = 0;
-    spawn_trap_enemy_recipe(trap);
+    spawn_trap_enemy_recipe(trap, player);
+    mark_trap_spawned(trap);
 }
 
 static void trigger_checkpoint(TrapManager *manager, Trap *trap, Level *level,
@@ -1664,6 +1713,24 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                    trap->state == TRAP_ACTIVE &&
                    trap->subtype == STAGE_PIPE_HAZARD) {
             update_stage_pipe_hazard(trap, player);
+        } else if (trap->kind == TRAP_STAGE_SPAWNER &&
+                   trap->state == TRAP_ACTIVE) {
+            int trap_x = FIX16_TO_INT(trap->x);
+            int trap_y = FIX16_TO_INT(trap->y);
+            int trap_w = FIX16_TO_INT(trap->w);
+            int trap_h = FIX16_TO_INT(trap->h);
+            int rearm_x = trap_x + FIX16_TO_INT(trap->repeat_rearm_offset_x);
+            int rearm_y = trap_y + FIX16_TO_INT(trap->repeat_rearm_offset_y);
+            uint8_t has_rearm_offset = trap_has_repeat_rearm_offset(trap);
+
+            if ((has_rearm_offset &&
+                 aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                              rearm_x, rearm_y, trap_w, trap_h)) ||
+                (!has_rearm_offset &&
+                 !aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                               trap_x, trap_y, trap_w, trap_h))) {
+                trap->state = TRAP_IDLE;
+            }
         } else if (trap->kind == TRAP_SPIKE_BLOCK) {
             update_spike_block(trap, player);
         } else if (trap->kind == TRAP_ENTER_PIPE) {
