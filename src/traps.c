@@ -34,6 +34,7 @@
 #define SPIKE_BLOCK_LEFT_TILE_INDEX 128
 #define SPIKE_BLOCK_RIGHT_TILE_INDEX 132
 #define SIDE_PIPE_TILE_INDEX 136
+#define GOAL_TILE_INDEX 152
 #define PLATFORM_TILE_INDEX 176
 #define PLATFORM_VISUAL_SLOTS 4
 /* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
@@ -112,6 +113,9 @@
 #define HURT_ITEM_TILE_INDEX BAD_ITEM_TILE_INDEX
 #define BRICK_FRAGMENT_LIFETIME 44
 #define TRAP_CHANNEL_NONE 0
+#define FAKE_GOAL_BOUNCE REF_VEL_TO_FIX(-900)
+#define FAKE_GOAL_MOVE_SPEED REF_VEL_TO_FIX(400)
+#define FAKE_GOAL_TOP_PALETTE_BANK 6
 TrapManager traps_current;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
@@ -617,6 +621,9 @@ static void load_trap_tiles(void)
            items_16Pal, 16 * sizeof(uint16_t));
     memcpy(&SPRITE_PALETTE[UNDERGROUND_TILE_PALETTE_BANK * 16],
            underground_tile_obj_palette, sizeof(underground_tile_obj_palette));
+    memcpy(&SPRITE_PALETTE[FAKE_GOAL_TOP_PALETTE_BANK * 16],
+           tiles_16Pal, 16 * sizeof(uint16_t));
+    SPRITE_PALETTE[FAKE_GOAL_TOP_PALETTE_BANK * 16 + 4] = RGB15(0, 31, 25);
     memcpy(&SPRITE_GFX[TRAP_TILE_INDEX * 16], traps_16Tiles, traps_16TilesLen);
     memcpy(&SPRITE_GFX[EVASIVE_BLOCK_TILE_INDEX * 16],
            &tiles_16Tiles[METATILE_QUESTION * 4 * 8],
@@ -650,6 +657,11 @@ static void load_trap_tiles(void)
         memcpy(&SPRITE_GFX[(CHECKPOINT_TILE_INDEX + i * 4) * 16],
                &tiles_16Tiles[(METATILE_CHECKPOINT_00 * 4 + i * 4) * 8],
                4 * 16 * sizeof(uint16_t));
+    }
+
+    for (uint8_t i = 0; i < 4; ++i) {
+        copy_metatile_to_obj_tiles(GOAL_TILE_INDEX + i * 4,
+                                   METATILE_GOAL_00 + i);
     }
 
 }
@@ -1239,6 +1251,83 @@ static void trigger_goal(TrapManager *manager, Trap *trap, Level *level,
     emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
+static void trigger_fake_goal(TrapManager *manager, Trap *trap, Level *level,
+                              Player *player)
+{
+    if (!player->alive) {
+        return;
+    }
+
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    int trap_x = FIX16_TO_INT(trap->x);
+    int trap_y = FIX16_TO_INT(trap->y);
+    int trap_h = FIX16_TO_INT(trap->h);
+    int bounce_left = trap_x + FIX16_TO_INT(REF_POS_TO_FIX(500));
+    int bounce_right = trap_x + FIX16_TO_INT(REF_POS_TO_FIX(2000));
+    int body_left = trap_x + FIX16_TO_INT(REF_POS_TO_FIX(500));
+    int body_right = trap_x + FIX16_TO_INT(REF_POS_TO_FIX(2000));
+    int bottom = player_y + PLAYER_HEIGHT_PX;
+
+    if (player->vy >= 0 &&
+        player_x + PLAYER_WIDTH_PX > bounce_left &&
+        player_x < bounce_right &&
+        bottom > trap_y + FIX16_TO_INT(REF_POS_TO_FIX(800)) &&
+        bottom < trap_y + FIX16_TO_INT(REF_POS_TO_FIX(1600)) + FIX16_TO_INT(player->vy)) {
+        trap->state = TRAP_ACTIVE;
+        trap->spawn_dir = player_x < trap_x ? -1 : 1;
+        trap->vx = trap->spawn_dir < 0 ? -FAKE_GOAL_MOVE_SPEED : FAKE_GOAL_MOVE_SPEED;
+        player->y = trap->y - REF_POS_TO_FIX(4000);
+        player->vy = FAKE_GOAL_BOUNCE;
+        player->on_ground = 0;
+        audio_play_trap_trigger();
+        return;
+    }
+
+    if (player_x + PLAYER_WIDTH_PX > body_left &&
+        player_x < body_right &&
+        player_y < trap_y + trap_h - FIX16_TO_INT(REF_POS_TO_FIX(500)) &&
+        bottom > trap_y + FIX16_TO_INT(REF_POS_TO_FIX(5750))) {
+        messages_show_text(trap_random(2) ? TXT_FAKE_GOAL_ATTACK :
+                           TXT_FAKE_GOAL_BETRAYED,
+                           player->x - FIX16_FROM_INT(8),
+                           player->y - FIX16_FROM_INT(12),
+                           90);
+        player_kill(player);
+        emit_trap_channel(manager, level, player, trap->trigger_channel);
+    }
+}
+
+static void update_fake_goal(Trap *trap, Player *player)
+{
+    int player_x = FIX16_TO_INT(player->x);
+    int player_y = FIX16_TO_INT(player->y);
+    int trap_x = FIX16_TO_INT(trap->x);
+
+    if (trap->state == TRAP_IDLE) {
+        int left_y = FIX16_TO_INT(REF_STAGE_Y_TO_FIX(30000));
+        int right_y = FIX16_TO_INT(REF_STAGE_Y_TO_FIX(24000));
+
+        if (player_y >= left_y &&
+            player_x >= trap_x - FIX16_TO_INT(REF_POS_TO_FIX(3000 * 5)) &&
+            player_x <= trap_x) {
+            trap->state = TRAP_ACTIVE;
+            trap->spawn_dir = -1;
+            trap->vx = -FAKE_GOAL_MOVE_SPEED;
+        } else if (player_y >= right_y &&
+                   player_x <= trap_x + FIX16_TO_INT(REF_POS_TO_FIX(3000 * 8)) &&
+                   player_x >= trap_x) {
+            trap->state = TRAP_ACTIVE;
+            trap->spawn_dir = 1;
+            trap->vx = FAKE_GOAL_MOVE_SPEED;
+        }
+    }
+
+    if (trap->state == TRAP_ACTIVE) {
+        trap->x += trap->vx;
+    }
+}
+
 static void trigger_hint_block(TrapManager *manager, Trap *trap, Level *level,
                                Player *player)
 {
@@ -1274,6 +1363,11 @@ static void activate_linked_trap(TrapManager *manager, Level *level,
     case TRAP_GOAL:
         if (player) {
             trigger_goal(manager, trap, level, player);
+        }
+        break;
+    case TRAP_FAKE_GOAL:
+        if (player) {
+            trigger_fake_goal(manager, trap, level, player);
         }
         break;
     case TRAP_HINT_BLOCK:
@@ -1854,6 +1948,9 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             if (player_hits_goal_trigger(trap, player)) {
                 trigger_goal(manager, trap, level, player);
             }
+        } else if (trap->kind == TRAP_FAKE_GOAL) {
+            update_fake_goal(trap, player);
+            trigger_fake_goal(manager, trap, level, player);
         } else if (trap->kind == TRAP_GOAL && trap->state == TRAP_ACTIVE &&
                    !player->alive) {
             trap->state = TRAP_IDLE;
@@ -2083,6 +2180,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             cull_y -= FIX16_FROM_INT(16);
             cull_w = 48;
             cull_h = 48;
+        } else if (trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) {
+            cull_w = 16;
         }
 
         if (cull_w < 1) {
@@ -2289,6 +2388,40 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
                     dynamic_index++;
                 }
+            }
+        } else if (trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) {
+            int base_x = camera_world_to_screen_x(camera, trap->x);
+            int base_y = camera_world_to_screen_y(camera, trap->y);
+            int rows = FIX16_TO_INT(trap->h) / LEVEL_METATILE_SIZE;
+            uint16_t palette = block_overlay_obj_palette(trap->visual_palette);
+
+            if (rows < 1) {
+                rows = 1;
+            }
+
+            for (int row = 0; row < rows && dynamic_index < TRAPS_MAX_DYNAMIC_SPRITES; ++row) {
+                int screen_y = base_y + row * LEVEL_METATILE_SIZE;
+                uint8_t art_row = row < 4 ? (uint8_t)row : 3;
+                OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
+
+                if (!camera_sprite_visible(base_x, screen_y,
+                                           LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE)) {
+                    continue;
+                }
+
+                uint16_t row_palette = palette;
+
+                if (trap->kind == TRAP_FAKE_GOAL && row == 0) {
+                    row_palette = FAKE_GOAL_TOP_PALETTE_BANK;
+                }
+
+                obj->attr0 = (uint16_t)((screen_y & 0x00ff) |
+                                        ATTR0_COLOR_16 | ATTR0_SQUARE);
+                obj->attr1 = (uint16_t)((base_x & 0x01ff) | ATTR1_SIZE_16);
+                obj->attr2 = (uint16_t)(OBJ_CHAR(GOAL_TILE_INDEX + art_row * 4) |
+                                        ATTR2_PALETTE(row_palette));
+                OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
+                dynamic_index++;
             }
         }
 

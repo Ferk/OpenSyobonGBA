@@ -29,6 +29,7 @@ typedef enum TrapKind {
     TRAP_SPIKE_BLOCK,
     TRAP_MOVING_PLATFORM,
     TRAP_PICKUP_ITEM,
+    TRAP_FAKE_GOAL,
 } TrapKind;
 
 typedef enum TrapState {

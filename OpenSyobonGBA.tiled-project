@@ -27,7 +27,8 @@
     "hint_block",
     "spike_block",
     "moving_platform",
-    "pickup_item"
+    "pickup_item",
+    "fake_goal"
    ]
   },
   {

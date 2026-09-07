@@ -20,6 +20,7 @@ TRAP_KIND_NAMES = {
     "spike_block": "TRAP_SPIKE_BLOCK",
     "moving_platform": "TRAP_MOVING_PLATFORM",
     "pickup_item": "TRAP_PICKUP_ITEM",
+    "fake_goal": "TRAP_FAKE_GOAL",
 }
 
 TRAP_SUBTYPE_NAMES = {

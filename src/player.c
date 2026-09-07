@@ -549,6 +549,18 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
             } else {
                 player->vx = PLAYER_GOAL_WALK_SPEED;
                 player->x += player->vx;
+                move_y(player, level, traps);
+                if (player->vy < PLAYER_MAX_FALL_SPEED) {
+                    if (!player->on_ground) {
+                        player->vy += PLAYER_GRAVITY;
+                        if (player->vy > PLAYER_MAX_FALL_SPEED) {
+                            player->vy = PLAYER_MAX_FALL_SPEED;
+                        }
+                    } else {
+                        player->vy = 0;
+                    }
+                }
+
                 player->walk_distance += player->vx;
                 if (player->walk_distance < 0) {
                     player->walk_distance = -player->walk_distance;
