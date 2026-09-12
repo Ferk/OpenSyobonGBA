@@ -411,10 +411,8 @@ def parse_object_layers(map_data, tile_props):
                               default_goal_walk_frames(trap))))
             hint_text = prop_value(props, "hint_text",
                                    tile_prop.get("hint_text"))
-            source_x = int(float(prop_value(props, "source_x",
-                           tiled_x / GBA_METATILE_SIZE)))
-            source_y = int(float(prop_value(props, "source_y",
-                           tiled_y / GBA_METATILE_SIZE)))
+            source_x = int(round(tiled_x / GBA_METATILE_SIZE))
+            source_y = int(round(tiled_y / GBA_METATILE_SIZE))
             trigger_x = fixed(prop_value(props, "trigger_x", tiled_x))
             trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
                               WORLD_Y_OFFSET_PX)

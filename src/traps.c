@@ -118,6 +118,8 @@
 #define ITEM_FAST_SPEED REF_VEL_TO_FIX(200)
 #define HURT_ITEM_TILE_INDEX BAD_ITEM_TILE_INDEX
 #define BRICK_FRAGMENT_LIFETIME 44
+#define BREAKING_PLATFORM_FRAGMENT_COUNT 6
+#define FRAGMENT_ART_PLATFORM 1
 #define TRAP_CHANNEL_NONE 0
 #define FAKE_GOAL_BOUNCE REF_VEL_TO_FIX(-900)
 #define FAKE_GOAL_MOVE_SPEED REF_VEL_TO_FIX(400)
@@ -989,6 +991,7 @@ void traps_break_brick(TrapManager *manager, Level *level,
         if (fragment) {
             fragment->timer = BRICK_FRAGMENT_LIFETIME;
             fragment->frame = i;
+            fragment->palette = EVASIVE_BLOCK_PALETTE_BANK;
         }
     }
 }
@@ -1939,45 +1942,93 @@ static void update_moving_platform(Trap *trap, const Level *level, Player *playe
     player_set_supported(player);
 }
 
-static void break_platform(TrapManager *manager, Trap *trap, Player *player)
+static void break_platform(TrapManager *manager, Trap *trap, Level *level,
+                           Player *player)
 {
-    static const fix16_t fragment_x_offsets[2] = {
-        REF_POS_TO_FIX(200), REF_POS_TO_FIX(4500 - 200),
+    static const fix16_t fragment_vx[BREAKING_PLATFORM_FRAGMENT_COUNT] = {
+        -REF_VEL_TO_FIX(420), -REF_VEL_TO_FIX(250), -REF_VEL_TO_FIX(80),
+        REF_VEL_TO_FIX(80), REF_VEL_TO_FIX(250), REF_VEL_TO_FIX(420),
     };
-    static const fix16_t fragment_vx[2] = {
-        -REF_VEL_TO_FIX(240), REF_VEL_TO_FIX(240),
+    static const fix16_t fragment_vy[BREAKING_PLATFORM_FRAGMENT_COUNT] = {
+        -REF_VEL_TO_FIX(1100), -REF_VEL_TO_FIX(1450), -REF_VEL_TO_FIX(1650),
+        -REF_VEL_TO_FIX(1650), -REF_VEL_TO_FIX(1450), -REF_VEL_TO_FIX(1100),
     };
+    fix16_t span = trap->w - FIX16_FROM_INT(8);
+    uint16_t platform_tile = platform_tile_index_for_metatile(trap->visual_metatile);
+    uint8_t palette = block_overlay_obj_palette(trap->visual_palette);
+    uint16_t cols = (uint16_t)(FIX16_TO_INT(trap->w) + LEVEL_METATILE_SIZE - 1) /
+                    LEVEL_METATILE_SIZE;
+    uint16_t rows = (uint16_t)(FIX16_TO_INT(trap->h) + LEVEL_METATILE_SIZE - 1) /
+                    LEVEL_METATILE_SIZE;
 
     trap->state = TRAP_SPENT;
     player->on_ground = 0;
     audio_play_brick_break();
 
-    for (uint8_t i = 0; i < 2; ++i) {
+    for (uint16_t y = 0; y < rows; ++y) {
+        for (uint16_t x = 0; x < cols; ++x) {
+            set_trap_metatile_cell(level, trap, trap->source_x + x, trap->source_y + y,
+                                   METATILE_EMPTY);
+            set_cell_collision(manager, trap->source_x + x, trap->source_y + y,
+                               LEVEL_COLLISION_EMPTY, 0);
+        }
+    }
+
+    for (uint8_t i = 0; i < BREAKING_PLATFORM_FRAGMENT_COUNT; ++i) {
         TrapEntity *fragment = spawn_entity(
             manager, TRAP_ENTITY_BRICK_FRAGMENT,
-            trap->x + fragment_x_offsets[i],
-            trap->y - REF_POS_TO_FIX(1000),
-            fragment_vx[i], -REF_VEL_TO_FIX(1400), 8, 8);
+            trap->x + (span * i) / (BREAKING_PLATFORM_FRAGMENT_COUNT - 1),
+            trap->y + FIX16_FROM_INT((i & 1) * 4),
+            fragment_vx[i], fragment_vy[i], 8, 8);
 
         if (fragment) {
             fragment->timer = BRICK_FRAGMENT_LIFETIME;
-            fragment->frame = i;
+            fragment->frame = (uint8_t)(platform_tile + (i & 3));
+            fragment->palette = palette;
+            fragment->param = FRAGMENT_ART_PLATFORM;
         }
     }
 }
 
-static void update_breaking_platform(TrapManager *manager, Trap *trap, Player *player)
+static void update_breaking_platform(TrapManager *manager, Trap *trap,
+                                     Level *level, Player *player)
 {
     int platform_y = FIX16_TO_INT(trap->y);
 
-    if (trap->state != TRAP_IDLE || !player->alive ||
-        !player_can_stand_on_platform(trap, player, platform_y)) {
+    if (trap->state == TRAP_SPENT || !player->alive) {
         return;
     }
 
-    player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
-    player->vy = 0;
-    break_platform(manager, trap, player);
+    if (trap->state == TRAP_IDLE) {
+        if (!player_can_stand_on_platform(trap, player, platform_y)) {
+            return;
+        }
+
+        player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+        player->vy = 0;
+        player_set_supported(player);
+        trap->state = TRAP_ACTIVE;
+        trap->timer = trap->trigger_delay;
+        if (trap->timer == 0) {
+            break_platform(manager, trap, level, player);
+        }
+        return;
+    }
+
+    if (player_can_stand_on_platform(trap, player, platform_y)) {
+        player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+        player->vy = 0;
+        player_set_supported(player);
+    }
+
+    if (trap->timer > 0) {
+        trap->timer--;
+        if (trap->timer > 0) {
+            return;
+        }
+    }
+
+    break_platform(manager, trap, level, player);
 }
 
 /* btype 105 is a gravity-driven item in the reference, not a fixed trigger. */
@@ -2096,7 +2147,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
         } else if (trap->kind == TRAP_MOVING_PLATFORM) {
             update_moving_platform(trap, level, player);
         } else if (trap->kind == TRAP_BREAKING_PLATFORM) {
-            update_breaking_platform(manager, trap, player);
+            update_breaking_platform(manager, trap, level, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -2300,7 +2351,9 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
                 tile = HURT_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
-                tile = BRICK_FRAGMENT_TILE_INDEX + entity->frame;
+                tile = entity->param == FRAGMENT_ART_PLATFORM
+                           ? entity->frame
+                           : BRICK_FRAGMENT_TILE_INDEX + entity->frame;
             }
             uint16_t size = (entity->kind == TRAP_ENTITY_PROJECTILE ||
                              entity->kind == TRAP_ENTITY_COIN_POPUP ||
@@ -2312,7 +2365,7 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             if (entity->kind == TRAP_ENTITY_FALLING_TILE) {
                 palette = entity->palette;
             } else if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
-                palette = EVASIVE_BLOCK_PALETTE_BANK;
+                palette = entity->palette;
             } else if (entity->kind == TRAP_ENTITY_COIN_POPUP ||
                        entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                        entity->kind == TRAP_ENTITY_BAD_ITEM ||
@@ -2489,9 +2542,10 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
-        } else if (((trap->kind == TRAP_MOVING_PLATFORM ||
-                     trap->kind == TRAP_BREAKING_PLATFORM) &&
-                    trap->state == TRAP_IDLE) ||
+        } else if ((trap->kind == TRAP_MOVING_PLATFORM &&
+                     trap->state == TRAP_IDLE) ||
+                    (trap->kind == TRAP_BREAKING_PLATFORM &&
+                     trap->state != TRAP_SPENT) ||
                    (trap->kind == TRAP_MOVING_BLOCK &&
                     trap->state == TRAP_ACTIVE)) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
@@ -2639,7 +2693,7 @@ LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, in
 
         if (trap->kind == TRAP_MOVING_PLATFORM ||
             (trap->kind == TRAP_BREAKING_PLATFORM &&
-             trap->state == TRAP_IDLE)) {
+             trap->state != TRAP_SPENT)) {
             return LEVEL_COLLISION_PASS_THROUGH;
         }
 

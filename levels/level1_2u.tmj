@@ -434,18 +434,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":26
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":5
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -486,18 +475,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":19
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -538,18 +516,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":123
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -590,18 +557,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":124
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -642,18 +598,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":125
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -694,18 +639,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":126
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -746,18 +680,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":127
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -798,18 +721,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":21
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -850,18 +762,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":22
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -902,18 +803,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":23
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -954,18 +844,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":24
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -1048,18 +927,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":2
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":12
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -1100,18 +968,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":39
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":12
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -1199,18 +1056,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -1256,18 +1102,7 @@
                          "name":"hidden",
                          "type":"bool",
                          "value":false
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -1547,18 +1382,7 @@
                          "name":"item_variant",
                          "type":"int",
                          "value":2
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":7
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "type":"string",
                          "value":"auto"
@@ -1620,18 +1444,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "type":"string",
                          "value":"right"
@@ -1786,18 +1599,7 @@
                          "name":"ref_spawn_y",
                          "type":"float",
                          "value":30000
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":103
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -1882,18 +1684,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":18
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "type":"string",
                          "value":"auto"
@@ -1956,18 +1747,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":61
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":11
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "type":"string",
                          "value":"auto"
@@ -2048,18 +1828,7 @@
                          "name":"ref_spawn_y",
                          "type":"float",
                          "value":44000
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":43
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2173,18 +1942,7 @@
                          "name":"ref_spawn_y",
                          "type":"float",
                          "value":24200
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":53
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2278,18 +2036,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":"Careful. Special tricks show up even here."
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":154
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2356,18 +2103,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":123
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":9
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2433,18 +2169,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":129
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":7
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2510,18 +2235,7 @@
                          "name":"hint_text",
                          "type":"string",
                          "value":""
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":69
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
+                        },{
                          "name":"spawn_dir",
                          "propertytype":"TrapSpawnDirection",
                          "type":"string",
@@ -2588,18 +2302,7 @@
                          "name":"listen_channel",
                          "type":"int",
                          "value":21
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":66
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2655,18 +2358,7 @@
                          "name":"listen_channel",
                          "type":"int",
                          "value":22
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":66
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":-2
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2711,18 +2403,7 @@
                          "name":"ref_vy",
                          "type":"float",
                          "value":-300
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":111
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2756,18 +2437,7 @@
                          "name":"ref_vy",
                          "type":"float",
                          "value":-300
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":111
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2801,18 +2471,7 @@
                          "name":"ref_vy",
                          "type":"float",
                          "value":300
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":116
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":4
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2846,18 +2505,7 @@
                          "name":"ref_vy",
                          "type":"float",
                          "value":300
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":116
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":12
-                        }, 
-                        {
+                        },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
                          "type":"string",
@@ -2891,18 +2539,7 @@
                          "name":"item_variant",
                          "type":"int",
                          "value":0
-                        }, 
-                        {
-                         "name":"source_x",
-                         "type":"int",
-                         "value":96
-                        }, 
-                        {
-                         "name":"source_y",
-                         "type":"int",
-                         "value":10
-                        }, 
-                        {
+                        },{
                          "name":"trap_type",
                          "propertytype":"TrapKind",
                          "type":"string",

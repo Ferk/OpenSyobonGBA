@@ -1027,16 +1027,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 44
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 10
-      },
-      {
        "name": "subtype",
        "type": "string",
        "value": "pipe_fake_kill"
@@ -1061,16 +1051,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 19
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 2
-      },
-      {
        "name": "trap_type",
        "type": "string",
        "value": "fake_goal"
@@ -1093,16 +1073,6 @@
        "name": "goal_walk_frames",
        "type": "int",
        "value": 207
-      },
-      {
-       "name": "source_x",
-       "type": "int",
-       "value": 26
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 2
       },
       {
        "name": "trap_type",
@@ -1178,16 +1148,6 @@
        "name": "ref_spawn_vy",
        "type": "int",
        "value": -1600
-      },
-      {
-       "name": "source_x",
-       "type": "int",
-       "value": 5
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 0
       }
      ]
     }

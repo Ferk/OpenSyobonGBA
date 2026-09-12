@@ -329,16 +329,6 @@
        "value": true
       },
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 11
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 8
-      },
-      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -376,16 +366,6 @@
        "value": true
       },
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 16
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 8
-      },
-      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -421,16 +401,6 @@
        "name": "hidden",
        "type": "bool",
        "value": true
-      },
-      {
-       "name": "source_x",
-       "type": "int",
-       "value": 13
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 8
       },
       {
        "name": "spent_metatile",
@@ -485,16 +455,6 @@
        "value": "FROM STAGE 1\\nSPECIAL TRICKS SHOW UP NOW.\\nPLEASE BE CAREFUL.\\nSOME ITEMS MAY BE USEFUL...\\n\\n                    - CHIKU"
       },
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 4
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 9
-      },
-      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -531,16 +491,6 @@
        "value": false
       },
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 14
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 9
-      },
-      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -572,16 +522,6 @@
        "value": false
       },
       {
-       "name": "source_x",
-       "type": "int",
-       "value": 12
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 11
-      },
-      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -611,16 +551,6 @@
        "name": "hidden",
        "type": "bool",
        "value": false
-      },
-      {
-       "name": "source_x",
-       "type": "int",
-       "value": 14
-      },
-      {
-       "name": "source_y",
-       "type": "int",
-       "value": 0
       },
       {
        "name": "subtype",

@@ -377,16 +377,6 @@
      "value": ""
     },
     {
-     "name": "source_x",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "source_y",
-     "type": "int",
-     "value": 0
-    },
-    {
      "name": "visual_metatile",
      "type": "int",
      "value": 255
