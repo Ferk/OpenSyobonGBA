@@ -63,6 +63,7 @@ typedef struct Trap {
     fix16_t h;
     fix16_t vx;
     fix16_t vy;
+    fix16_t gravity;
     uint8_t timer;
     uint8_t subtype;
     int8_t spawn_dir;
@@ -107,6 +108,7 @@ typedef struct TrapEntity {
     fix16_t y;
     fix16_t vx;
     fix16_t vy;
+    fix16_t gravity;
     uint8_t w;
     uint8_t h;
     uint8_t timer;
@@ -159,6 +161,7 @@ typedef struct TrapTrigger {
     fix16_t h;
     fix16_t vx;
     fix16_t vy;
+    fix16_t gravity;
     fix16_t trigger_x;
     fix16_t trigger_y;
 } TrapTrigger;

@@ -416,12 +416,9 @@ def parse_object_layers(map_data, tile_props):
             trigger_x = fixed(prop_value(props, "trigger_x", tiled_x))
             trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
                               WORLD_Y_OFFSET_PX)
-            vx_prop = prop_value(props, "vx", tile_prop.get("vx"))
-            vy_prop = prop_value(props, "vy", tile_prop.get("vy"))
-            ref_vx_prop = prop_value(props, "ref_vx", tile_prop.get("ref_vx"))
-            ref_vy_prop = prop_value(props, "ref_vy", tile_prop.get("ref_vy"))
-            vx = ref_velocity_fixed(ref_vx_prop) if ref_vx_prop is not None else fixed(vx_prop or 0)
-            vy = ref_velocity_fixed(ref_vy_prop) if ref_vy_prop is not None else fixed(vy_prop or 0)
+            vx = 0
+            vy = fixed(prop_value(props, "vy", tile_prop.get("vy", 0)) or 0)
+            gravity = fixed(prop_value(props, "gravity", tile_prop.get("gravity", 0)) or 0)
             move_offset_x_prop = prop_value(props, "move_offset_x",
                                              tile_prop.get("move_offset_x"))
             move_offset_y_prop = prop_value(props, "move_offset_y",
@@ -621,6 +618,7 @@ def parse_object_layers(map_data, tile_props):
                     "h": h,
                     "vx": vx,
                     "vy": vy,
+                    "gravity": gravity,
                     "trigger_x": trigger_x,
                     "trigger_y": trigger_y,
                 })
@@ -806,7 +804,7 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .spent_metatile = {trap['spent_metatile']}, .collision = {trap['collision']}, .hidden = {trap['hidden']},",
                 f"        .source_x = {trap['source_x']}, .source_y = {trap['source_y']},",
                 f"        .x = {trap['x']}, .y = {trap['y']}, .w = {trap['w']}, .h = {trap['h']},",
-                f"        .vx = {trap['vx']}, .vy = {trap['vy']},",
+                f"        .vx = {trap['vx']}, .vy = {trap['vy']}, .gravity = {trap['gravity']},",
                 f"        .trigger_x = {trap['trigger_x']}, .trigger_y = {trap['trigger_y']},",
                 f"        .spawn_offset_x = {trap['spawn_offset_x']}, .spawn_offset_y = {trap['spawn_offset_y']},",
                 f"        .spawn_vx = {trap['spawn_vx']}, .spawn_vy = {trap['spawn_vy']},",

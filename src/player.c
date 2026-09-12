@@ -352,7 +352,7 @@ static void move_y(Player *player, Level *level, TrapManager *traps)
     }
 
     if (player->vy > 0 && aabb_lands_on_platform(level, traps, px, old_y, py)) {
-        int bottom_tile = (py + PLAYER_HEIGHT_PX) / LEVEL_METATILE_SIZE;
+        int bottom_tile = floor_div_int(py + PLAYER_HEIGHT_PX, LEVEL_METATILE_SIZE);
         player->y = FIX16_FROM_INT(bottom_tile * LEVEL_METATILE_SIZE - PLAYER_HEIGHT_PX);
         player->vy = 0;
         player->on_ground = 1;
@@ -368,7 +368,7 @@ static void move_y(Player *player, Level *level, TrapManager *traps)
     }
 
     if (player->vy > 0) {
-        int tile_bottom = (py + PLAYER_HEIGHT_PX - 1) / LEVEL_METATILE_SIZE;
+        int tile_bottom = floor_div_int(py + PLAYER_HEIGHT_PX - 1, LEVEL_METATILE_SIZE);
         player->y = FIX16_FROM_INT(tile_bottom * LEVEL_METATILE_SIZE - PLAYER_HEIGHT_PX);
         player->on_ground = 1;
     } else if (player->vy < 0) {

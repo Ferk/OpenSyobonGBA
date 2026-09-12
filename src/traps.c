@@ -367,6 +367,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->h = h;
     trap->vx = 0;
     trap->vy = 0;
+    trap->gravity = 0;
     trap->timer = 0;
     trap->subtype = subtype;
     trap->spawn_dir = 0;
@@ -610,6 +611,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->trigger_pending = 0;
     trap->vx = trigger->vx;
     trap->vy = trigger->vy;
+    trap->gravity = trigger->gravity;
 
     apply_generated_cells(manager, level, trigger);
 
@@ -646,6 +648,7 @@ static TrapEntity *spawn_entity(TrapManager *manager, TrapEntityKind kind,
             entity->y = y;
             entity->vx = vx;
             entity->vy = vy;
+            entity->gravity = 0;
             entity->w = w;
             entity->h = h;
             entity->timer = 0;
@@ -923,6 +926,7 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
                 entity->frame = slot;
                 entity->palette = falling_tile_obj_palette(palettes[slot]);
                 entity->param = trap->subtype;
+                entity->gravity = trap->gravity ? trap->gravity : FALL_GRAVITY;
             }
         }
     }
@@ -1296,7 +1300,7 @@ static void trigger_checkpoint(TrapManager *manager, Trap *trap, Level *level,
     trap->state = TRAP_SPENT;
     trap->trigger_pending = 0;
     player_set_checkpoint(player,
-                          trap->x - FIX16_FROM_INT(PLAYER_WIDTH_PX),
+                          trap->x,
                           trap->y + trap->h - FIX16_FROM_INT(PLAYER_HEIGHT_PX));
     audio_play_trap_trigger();
     emit_trap_channel(manager, level, player, trap->trigger_channel);
@@ -2246,7 +2250,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             entity->vy += PROJECTILE_GRAVITY;
         } else if (entity->kind == TRAP_ENTITY_FALLING_TILE ||
                    entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
-            entity->vy += FALL_GRAVITY;
+            entity->vy += entity->kind == TRAP_ENTITY_FALLING_TILE
+                ? entity->gravity : FALL_GRAVITY;
             if (entity->vy > FALL_MAX_SPEED) {
                 entity->vy = FALL_MAX_SPEED;
             }

@@ -2400,9 +2400,9 @@
                  "opacity":1,
                  "properties":[
                         {
-                         "name":"ref_vy",
+                         "name":"vy",
                          "type":"float",
-                         "value":-300
+                         "value":-0.827586
                         },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
@@ -2434,9 +2434,9 @@
                  "opacity":1,
                  "properties":[
                         {
-                         "name":"ref_vy",
+                         "name":"vy",
                          "type":"float",
-                         "value":-300
+                         "value":-0.827586
                         },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
@@ -2468,9 +2468,9 @@
                  "opacity":1,
                  "properties":[
                         {
-                         "name":"ref_vy",
+                         "name":"vy",
                          "type":"float",
-                         "value":300
+                         "value":0.827586
                         },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",
@@ -2502,9 +2502,9 @@
                  "opacity":1,
                  "properties":[
                         {
-                         "name":"ref_vy",
+                         "name":"vy",
                          "type":"float",
-                         "value":300
+                         "value":0.827586
                         },{
                          "name":"subtype",
                          "propertytype":"TrapSubtype",

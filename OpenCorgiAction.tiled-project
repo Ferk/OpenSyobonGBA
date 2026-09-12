@@ -404,12 +404,12 @@
      "value": false
     },
     {
-     "name": "ref_vx",
+     "name": "vy",
      "type": "float",
      "value": 0
     },
     {
-     "name": "ref_vy",
+     "name": "gravity",
      "type": "float",
      "value": 0
     }
