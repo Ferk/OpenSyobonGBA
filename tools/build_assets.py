@@ -446,6 +446,10 @@ def main():
         crop_resize_on_sky(haikei, (151, 113, 202, 142), (16, 16), sky),
         crop_resize_on_sky(haikei, (222, 0, 250, 60), (16, 16), sky),
         *decor_tiles(haikei, (151, 143, 241, 183), 5, 2, sky),
+        # Preserve the legacy compressed entries above; these retain the original
+        # background-image proportions for authored multi-cell placements.
+        *decor_tiles(haikei, (151, 113, 202, 142), 2, 1, sky),
+        *decor_tiles(haikei, (222, 0, 250, 60), 1, 2, sky),
     ]:
         append_unique_tile(tile_sources, tile_signatures, tile)
     if haikei.width >= 442:

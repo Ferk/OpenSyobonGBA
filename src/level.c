@@ -403,6 +403,7 @@ LevelCollision level_collision_at(const Level *level, int world_x_px, int world_
     case METATILE_BRICK:
     case METATILE_QUESTION:
     case METATILE_SOLID:
+    case METATILE_GREEN_SOLID:
     case METATILE_GROUND_TOP:
     case METATILE_GROUND_DIRT:
     case METATILE_PIPE_TOP_LEFT:

@@ -86,6 +86,9 @@ typedef enum MetatileId {
     METATILE_GOAL_10,
     METATILE_GOAL_20,
     METATILE_GOAL_30,
+    /* Original 1-3 map art: decorative brown, then solid green. */
+    METATILE_BROWN_BACKGROUND,
+    METATILE_GREEN_SOLID,
 } MetatileId;
 
 typedef enum LevelCollision {
