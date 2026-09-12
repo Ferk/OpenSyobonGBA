@@ -10,6 +10,7 @@
 #include "generated/level1_2_data.h"
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
+#include "generated/level1_3_data.h"
 #include "messages.h"
 #include "player.h"
 #include "text.h"
@@ -37,8 +38,8 @@
 #define GOAL_TILE_INDEX 152
 #define PLATFORM_TILE_INDEX 176
 #define PLATFORM_VISUAL_SLOTS 4
-/* Keep this past trap overlays/checkpoint tiles; enemies start at tile 256. */
-#define FALLING_TILE_DYNAMIC_INDEX 224
+/* Enemy graphics occupy OBJ characters 256..359. */
+#define FALLING_TILE_DYNAMIC_INDEX 360
 #define FALLING_TILE_DYNAMIC_SLOTS 16
 #define CHECKPOINT_TILE_INDEX 192
 #define EVASIVE_BLOCK_PALETTE_BANK 1
@@ -58,6 +59,11 @@
 
 #define FALL_GRAVITY REF_ACCEL_TO_FIX(120)
 #define FALL_MAX_SPEED REF_VEL_TO_FIX(1600)
+/* Match the player's reference terminal fall speed: faster tiles cannot carry. */
+#define FALLING_PLATFORM_MAX_RIDE_SPEED \
+    ((fix16_t)(((int64_t)1600 * 20 * FIX16_ONE) / (29 * 100 * 2)))
+#define STAR_MAX_FALL_SPEED REF_VEL_TO_FIX(1200)
+#define PICKUP_BALL_MAX_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define PROJECTILE_SPEED REF_VEL_TO_FIX(900)
 #define PROJECTILE_GRAVITY REF_ACCEL_TO_FIX(50)
 #define EVASIVE_BLOCK_HOME_X CELL_WORLD_X(8)
@@ -116,7 +122,7 @@
 #define FAKE_GOAL_BOUNCE REF_VEL_TO_FIX(-900)
 #define FAKE_GOAL_MOVE_SPEED REF_VEL_TO_FIX(400)
 #define FAKE_GOAL_TOP_PALETTE_BANK 6
-TrapManager traps_current;
+TrapManager traps_current EWRAM_BSS;
 
 static OBJATTR trap_oam[TRAPS_MAX_ENTITIES];
 static uint16_t trap_rng = 0xace1;
@@ -388,6 +394,8 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_spacing_y = 0;
     trap->repeat_rearm_offset_x = 0;
     trap->repeat_rearm_offset_y = 0;
+    trap->move_offset_x = 0;
+    trap->move_offset_y = 0;
     trap->goal_walk_frames = 0;
     trap->hint_text = 0;
     trap->spawn_count = 0;
@@ -442,6 +450,39 @@ static uint8_t falling_tile_crushes_player(const TrapEntity *entity,
     return entity->vy > 0 &&
            previous_bottom <= crush_line &&
            current_bottom > crush_line;
+}
+
+static uint8_t player_can_ride_falling_tile(const TrapEntity *entity,
+                                             int previous_y,
+                                             const Player *player)
+{
+    int player_x = FIX16_TO_INT(player->x);
+    int player_bottom = FIX16_TO_INT(player->y) + PLAYER_HEIGHT_PX;
+    int entity_x = FIX16_TO_INT(entity->x);
+    int entity_y = FIX16_TO_INT(entity->y);
+
+    if (entity->param == FALLING_ON_PASS_UNDER ||
+        entity->vy > FALLING_PLATFORM_MAX_RIDE_SPEED ||
+        player->vy < -REF_VEL_TO_FIX(100)) {
+        return 0;
+    }
+
+    return player_x + PLAYER_WIDTH_PX > entity_x + 5 &&
+           player_x < entity_x + entity->w - 5 &&
+           player_bottom >= previous_y - 2 &&
+           player_bottom <= entity_y + 8;
+}
+
+static void carry_player_on_falling_tile(const TrapEntity *entity,
+                                         int previous_y, Player *player)
+{
+    if (!player_can_ride_falling_tile(entity, previous_y, player)) {
+        return;
+    }
+
+    player->y = entity->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    player->vy = 0;
+    player_set_supported(player);
 }
 
 static void apply_generated_cells(TrapManager *manager, Level *level,
@@ -559,6 +600,8 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_spacing_y = trigger->spawn_spacing_y;
     trap->repeat_rearm_offset_x = trigger->repeat_rearm_offset_x;
     trap->repeat_rearm_offset_y = trigger->repeat_rearm_offset_y;
+    trap->move_offset_x = trigger->move_offset_x;
+    trap->move_offset_y = trigger->move_offset_y;
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
@@ -575,7 +618,9 @@ static void add_generated_trap(TrapManager *manager, Level *level,
 
     if (trigger->kind == TRAP_ENTER_PIPE || trigger->kind == TRAP_SIDE_PIPE ||
         trigger->kind == TRAP_EVASIVE_BLOCK ||
-        trigger->kind == TRAP_MOVING_PLATFORM) {
+        trigger->kind == TRAP_MOVING_PLATFORM ||
+        trigger->kind == TRAP_BREAKING_PLATFORM ||
+        trigger->kind == TRAP_MOVING_BLOCK) {
         add_dynamic_collider(manager, trap);
     }
 
@@ -810,7 +855,6 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
     trap->state = TRAP_ACTIVE;
     trap->trigger_pending = 0;
     trap->timer = 16;
-    trap->vy = 0;
     audio_play_trap_trigger();
     emit_trap_channel(manager, level, player, trap->trigger_channel);
 
@@ -867,7 +911,7 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
                 manager, TRAP_ENTITY_FALLING_TILE,
                 trap->x + FIX16_FROM_INT(x * LEVEL_METATILE_SIZE),
                 trap->y + FIX16_FROM_INT(y * LEVEL_METATILE_SIZE),
-                0, 0, 16, 16);
+                trap->vx, trap->vy, 16, 16);
 
             if (slot >= FALLING_TILE_DYNAMIC_SLOTS) {
                 slot = FALLING_TILE_DYNAMIC_SLOTS - 1;
@@ -876,6 +920,7 @@ static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level
             if (entity) {
                 entity->frame = slot;
                 entity->palette = falling_tile_obj_palette(palettes[slot]);
+                entity->param = trap->subtype;
             }
         }
     }
@@ -896,6 +941,23 @@ static void trigger_bump_shooter(TrapManager *manager, Trap *trap, Level *level,
                  trap->x + FIX16_FROM_INT(4),
                  trap->y - FIX16_FROM_INT(8),
                  0, -PROJECTILE_SPEED, 8, 8);
+    emit_trap_channel(manager, level, player, trap->trigger_channel);
+}
+
+static void trigger_moving_block(TrapManager *manager, Trap *trap, Level *level,
+                                 Player *player)
+{
+    if (trap->state != TRAP_IDLE) {
+        return;
+    }
+
+    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y,
+                           METATILE_EMPTY);
+    set_cell_collision(manager, trap->source_x, trap->source_y,
+                       LEVEL_COLLISION_EMPTY, 0);
+    trap->x += trap->move_offset_x;
+    trap->y += trap->move_offset_y;
+    trap->state = TRAP_ACTIVE;
     emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
@@ -971,17 +1033,21 @@ static void spawn_block_item(TrapManager *manager, Trap *trap,
     }
 }
 
-static void spawn_hurt_item_at(TrapManager *manager, fix16_t x, fix16_t y)
+static void spawn_question_ball_star(TrapManager *manager, fix16_t x, fix16_t y,
+                                     const Player *player)
 {
-    TrapEntity *entity = spawn_entity(manager, TRAP_ENTITY_HURT_ITEM,
-                                      x, y, 0, 0, 16, 16);
+    int player_center = FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX / 2;
+    int8_t direction = FIX16_TO_INT(x) <= player_center ? 1 : -1;
+    TrapEntity *entity = spawn_entity(manager, TRAP_ENTITY_STAR_ITEM,
+                                      x, y, direction * ITEM_FAST_SPEED, 0, 16, 16);
 
     if (entity) {
         entity->timer = 0;
     }
 }
 
-static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap)
+static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap,
+                                      const Player *player)
 {
     static const int16_t ref_offsets[][2] = {
         { -8 * 3000 - 1000, -4 * 3000 },
@@ -994,9 +1060,10 @@ static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap)
     };
 
     for (uint8_t i = 0; i < sizeof(ref_offsets) / sizeof(ref_offsets[0]); ++i) {
-        spawn_hurt_item_at(manager,
-                           trap->x + REF_POS_TO_FIX(ref_offsets[i][0]),
-                           trap->y + REF_POS_TO_FIX(ref_offsets[i][1]));
+        spawn_question_ball_star(manager,
+                                 trap->x + REF_POS_TO_FIX(ref_offsets[i][0]),
+                                 trap->y + REF_POS_TO_FIX(ref_offsets[i][1]),
+                                 player);
     }
 }
 
@@ -1012,7 +1079,7 @@ static void trigger_pickup_item(TrapManager *manager, Trap *trap, Level *level,
     audio_play_trap_trigger();
 
     if (trap->item_variant == 1) {
-        spawn_question_ball_burst(manager, trap);
+        spawn_question_ball_burst(manager, trap, player);
     }
 
     emit_trap_channel(manager, level, player, trap->trigger_channel);
@@ -1378,6 +1445,9 @@ static void activate_linked_trap(TrapManager *manager, Level *level,
             trigger_pickup_item(manager, trap, level, player);
         }
         break;
+    case TRAP_MOVING_BLOCK:
+        trigger_moving_block(manager, trap, level, player);
+        break;
     default:
         break;
     }
@@ -1718,6 +1788,15 @@ void traps_load_1_2b(TrapManager *manager, Level *level)
     }
 }
 
+void traps_load_1_3(TrapManager *manager, Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+
+    for (uint16_t i = 0; i < level1_3_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_3_traps[i]);
+    }
+}
+
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player)
 {
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
@@ -1769,11 +1848,17 @@ static void update_moving_item(TrapEntity *entity, const Level *level)
             int tile_left = px / LEVEL_METATILE_SIZE;
             entity->x = FIX16_FROM_INT((tile_left + 1) * LEVEL_METATILE_SIZE);
         }
-        entity->vx = -entity->vx;
+        if (entity->kind != TRAP_ENTITY_STAR_ITEM) {
+            entity->vx = -entity->vx;
+        }
     }
 
     entity->vy += FALL_GRAVITY;
-    if (entity->vy > FALL_MAX_SPEED) {
+    if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
+        if (entity->vy > STAR_MAX_FALL_SPEED) {
+            entity->vy = STAR_MAX_FALL_SPEED;
+        }
+    } else if (entity->vy > FALL_MAX_SPEED) {
         entity->vy = FALL_MAX_SPEED;
     }
 
@@ -1789,6 +1874,8 @@ static void update_moving_item(TrapEntity *entity, const Level *level)
         int tile_bottom = (py + entity->h - 1) / LEVEL_METATILE_SIZE;
         entity->y = FIX16_FROM_INT(tile_bottom * LEVEL_METATILE_SIZE - entity->h);
         if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
+            /* Reference atype 110 rebounds at -1400 after ground contact. */
+            entity->y -= REF_POS_TO_FIX(1200);
             entity->vy = -REF_VEL_TO_FIX(1400);
         } else {
             entity->vy = 0;
@@ -1849,7 +1936,81 @@ static void update_moving_platform(Trap *trap, const Level *level, Player *playe
     player->x += trap->x - old_x;
     player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
     player->vy = 0;
-    player->on_ground = 1;
+    player_set_supported(player);
+}
+
+static void break_platform(TrapManager *manager, Trap *trap, Player *player)
+{
+    static const fix16_t fragment_x_offsets[2] = {
+        REF_POS_TO_FIX(200), REF_POS_TO_FIX(4500 - 200),
+    };
+    static const fix16_t fragment_vx[2] = {
+        -REF_VEL_TO_FIX(240), REF_VEL_TO_FIX(240),
+    };
+
+    trap->state = TRAP_SPENT;
+    player->on_ground = 0;
+    audio_play_brick_break();
+
+    for (uint8_t i = 0; i < 2; ++i) {
+        TrapEntity *fragment = spawn_entity(
+            manager, TRAP_ENTITY_BRICK_FRAGMENT,
+            trap->x + fragment_x_offsets[i],
+            trap->y - REF_POS_TO_FIX(1000),
+            fragment_vx[i], -REF_VEL_TO_FIX(1400), 8, 8);
+
+        if (fragment) {
+            fragment->timer = BRICK_FRAGMENT_LIFETIME;
+            fragment->frame = i;
+        }
+    }
+}
+
+static void update_breaking_platform(TrapManager *manager, Trap *trap, Player *player)
+{
+    int platform_y = FIX16_TO_INT(trap->y);
+
+    if (trap->state != TRAP_IDLE || !player->alive ||
+        !player_can_stand_on_platform(trap, player, platform_y)) {
+        return;
+    }
+
+    player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    player->vy = 0;
+    break_platform(manager, trap, player);
+}
+
+/* btype 105 is a gravity-driven item in the reference, not a fixed trigger. */
+static void update_pickup_item_fall(Trap *trap, const Level *level,
+                                    const Player *player)
+{
+    int player_x = FIX16_TO_INT(player->x);
+    int item_x = FIX16_TO_INT(trap->x);
+    int next_y;
+    int bottom_y;
+
+    if (item_x < player_x - LEVEL_STREAM_MARGIN_PX ||
+        item_x > player_x + LEVEL_STREAM_RIGHT_PX) {
+        return;
+    }
+
+    trap->vy += FALL_GRAVITY;
+    if (trap->vy > PICKUP_BALL_MAX_FALL_SPEED) {
+        trap->vy = PICKUP_BALL_MAX_FALL_SPEED;
+    }
+
+    next_y = FIX16_TO_INT(trap->y + trap->vy);
+    bottom_y = next_y + FIX16_TO_INT(trap->h) - 1;
+    if (trap->vy > 0 &&
+        (level_collision_at(level, item_x + 1, bottom_y) == LEVEL_COLLISION_SOLID ||
+         level_collision_at(level, item_x + FIX16_TO_INT(trap->w) - 2, bottom_y) ==
+             LEVEL_COLLISION_SOLID)) {
+        trap->y = FIX16_FROM_INT((bottom_y / LEVEL_METATILE_SIZE) *
+                                 LEVEL_METATILE_SIZE - FIX16_TO_INT(trap->h));
+        return;
+    }
+
+    trap->y += trap->vy;
 }
 
 void traps_update(TrapManager *manager, Level *level, struct Player *player)
@@ -1934,6 +2095,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             update_side_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_MOVING_PLATFORM) {
             update_moving_platform(trap, level, player);
+        } else if (trap->kind == TRAP_BREAKING_PLATFORM) {
+            update_breaking_platform(manager, trap, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -1955,6 +2118,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                    !player->alive) {
             trap->state = TRAP_IDLE;
         } else if (trap->kind == TRAP_PICKUP_ITEM && trap->state == TRAP_IDLE) {
+            update_pickup_item_fall(trap, level, player);
+
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
             int trap_w = FIX16_TO_INT(trap->w);
@@ -2040,6 +2205,11 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
 
         int entity_x = FIX16_TO_INT(entity->x);
         int entity_y = FIX16_TO_INT(entity->y);
+        if (entity->kind == TRAP_ENTITY_FALLING_TILE) {
+            carry_player_on_falling_tile(entity, previous_entity_y, player);
+            player_x = FIX16_TO_INT(player->x);
+            player_y = FIX16_TO_INT(player->y);
+        }
 
         if (entity->kind == TRAP_ENTITY_BAD_ITEM &&
             (entity_x < player_x - QUESTION_GENERATOR_DESPAWN_LEFT ||
@@ -2062,10 +2232,11 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             continue;
         }
 
-        if (player->alive &&
+        if (player->alive && entity->timer == 0 &&
             aabb_overlap(player_x, player_y, PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
                          entity_x, entity_y, entity->w, entity->h)) {
-            if (entity->kind == TRAP_ENTITY_FALLING_TILE) {
+            if (entity->kind == TRAP_ENTITY_FALLING_TILE &&
+                entity->param == FALLING_ON_PASS_UNDER) {
                 if (falling_tile_crushes_player(entity, previous_entity_y,
                                                 entity_y, player_y)) {
                     player_kill(player);
@@ -2318,7 +2489,11 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
-        } else if (trap->kind == TRAP_MOVING_PLATFORM) {
+        } else if (((trap->kind == TRAP_MOVING_PLATFORM ||
+                     trap->kind == TRAP_BREAKING_PLATFORM) &&
+                    trap->state == TRAP_IDLE) ||
+                   (trap->kind == TRAP_MOVING_BLOCK &&
+                    trap->state == TRAP_ACTIVE)) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
             int base_y = camera_world_to_screen_y(camera, trap->y);
             int cols = (FIX16_TO_INT(trap->w) + LEVEL_METATILE_SIZE - 1) /
@@ -2462,8 +2637,14 @@ LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, in
             return LEVEL_COLLISION_SOLID;
         }
 
-        if (trap->kind == TRAP_MOVING_PLATFORM) {
+        if (trap->kind == TRAP_MOVING_PLATFORM ||
+            (trap->kind == TRAP_BREAKING_PLATFORM &&
+             trap->state == TRAP_IDLE)) {
             return LEVEL_COLLISION_PASS_THROUGH;
+        }
+
+        if (trap->kind == TRAP_MOVING_BLOCK) {
+            return LEVEL_COLLISION_SOLID;
         }
     }
 

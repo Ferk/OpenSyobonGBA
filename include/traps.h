@@ -30,6 +30,8 @@ typedef enum TrapKind {
     TRAP_MOVING_PLATFORM,
     TRAP_PICKUP_ITEM,
     TRAP_FAKE_GOAL,
+    TRAP_MOVING_BLOCK,
+    TRAP_BREAKING_PLATFORM,
 } TrapKind;
 
 typedef enum TrapState {
@@ -90,6 +92,8 @@ typedef struct Trap {
     fix16_t spawn_spacing_y;
     fix16_t repeat_rearm_offset_x;
     fix16_t repeat_rearm_offset_y;
+    fix16_t move_offset_x;
+    fix16_t move_offset_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t spawn_count;
@@ -139,6 +143,8 @@ typedef struct TrapTrigger {
     fix16_t spawn_spacing_y;
     fix16_t repeat_rearm_offset_x;
     fix16_t repeat_rearm_offset_y;
+    fix16_t move_offset_x;
+    fix16_t move_offset_y;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t visual_metatile;
@@ -177,6 +183,7 @@ void traps_load_1_1(TrapManager *manager, Level *level);
 void traps_load_1_2(TrapManager *manager, Level *level);
 void traps_load_1_2_underground(TrapManager *manager, Level *level);
 void traps_load_1_2b(TrapManager *manager, Level *level);
+void traps_load_1_3(TrapManager *manager, Level *level);
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
 void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);

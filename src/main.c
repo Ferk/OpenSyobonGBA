@@ -10,6 +10,7 @@
 #include "generated/level1_2_data.h"
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
+#include "generated/level1_3_data.h"
 #include "level.h"
 #include "messages.h"
 #include "player.h"
@@ -39,6 +40,7 @@ typedef enum StageId {
     STAGE_ID_1_2,
     STAGE_ID_1_2_UNDERGROUND,
     STAGE_ID_1_2B,
+    STAGE_ID_1_3,
     STAGE_ID_COUNT,
 } StageId;
 
@@ -171,6 +173,10 @@ static const char *stage_label(StageId stage)
         return "1-2B ";
     }
 
+    if (stage == STAGE_ID_1_3) {
+        return "1-3 ";
+    }
+
     if (stage == STAGE_ID_1_2) {
         return "1-2 ";
     }
@@ -282,6 +288,10 @@ static void load_stage(StageId stage)
         level_load_1_2b(&level_current);
         traps_load_1_2b(&traps_current, &level_current);
         enemies_load_1_2b(&enemy_current, &level_current);
+    } else if (stage == STAGE_ID_1_3) {
+        level_load_1_3(&level_current);
+        traps_load_1_3(&traps_current, &level_current);
+        enemies_load_1_3(&enemy_current, &level_current);
     } else if (stage == STAGE_ID_1_2) {
         level_load_1_2(&level_current);
         traps_load_1_2(&traps_current, &level_current);
@@ -307,6 +317,9 @@ static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, f
     } else if (stage == STAGE_ID_1_2B) {
         objects = level1_2b_objects;
         object_count = level1_2b_object_count;
+    } else if (stage == STAGE_ID_1_3) {
+        objects = level1_3_objects;
+        object_count = level1_3_object_count;
     }
 
     for (uint16_t i = 0; i < object_count; ++i) {
@@ -507,6 +520,8 @@ int main(void)
             traps_ack_stage_clear(&traps_current);
             if (current_stage == STAGE_ID_1_1) {
                 current_stage = STAGE_ID_1_2;
+            } else if (current_stage == STAGE_ID_1_2B) {
+                current_stage = STAGE_ID_1_3;
             }
             memset(&player, 0, sizeof(player));
             player.death_count = death_count;

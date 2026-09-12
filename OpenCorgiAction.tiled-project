@@ -28,7 +28,9 @@
     "spike_block",
     "moving_platform",
     "pickup_item",
-    "fake_goal"
+    "fake_goal",
+    "moving_block",
+    "breaking_platform"
    ]
   },
   {
@@ -331,6 +333,16 @@
 	    },
 	    {
 	     "name": "ref_repeat_rearm_offset_y",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_move_offset_x",
+	     "type": "float",
+	     "value": 0
+	    },
+	    {
+	     "name": "ref_move_offset_y",
 	     "type": "float",
 	     "value": 0
 	    },

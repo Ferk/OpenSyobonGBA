@@ -1,5 +1,5 @@
 *.gba
+*.tiled-session
 build
 include/generated/
 src/generated/
-OpenSyobonGBA.tiled-session

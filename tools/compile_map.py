@@ -21,6 +21,8 @@ TRAP_KIND_NAMES = {
     "moving_platform": "TRAP_MOVING_PLATFORM",
     "pickup_item": "TRAP_PICKUP_ITEM",
     "fake_goal": "TRAP_FAKE_GOAL",
+    "moving_block": "TRAP_MOVING_BLOCK",
+    "breaking_platform": "TRAP_BREAKING_PLATFORM",
 }
 
 TRAP_SUBTYPE_NAMES = {
@@ -422,6 +424,20 @@ def parse_object_layers(map_data, tile_props):
             ref_vy_prop = prop_value(props, "ref_vy", tile_prop.get("ref_vy"))
             vx = ref_velocity_fixed(ref_vx_prop) if ref_vx_prop is not None else fixed(vx_prop or 0)
             vy = ref_velocity_fixed(ref_vy_prop) if ref_vy_prop is not None else fixed(vy_prop or 0)
+            move_offset_x_prop = prop_value(props, "move_offset_x",
+                                             tile_prop.get("move_offset_x"))
+            move_offset_y_prop = prop_value(props, "move_offset_y",
+                                             tile_prop.get("move_offset_y"))
+            ref_move_offset_x_prop = prop_value(props, "ref_move_offset_x",
+                                                 tile_prop.get("ref_move_offset_x"))
+            ref_move_offset_y_prop = prop_value(props, "ref_move_offset_y",
+                                                 tile_prop.get("ref_move_offset_y"))
+            move_offset_x = (ref_position_fixed(ref_move_offset_x_prop)
+                             if ref_move_offset_x_prop is not None
+                             else fixed(move_offset_x_prop or 0))
+            move_offset_y = (ref_position_fixed(ref_move_offset_y_prop)
+                             if ref_move_offset_y_prop is not None
+                             else fixed(move_offset_y_prop or 0))
             spawn_enemy_kind = enum_name(prop_value(
                 props, "spawn_enemy_kind", tile_prop.get("spawn_enemy_kind")),
                 ENEMY_KIND_NAMES, "ENEMY_NONE")
@@ -587,6 +603,8 @@ def parse_object_layers(map_data, tile_props):
                     "spawn_spacing_y": spawn_spacing_y,
                     "repeat_rearm_offset_x": repeat_rearm_offset_x,
                     "repeat_rearm_offset_y": repeat_rearm_offset_y,
+                    "move_offset_x": move_offset_x,
+                    "move_offset_y": move_offset_y,
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": int(prop_value(props, "visual_metatile",
@@ -797,6 +815,7 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .spawn_random_vx = {trap['spawn_random_vx']}, .spawn_random_vy = {trap['spawn_random_vy']},",
                 f"        .spawn_spacing_x = {trap['spawn_spacing_x']}, .spawn_spacing_y = {trap['spawn_spacing_y']},",
                 f"        .repeat_rearm_offset_x = {trap['repeat_rearm_offset_x']}, .repeat_rearm_offset_y = {trap['repeat_rearm_offset_y']},",
+                f"        .move_offset_x = {trap['move_offset_x']}, .move_offset_y = {trap['move_offset_y']},",
                 "    },",
             ])
     else:

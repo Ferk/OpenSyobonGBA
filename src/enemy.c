@@ -9,6 +9,7 @@
 #include "generated/level1_2_data.h"
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
+#include "generated/level1_3_data.h"
 #include "messages.h"
 #include "traps.h"
 
@@ -57,7 +58,7 @@
 #define ENEMY_DARK_PALETTE_BANK 4
 #define FIREBAR_SEGMENT_SPACING 18
 
-EnemyManager enemy_current;
+EnemyManager enemy_current EWRAM_BSS;
 
 static OBJATTR enemy_oam[ENEMY_MAX_ACTIVE];
 static OBJATTR enemy_extra_oam[ENEMY_MAX_ACTIVE];
@@ -807,6 +808,14 @@ void enemies_load_1_2b(EnemyManager *manager, const Level *level)
     memset(manager, 0, sizeof(*manager));
     load_generated_spawns(manager, level1_2b_enemy_spawns,
                           level1_2b_enemy_spawn_count);
+}
+
+void enemies_load_1_3(EnemyManager *manager, const Level *level)
+{
+    (void)level;
+    memset(manager, 0, sizeof(*manager));
+    load_generated_spawns(manager, level1_3_enemy_spawns,
+                          level1_3_enemy_spawn_count);
 }
 
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,

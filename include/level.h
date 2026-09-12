@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define LEVEL_SOURCE_ROWS 17
-#define LEVEL_SOURCE_COLS 150
+#define LEVEL_SOURCE_COLS 160
 
 #define LEVEL_METATILE_SIZE 16
 #define LEVEL_SCREEN_METATILE_COLS 15
@@ -112,6 +112,7 @@ void level_load_1_1(Level *level);
 void level_load_1_2(Level *level);
 void level_load_1_2_underground(Level *level);
 void level_load_1_2b(Level *level);
+void level_load_1_3(Level *level);
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px);
 void level_force_stream_update(void);
 uint8_t level_metatile_at(const Level *level, int world_x_px, int world_y_px);

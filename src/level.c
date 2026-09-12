@@ -7,6 +7,7 @@
 #include "generated/level1_2_data.h"
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
+#include "generated/level1_3_data.h"
 #include "tiles_16.h"
 
 #define BG_CHARBLOCK 0
@@ -18,7 +19,7 @@
 #define BG_SE_PALBANK(bank) ((uint16_t)((bank) << 12))
 #define RGB15(r, g, b) ((uint16_t)((r) | ((g) << 5) | ((b) << 10)))
 
-Level level_current;
+Level level_current EWRAM_BSS;
 
 static int stream_first_world_tile_x;
 static int stream_first_world_tile_y;
@@ -285,6 +286,20 @@ void level_load_1_2b(Level *level)
                               (const uint8_t *)level1_2b_metatiles,
                               (const uint8_t *)level1_2b_palettes,
                               LEVEL1_2B_WIDTH, LEVEL1_2B_HEIGHT);
+    level_force_stream_update();
+}
+
+void level_load_1_3(Level *level)
+{
+    memset(level, 0, sizeof(*level));
+    level->width = LEVEL1_3_WIDTH;
+    level->height = LEVEL1_3_HEIGHT;
+    level->camera_margin_top = LEVEL1_3_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_3_CAMERA_MARGIN_BOTTOM;
+    copy_generated_level_data(level, (const uint8_t *)level1_3_source,
+                              (const uint8_t *)level1_3_metatiles,
+                              (const uint8_t *)level1_3_palettes,
+                              LEVEL1_3_WIDTH, LEVEL1_3_HEIGHT);
     level_force_stream_update();
 }
 

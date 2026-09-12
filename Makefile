@@ -1,6 +1,6 @@
-# OpenSyobonGBA - native Game Boy Advance build
+# OpenCorgiAction - native Game Boy Advance build
 
-TARGET      := OpenSyobonGBA
+TARGET      := OpenCorgiAction
 BUILD       := build
 SOURCES     := src
 INCLUDES    := include

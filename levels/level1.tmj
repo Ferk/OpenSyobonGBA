@@ -3785,7 +3785,7 @@
     {
      "height": 16,
      "id": 29,
-     "name": "good mushroom block",
+     "name": "poison mushroom block",
      "opacity": 1,
      "properties": [
       {
@@ -3813,7 +3813,7 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "question_good_mushroom"
+       "value": "question_bad_mushroom"
       },
       {
        "name": "trap_type",

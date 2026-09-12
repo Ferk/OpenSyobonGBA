@@ -22,13 +22,15 @@
 #define OBJ_ATTR0_Y_MASK 0x00ff
 #define OBJ_ATTR1_X_MASK 0x01ff
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
-#define REF_Y_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 24 * FIX16_ONE) / (29 * 100)))
+#define REF_Y_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 20 * FIX16_ONE) / (29 * 100)))
 #define REF_VEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 2)
 #define REF_Y_VEL_TO_FIX(v) (REF_Y_POS_TO_FIX(v) / 2)
 #define REF_ACCEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 4)
 #define REF_Y_ACCEL_TO_FIX(v) (REF_Y_POS_TO_FIX(v) / 4)
 
 #define PLAYER_ACCEL REF_ACCEL_TO_FIX(40)
+#define PLAYER_REVERSE_AIR_BRAKE REF_ACCEL_TO_FIX(80 / 3)
+#define PLAYER_REVERSE_GROUND_BRAKE REF_ACCEL_TO_FIX(60)
 #define PLAYER_AIR_LIMIT REF_VEL_TO_FIX(500)
 #define PLAYER_RUN_LIMIT REF_VEL_TO_FIX(800)
 #define PLAYER_FRICTION REF_ACCEL_TO_FIX(60)
@@ -37,6 +39,7 @@
 #define PLAYER_FAST_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1400))
 #define PLAYER_EXTRA_FAST_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1500))
 #define PLAYER_MAX_FALL_SPEED REF_Y_VEL_TO_FIX(1600)
+#define PLAYER_SPEED_100 REF_VEL_TO_FIX(100)
 #define PLAYER_SPEED_200 REF_VEL_TO_FIX(200)
 #define PLAYER_SPEED_600 REF_VEL_TO_FIX(600)
 #define PLAYER_JUMP_HOLD_CHECK_SPEED (-REF_Y_VEL_TO_FIX(900))
@@ -449,6 +452,12 @@ void player_set_checkpoint(Player *player, fix16_t x, fix16_t y)
     player->checkpoint_y = y;
 }
 
+void player_set_supported(Player *player)
+{
+    player->on_ground = 1;
+    player->coyote_timer = PLAYER_COYOTE_FRAMES;
+}
+
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames)
 {
     player->control_locked = 1;
@@ -631,7 +640,13 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
                 player->vx = 0;
             }
         } else if (player->on_ground || player->vx > -PLAYER_AIR_LIMIT) {
+            uint8_t reversing = player->vx > PLAYER_SPEED_100;
             player->vx -= PLAYER_ACCEL;
+            if (reversing) {
+                player->vx -= player->on_ground
+                                  ? PLAYER_REVERSE_GROUND_BRAKE
+                                  : PLAYER_REVERSE_AIR_BRAKE;
+            }
         }
     }
 
@@ -644,7 +659,13 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
                 player->vx = 0;
             }
         } else if (player->on_ground || player->vx < PLAYER_AIR_LIMIT) {
+            uint8_t reversing = player->vx < -PLAYER_SPEED_100;
             player->vx += PLAYER_ACCEL;
+            if (reversing) {
+                player->vx += player->on_ground
+                                  ? PLAYER_REVERSE_GROUND_BRAKE
+                                  : PLAYER_REVERSE_AIR_BRAKE;
+            }
         }
     }
 
@@ -656,21 +677,15 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         }
     }
 
-    if (player->on_ground && player->vx > PLAYER_RUN_LIMIT) {
+    if (player->vx > PLAYER_RUN_LIMIT) {
         player->vx = PLAYER_RUN_LIMIT;
-    } else if (player->on_ground && player->vx < -PLAYER_RUN_LIMIT) {
+    } else if (player->vx < -PLAYER_RUN_LIMIT) {
         player->vx = -PLAYER_RUN_LIMIT;
     }
 
     if (player->jump_buffer > 0 && player->coyote_timer > 0) {
         player->y -= PLAYER_JUMP_LIFT;
-        if (player->vx >= PLAYER_SPEED_600 || player->vx <= -PLAYER_SPEED_600) {
-            player->vy = PLAYER_EXTRA_FAST_JUMP_SPEED;
-        } else if (player->vx >= PLAYER_SPEED_200 || player->vx <= -PLAYER_SPEED_200) {
-            player->vy = PLAYER_FAST_JUMP_SPEED;
-        } else {
-            player->vy = PLAYER_JUMP_SPEED;
-        }
+        player->vy = PLAYER_JUMP_SPEED;
         player->on_ground = 0;
         player->coyote_timer = 0;
         player->jump_buffer = 0;
@@ -678,8 +693,7 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         audio_play_jump();
     }
 
-    if ((keys & KEY_A_MASK) && player->jump_timer == 16 &&
-        player->vy >= PLAYER_JUMP_HOLD_CHECK_SPEED) {
+    if ((keys & KEY_A_MASK) && player->jump_timer == 16) {
         if (player->vx >= PLAYER_SPEED_600 || player->vx <= -PLAYER_SPEED_600) {
             player->vy = PLAYER_EXTRA_FAST_JUMP_SPEED;
         } else if (player->vx >= PLAYER_SPEED_200 || player->vx <= -PLAYER_SPEED_200) {

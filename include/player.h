@@ -45,6 +45,7 @@ void player_init_video(void);
 void player_spawn(Player *player);
 void player_spawn_at(Player *player, fix16_t x, fix16_t y);
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
+void player_set_supported(Player *player);
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
 void player_power_up(Player *player);
 uint8_t player_goal_clear_done(const Player *player);
