@@ -121,8 +121,12 @@
     "pipe_shot",
     "firebar",
     "superjien",
+    "jien_cannon",
     "kuma",
-    "giant"
+    "giant",
+    "defrag",
+    "aramaki",
+    "laser"
    ]
   },
   {
@@ -145,7 +149,11 @@
     "cuckoo32",
     "fire_projectile",
     "superjien",
-    "giant"
+    "jien_cannon",
+    "giant",
+    "defrag",
+    "defrag_stomped",
+    "laser"
    ]
   },
   {
@@ -462,6 +470,11 @@
      "name": "enemy_param",
      "type": "int",
      "value": 0
+    },
+    {
+     "name": "throw_vx",
+     "type": "int",
+     "value": 700
     }
    ]
   },

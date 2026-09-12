@@ -413,6 +413,7 @@ void player_spawn(Player *player)
     player->coyote_timer = 0;
     player->jump_timer = 0;
     player->control_locked = 0;
+    player->input_lock_timer = 0;
     player->hidden = 0;
     player->powered_up = 0;
     player->blocked_left = 0;
@@ -506,6 +507,7 @@ void player_kill(Player *player)
     player->jump_timer = 0;
     player->on_ground = 0;
     player->control_locked = 0;
+    player->input_lock_timer = 0;
     player->hidden = 0;
     player->walk_frame = 0;
     player->walk_distance = 0;
@@ -531,6 +533,14 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
 {
     uint16_t keys = keys_held();
     uint16_t pressed = keys & (uint16_t)~previous_keys;
+    uint8_t launch_locked = 0;
+
+    if (player->input_lock_timer > 0) {
+        player->input_lock_timer--;
+        launch_locked = 1;
+        keys = 0;
+        pressed = 0;
+    }
 
     if (player->goal_phase != 0) {
         if (player->goal_phase == PLAYER_GOAL_PHASE_DROP) {
@@ -669,7 +679,8 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         }
     }
 
-    if (!(keys & (KEY_LEFT_MASK | KEY_RIGHT_MASK)) && player->on_ground) {
+    if (!launch_locked && !(keys & (KEY_LEFT_MASK | KEY_RIGHT_MASK)) &&
+        player->on_ground) {
         if (player->vx > 0) {
             player->vx = (player->vx > PLAYER_FRICTION) ? player->vx - PLAYER_FRICTION : 0;
         } else if (player->vx < 0) {
@@ -677,10 +688,13 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         }
     }
 
-    if (player->vx > PLAYER_RUN_LIMIT) {
-        player->vx = PLAYER_RUN_LIMIT;
-    } else if (player->vx < -PLAYER_RUN_LIMIT) {
-        player->vx = -PLAYER_RUN_LIMIT;
+    /* Defrag-san's throw owns horizontal velocity while player input is locked. */
+    if (!launch_locked) {
+        if (player->vx > PLAYER_RUN_LIMIT) {
+            player->vx = PLAYER_RUN_LIMIT;
+        } else if (player->vx < -PLAYER_RUN_LIMIT) {
+            player->vx = -PLAYER_RUN_LIMIT;
+        }
     }
 
     if (player->jump_buffer > 0 && player->coyote_timer > 0) {

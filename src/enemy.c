@@ -31,12 +31,23 @@
 #define ENEMY_FIRE_PROJECTILE_TILE (ENEMY_TILE_INDEX + 80)
 #define ENEMY_SUPERJIEN_TILE (ENEMY_TILE_INDEX + 84)
 #define ENEMY_GIANT_TILE (ENEMY_TILE_INDEX + 88)
+#define ENEMY_JIEN_CANNON_TILE (ENEMY_EXTRA_TILE_INDEX + 28)
+/* 360..423 are reserved for dynamically copied falling-floor tiles. */
+#define ENEMY_EXTRA_TILE_INDEX 424
+#define ENEMY_DEFRAG_TILE ENEMY_EXTRA_TILE_INDEX
+#define ENEMY_DEFRAG_STOMPED_TILE (ENEMY_EXTRA_TILE_INDEX + 8)
+#define ENEMY_LASER_LEFT_TILE (ENEMY_EXTRA_TILE_INDEX + 16)
+#define ENEMY_LASER_MIDDLE_TILE (ENEMY_EXTRA_TILE_INDEX + 20)
+#define ENEMY_LASER_RIGHT_TILE (ENEMY_EXTRA_TILE_INDEX + 24)
+#define ENEMY_BASE_SHEET_BYTES (26 * 16 * 16 / 2)
 #define FIRST_ENEMY_EXTRA_SPRITE 96
 #define ENEMY_SPAWN_AHEAD_PX 304
 #define ENEMY_SPAWN_BEHIND_PX 96
 
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
 #define REF_VEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 2)
+#define REF_PLAYER_Y_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 20 * FIX16_ONE) / (29 * 100)))
+#define REF_PLAYER_Y_VEL_TO_FIX(v) (REF_PLAYER_Y_POS_TO_FIX(v) / 2)
 #define REF_ACCEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 4)
 #define CELL_WORLD_X(cell_x) FIX16_FROM_INT((cell_x) * LEVEL_METATILE_SIZE)
 #define CELL_WORLD_Y(cell_y) FIX16_FROM_INT(((cell_y) - LEVEL_VIEW_SOURCE_ROW_OFFSET) * LEVEL_METATILE_SIZE)
@@ -45,8 +56,13 @@
 #define WALKER_SPEED REF_VEL_TO_FIX(100)
 #define SHELL_SPEED REF_VEL_TO_FIX(800)
 #define SUPERJIEN_SPEED REF_VEL_TO_FIX(120)
+#define JIEN_CANNON_SPEED REF_VEL_TO_FIX(400)
 #define KUMA_SPEED REF_VEL_TO_FIX(160)
 #define GIANT_SPEED REF_VEL_TO_FIX(160)
+#define LASER_SPEED REF_VEL_TO_FIX(1600)
+#define ARAMAKI_FALL_SPEED REF_VEL_TO_FIX(1200)
+#define DEFRAG_CAPTURE_FRAMES 10
+#define DEFRAG_RECOVER_FRAMES 31
 #define SUPERJIEN_HOP_SPEED (-REF_VEL_TO_FIX(1600))
 #define SUPERJIEN_HOP_COOLDOWN 40
 #define CEILING_FALL_SPEED REF_VEL_TO_FIX(1200)
@@ -75,12 +91,16 @@ static uint8_t default_enemy_width(EnemyKind kind)
     return (kind == ENEMY_WALKER ||
             kind == ENEMY_SHELL_WALKER ||
             kind == ENEMY_SHELL) ? 17 :
-           (kind == ENEMY_SUPERJIEN) ? 18 : 16;
+           (kind == ENEMY_SUPERJIEN) ? 18 :
+           (kind == ENEMY_DEFRAG) ? 16 :
+           (kind == ENEMY_LASER) ? 64 : 16;
 }
 
 static uint8_t default_enemy_height(EnemyKind kind)
 {
-    return (kind == ENEMY_KUMA) ? 32 : 16;
+    return (kind == ENEMY_KUMA) ? 32 :
+           (kind == ENEMY_DEFRAG) ? 32 :
+           (kind == ENEMY_LASER) ? 8 : 16;
 }
 
 static uint8_t aabb_overlap(int ax, int ay, int aw, int ah,
@@ -164,6 +184,7 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->y = CELL_WORLD_Y(source_y);
     enemy->vx = 0;
     enemy->vy = 0;
+    enemy->throw_vx = REF_VEL_TO_FIX(700);
     enemy->w = default_enemy_width(kind);
     enemy->h = default_enemy_height(kind);
     enemy->dir = dir;
@@ -179,6 +200,8 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
         enemy->vy = (dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED;
     } else if (kind == ENEMY_SUPERJIEN) {
         enemy->timer = 0;
+    } else if (kind == ENEMY_LASER) {
+        enemy->vx = (dir < 0) ? -LASER_SPEED : LASER_SPEED;
     }
 
     return enemy;
@@ -187,7 +210,7 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
 static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
                       uint8_t w, uint8_t h,
                       EnemyKind kind, uint8_t sprite, uint8_t palette,
-                      uint8_t param, int8_t dir)
+                      uint8_t param, fix16_t throw_vx, int8_t dir)
 {
     if (manager->spawn_count >= ENEMY_MAX_SPAWNS) {
         return;
@@ -203,6 +226,7 @@ static void add_spawn(EnemyManager *manager, fix16_t x, fix16_t y,
     spawn->sprite = sprite;
     spawn->palette = palette;
     spawn->param = param;
+    spawn->throw_vx = throw_vx;
     spawn->dir = dir;
     spawn->spawned = 0;
 }
@@ -233,6 +257,7 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
     enemy->sprite = spawn->sprite;
     enemy->palette = spawn->palette;
     enemy->param = spawn->param;
+    enemy->throw_vx = spawn->throw_vx;
     spawn->spawned = 1;
 }
 
@@ -393,6 +418,31 @@ static void update_superjien(Enemy *enemy, const Level *level,
     move_enemy_x(enemy, level);
 }
 
+static void update_jien_cannon(Enemy *enemy, const Level *level)
+{
+    switch (enemy->param) {
+    case 2:
+        enemy->y -= JIEN_CANNON_SPEED;
+        break;
+    case 3:
+        enemy->y += JIEN_CANNON_SPEED;
+        break;
+    default: {
+        /* Original axtype 0/1 reverses the speed before amuki applies it. */
+        fix16_t speed = (enemy->param == 1) ? -JIEN_CANNON_SPEED : JIEN_CANNON_SPEED;
+        enemy->x += (enemy->dir > 0) ? speed : -speed;
+        break;
+    }
+    }
+
+    if (FIX16_TO_INT(enemy->x) < -64 ||
+        FIX16_TO_INT(enemy->x) > (int)level->width * LEVEL_METATILE_SIZE + 64 ||
+        FIX16_TO_INT(enemy->y) < -64 ||
+        FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
+        enemy->state = ENEMY_STATE_EMPTY;
+    }
+}
+
 static void update_kuma(Enemy *enemy, const Level *level, const Player *player)
 {
     fix16_t speed = KUMA_SPEED;
@@ -481,6 +531,68 @@ static void update_giant(Enemy *enemy)
     enemy->x += enemy->vx;
 }
 
+static void update_defrag(Enemy *enemy, const Level *level, Player *player)
+{
+    if (enemy->timer > 0) {
+        enemy->timer++;
+        enemy->vx = 0;
+
+        if (player && player->alive && enemy->timer <= DEFRAG_CAPTURE_FRAMES) {
+            player->x = enemy->x;
+            player->y = enemy->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+            player->vx = 0;
+            player->vy = 0;
+            player->on_ground = 1;
+        } else if (player && player->alive &&
+                   enemy->timer == DEFRAG_CAPTURE_FRAMES + 1) {
+            enemy->sprite = ENEMY_SPRITE_DEFRAG;
+            player->y = enemy->y - REF_PLAYER_Y_POS_TO_FIX(4000);
+            player->vx = enemy->throw_vx;
+            player->vy = -REF_PLAYER_Y_VEL_TO_FIX(1200);
+            player->input_lock_timer = 24;
+            player->facing_right = 1;
+            player->on_ground = 0;
+        }
+
+        if (enemy->timer >= DEFRAG_RECOVER_FRAMES) {
+            enemy->timer = 0;
+            enemy->sprite = ENEMY_SPRITE_DEFRAG;
+        }
+        return;
+    }
+
+    /* The active original routine simply walks; the firing version is commented out. */
+    enemy->vx = (enemy->dir > 0) ? REF_VEL_TO_FIX(120) : -REF_VEL_TO_FIX(120);
+    move_enemy_x(enemy, level);
+}
+
+static void update_aramaki(Enemy *enemy, const Level *level)
+{
+    enemy->x += enemy->vx;
+    enemy->y += enemy->vy;
+
+    if (FIX16_TO_INT(enemy->y) < -96 ||
+        FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
+        enemy->state = ENEMY_STATE_EMPTY;
+    }
+}
+
+static void update_laser(Enemy *enemy, const Level *level)
+{
+    if (enemy->vx == 0) {
+        enemy->vx = (enemy->dir < 0) ? -LASER_SPEED : LASER_SPEED;
+    }
+    enemy->x += enemy->vx;
+    enemy->y += enemy->vy;
+
+    if (FIX16_TO_INT(enemy->x) + enemy->w < -96 ||
+        FIX16_TO_INT(enemy->x) > (int)level->width * LEVEL_METATILE_SIZE + 96 ||
+        FIX16_TO_INT(enemy->y) < -96 ||
+        FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
+        enemy->state = ENEMY_STATE_EMPTY;
+    }
+}
+
 static void update_shell_walker(Enemy *enemy, const Level *level)
 {
     enemy->vx = (enemy->dir > 0) ? WALKER_SPEED : -WALKER_SPEED;
@@ -547,7 +659,7 @@ static void moving_shell_hit_enemies(EnemyManager *manager, Enemy *shell)
 
         if (enemy == shell || enemy->state != ENEMY_STATE_ACTIVE ||
             enemy->kind == ENEMY_SHELL || enemy->kind == ENEMY_STATIC_HAZARD ||
-            enemy->kind == ENEMY_FIREBAR) {
+            enemy->kind == ENEMY_FIREBAR || enemy->kind == ENEMY_LASER) {
             continue;
         }
 
@@ -603,6 +715,13 @@ static void update_firebar(Enemy *enemy, Player *player)
     }
 }
 
+static void stomp_defrag(Enemy *enemy)
+{
+    enemy->sprite = ENEMY_SPRITE_DEFRAG_STOMPED;
+    enemy->timer = 1;
+    enemy->vx = 0;
+}
+
 static void stomp_shell_walker(Enemy *enemy, Player *player)
 {
     int enemy_y = FIX16_TO_INT(enemy->y);
@@ -651,12 +770,20 @@ static void handle_player_collision(Enemy *enemy, Player *player)
         return;
     }
 
+    if (enemy->kind == ENEMY_DEFRAG) {
+        if (enemy->timer == 0) {
+            stomp_defrag(enemy);
+        }
+        return;
+    }
+
     if (player->vy > 0 && player_y + PLAYER_HEIGHT_PX <= enemy_y + 8 &&
         enemy->kind != ENEMY_CEILING_FALLER &&
         enemy->kind != ENEMY_STATIC_HAZARD &&
         enemy->kind != ENEMY_PIPE_SHOT &&
         enemy->kind != ENEMY_SUPERJIEN &&
-        enemy->kind != ENEMY_GIANT) {
+        enemy->kind != ENEMY_GIANT &&
+        enemy->kind != ENEMY_LASER) {
         if (enemy->kind == ENEMY_SHELL_WALKER) {
             stomp_shell_walker(enemy, player);
             return;
@@ -760,7 +887,12 @@ void enemies_init_video(void)
         SPRITE_PALETTE[ENEMY_DARK_PALETTE_BANK * 16 + i] =
             (uint16_t)((r / 2) | ((g / 2) << 5) | ((b / 2) << 10));
     }
-    memcpy(&SPRITE_GFX[ENEMY_TILE_INDEX * 16], enemies_16Tiles, enemies_16TilesLen);
+    /* Keep extension art beyond the falling-floor cache (OBJ chars 360..423). */
+    memcpy(&SPRITE_GFX[ENEMY_TILE_INDEX * 16], enemies_16Tiles,
+           ENEMY_BASE_SHEET_BYTES);
+    memcpy(&SPRITE_GFX[ENEMY_EXTRA_TILE_INDEX * 16],
+           &enemies_16Tiles[ENEMY_BASE_SHEET_BYTES / sizeof(enemies_16Tiles[0])],
+           enemies_16TilesLen - ENEMY_BASE_SHEET_BYTES);
 }
 
 static void load_generated_spawns(EnemyManager *manager,
@@ -775,7 +907,8 @@ static void load_generated_spawns(EnemyManager *manager,
         }
 
         add_spawn(manager, spawn->x, spawn->y, spawn->w, spawn->h, spawn->kind,
-                  spawn->sprite, spawn->palette, spawn->param, spawn->dir);
+                  spawn->sprite, spawn->palette, spawn->param, spawn->throw_vx,
+                  spawn->dir);
     }
 }
 
@@ -863,6 +996,22 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             continue;
         }
 
+        if (enemy->kind == ENEMY_ARAMAKI) {
+            update_aramaki(enemy, level);
+            if (enemy->state == ENEMY_STATE_ACTIVE) {
+                handle_player_collision(enemy, player);
+            }
+            continue;
+        }
+
+        if (enemy->kind == ENEMY_LASER) {
+            update_laser(enemy, level);
+            if (enemy->state == ENEMY_STATE_ACTIVE) {
+                handle_player_collision(enemy, player);
+            }
+            continue;
+        }
+
         if (enemy->kind == ENEMY_PIPE_SHOT) {
             enemy->x += enemy->vx;
             enemy->y += enemy->vy;
@@ -906,10 +1055,14 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             update_walker(enemy, level);
         } else if (enemy->kind == ENEMY_SUPERJIEN) {
             update_superjien(enemy, level, player);
+        } else if (enemy->kind == ENEMY_JIEN_CANNON) {
+            update_jien_cannon(enemy, level);
         } else if (enemy->kind == ENEMY_KUMA) {
             update_kuma(enemy, level, player);
         } else if (enemy->kind == ENEMY_GIANT) {
             update_giant(enemy);
+        } else if (enemy->kind == ENEMY_DEFRAG) {
+            update_defrag(enemy, level, player);
         } else if (enemy->kind == ENEMY_SHELL_WALKER) {
             update_shell_walker(enemy, level);
         } else if (enemy->kind == ENEMY_SHELL) {
@@ -927,10 +1080,11 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             moved_before_gravity = 1;
         }
 
-        if (enemy->kind != ENEMY_CEILING_FALLER) {
+        if (enemy->kind != ENEMY_CEILING_FALLER &&
+            enemy->kind != ENEMY_JIEN_CANNON) {
             apply_gravity(enemy);
         }
-        if (!moved_before_gravity) {
+        if (!moved_before_gravity && enemy->kind != ENEMY_JIEN_CANNON) {
             move_enemy_y(enemy, level);
         }
 
@@ -996,6 +1150,46 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                                                  ATTR2_PALETTE(enemy->palette));
                 }
 
+                OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                continue;
+            }
+
+            if (enemy->sprite == ENEMY_SPRITE_LASER) {
+                if (extra_index + 3 > ENEMY_MAX_ACTIVE) {
+                    obj->attr0 = ATTR0_DISABLED;
+                    OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                    continue;
+                }
+                for (uint8_t part = 0; part < 4; ++part) {
+                    OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
+                    int part_x = screen_x + part * 16;
+                    part_obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    part_obj->attr1 = (uint16_t)((part_x & 0x01ff) | ATTR1_SIZE_16);
+                    uint16_t tile = (part == 0) ? ENEMY_LASER_LEFT_TILE :
+                                    (part == 3) ? ENEMY_LASER_RIGHT_TILE : ENEMY_LASER_MIDDLE_TILE;
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(tile) | ATTR2_PALETTE(enemy->palette));
+                }
+                OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                continue;
+            }
+
+            if (enemy->sprite == ENEMY_SPRITE_DEFRAG ||
+                enemy->sprite == ENEMY_SPRITE_DEFRAG_STOMPED) {
+                uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_DEFRAG_STOMPED)
+                    ? ENEMY_DEFRAG_STOMPED_TILE : ENEMY_DEFRAG_TILE;
+                if (extra_index + 1 > ENEMY_MAX_ACTIVE) {
+                    obj->attr0 = ATTR0_DISABLED;
+                    OAM[FIRST_ENEMY_SPRITE + i] = *obj;
+                    continue;
+                }
+                for (uint8_t part = 0; part < 2; ++part) {
+                    OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
+                    int part_y = screen_y + part * 16;
+                    part_obj->attr0 = (uint16_t)((part_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
+                    part_obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
+                    part_obj->attr2 = (uint16_t)(OBJ_CHAR(base_tile + part * 4) |
+                                                 ATTR2_PALETTE(enemy->palette));
+                }
                 OAM[FIRST_ENEMY_SPRITE + i] = *obj;
                 continue;
             }
@@ -1116,6 +1310,8 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                 tile = ENEMY_FIRE_PROJECTILE_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_SUPERJIEN) {
                 tile = ENEMY_SUPERJIEN_TILE;
+            } else if (enemy->sprite == ENEMY_SPRITE_JIEN_CANNON) {
+                tile = ENEMY_JIEN_CANNON_TILE;
             } else if (enemy->sprite == ENEMY_SPRITE_HAZARD ||
                        enemy->kind == ENEMY_CEILING_FALLER ||
                        enemy->kind == ENEMY_STATIC_HAZARD) {

@@ -115,8 +115,12 @@ ENEMY_KIND_NAMES = {
     "firebar": "ENEMY_FIREBAR",
     "superjien": "ENEMY_SUPERJIEN",
     "super_jien": "ENEMY_SUPERJIEN",
+    "jien_cannon": "ENEMY_JIEN_CANNON",
     "kuma": "ENEMY_KUMA",
     "giant": "ENEMY_GIANT",
+    "defrag": "ENEMY_DEFRAG",
+    "aramaki": "ENEMY_ARAMAKI",
+    "laser": "ENEMY_LASER",
 }
 
 ENEMY_SPRITE_NAMES = {
@@ -138,7 +142,11 @@ ENEMY_SPRITE_NAMES = {
     "fire_projectile": "ENEMY_SPRITE_FIRE_PROJECTILE",
     "superjien": "ENEMY_SPRITE_SUPERJIEN",
     "spiky_soldier": "ENEMY_SPRITE_SUPERJIEN",
+    "jien_cannon": "ENEMY_SPRITE_JIEN_CANNON",
     "giant": "ENEMY_SPRITE_GIANT",
+    "defrag": "ENEMY_SPRITE_DEFRAG",
+    "defrag_stomped": "ENEMY_SPRITE_DEFRAG_STOMPED",
+    "laser": "ENEMY_SPRITE_LASER",
 }
 
 FLIP_MASK = 0xE0000000
@@ -561,6 +569,8 @@ def parse_object_layers(map_data, tile_props):
                     "param": max(0, min(255, int(prop_value(
                         props, "enemy_param",
                         tile_prop.get("enemy_param", 0))))),
+                    "throw_vx": ref_velocity_fixed(prop_value(
+                        props, "throw_vx", tile_prop.get("throw_vx", 700))),
                     "x": x,
                     "y": y,
                 })
@@ -725,6 +735,7 @@ typedef struct GeneratedEnemySpawn {{
     uint8_t h;
     uint8_t palette;
     uint8_t param;
+    fix16_t throw_vx;
     fix16_t x;
     fix16_t y;
 }} GeneratedEnemySpawn;
@@ -775,12 +786,12 @@ extern const uint16_t {prefix}_trap_count;
     ])
     if enemy_spawns:
         for spawn in enemy_spawns:
-            lines.append("    { %s, %s, %d, %d, %d, %d, %d, %d, %d }," %
+            lines.append("    { %s, %s, %d, %d, %d, %d, %d, %d, %d, %d }," %
                          (spawn["kind"], spawn["sprite"], spawn["dir"],
                           spawn["w"], spawn["h"], spawn["palette"],
-                          spawn["param"], spawn["x"], spawn["y"]))
+                          spawn["param"], spawn["throw_vx"], spawn["x"], spawn["y"]))
     else:
-        lines.append("    { ENEMY_NONE, 0, 0, 16, 16, 0, 0, 0, 0 },")
+        lines.append("    { ENEMY_NONE, 0, 0, 16, 16, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_enemy_spawn_count = {len(enemy_spawns)};",

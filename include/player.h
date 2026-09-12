@@ -25,6 +25,7 @@ typedef struct Player {
     uint8_t coyote_timer;
     uint8_t jump_timer;
     uint8_t control_locked;
+    uint8_t input_lock_timer;
     uint8_t hidden;
     uint8_t powered_up;
     uint8_t blocked_left;

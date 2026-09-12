@@ -24,7 +24,11 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_CUCKOO32,
     ENEMY_SPRITE_FIRE_PROJECTILE,
     ENEMY_SPRITE_SUPERJIEN,
+    ENEMY_SPRITE_JIEN_CANNON,
     ENEMY_SPRITE_GIANT,
+    ENEMY_SPRITE_DEFRAG,
+    ENEMY_SPRITE_DEFRAG_STOMPED,
+    ENEMY_SPRITE_LASER,
 } EnemySprite;
 
 struct Camera;
@@ -40,8 +44,12 @@ typedef enum EnemyKind {
     ENEMY_PIPE_SHOT,
     ENEMY_FIREBAR,
     ENEMY_SUPERJIEN,
+    ENEMY_JIEN_CANNON,
     ENEMY_KUMA,
     ENEMY_GIANT,
+    ENEMY_DEFRAG,
+    ENEMY_ARAMAKI,
+    ENEMY_LASER,
 } EnemyKind;
 
 typedef enum EnemyState {
@@ -58,6 +66,7 @@ typedef struct Enemy {
     fix16_t y;
     fix16_t vx;
     fix16_t vy;
+    fix16_t throw_vx;
     uint8_t w;
     uint8_t h;
     int8_t dir;
@@ -79,6 +88,7 @@ typedef struct EnemySpawn {
     uint8_t sprite;
     uint8_t palette;
     uint8_t param;
+    fix16_t throw_vx;
     int8_t dir;
     uint8_t spawned;
 } EnemySpawn;

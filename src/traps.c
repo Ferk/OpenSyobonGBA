@@ -541,7 +541,7 @@ static void apply_falling_stage_body_cells(TrapManager *manager, Level *level,
     if (rows == 0) {
         rows = 1;
     }
-    if (visual == 255 || visual == METATILE_EMPTY) {
+    if (visual == METATILE_EMPTY) {
         visual = METATILE_BRICK;
     }
 
@@ -554,8 +554,11 @@ static void apply_falling_stage_body_cells(TrapManager *manager, Level *level,
                 continue;
             }
 
-            level_set_metatile_cell_palette(level, source_x, source_y,
-                                            visual, trigger->visual_palette);
+            /* 255 is the authored-background sentinel: retain its art and palette. */
+            if (visual != 255) {
+                level_set_metatile_cell_palette(level, source_x, source_y,
+                                                visual, trigger->visual_palette);
+            }
             set_cell_collision(manager, source_x, source_y,
                                LEVEL_COLLISION_SOLID, 0);
         }
@@ -1121,9 +1124,18 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
     case QUESTION_ENEMY:
         audio_play_trap_trigger();
         spend_question_block(manager, trap, level);
-        enemies_spawn_from_block(&enemy_current, trap->x, trap->y,
-                                 ENEMY_SPRITE_WALKER,
-                                 resolve_question_enemy_dir(trap, player));
+        if (trap->spawn_enemy_kind != ENEMY_NONE) {
+            enemies_spawn_direct_config(
+                &enemy_current, (EnemyKind)trap->spawn_enemy_kind,
+                trap->x + trap->spawn_offset_x, trap->y + trap->spawn_offset_y,
+                trap->spawn_vx, trap->spawn_vy, trap->spawn_enemy_sprite,
+                trap->spawn_enemy_palette, trap->spawn_enemy_param,
+                resolve_question_enemy_dir(trap, player));
+        } else {
+            enemies_spawn_from_block(&enemy_current, trap->x, trap->y,
+                                     ENEMY_SPRITE_WALKER,
+                                     resolve_question_enemy_dir(trap, player));
+        }
         break;
     case QUESTION_GOOD_MUSHROOM:
         audio_play_trap_trigger();
@@ -1235,6 +1247,14 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
                                   Player *player)
 {
     if (trap->state != TRAP_IDLE) {
+        return;
+    }
+
+    /* Original stype 102/sxtype 10 relocates once, then behaves as stype 101. */
+    if (trap->subtype == STAGE_UPWARD_HAZARD_TOGGLE) {
+        trap->x += trap->move_offset_x;
+        trap->y += trap->move_offset_y;
+        trap->subtype = STAGE_UPWARD_HAZARD;
         return;
     }
     uint8_t has_rearm_offset = trap_has_repeat_rearm_offset(trap);
