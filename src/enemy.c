@@ -41,8 +41,9 @@
 #define ENEMY_LASER_RIGHT_TILE (ENEMY_EXTRA_TILE_INDEX + 24)
 #define ENEMY_BASE_SHEET_BYTES (26 * 16 * 16 / 2)
 #define FIRST_ENEMY_EXTRA_SPRITE 96
-#define ENEMY_SPAWN_AHEAD_PX 304
-#define ENEMY_SPAWN_BEHIND_PX 96
+/* Staged enemies activate relative to the player, not the camera viewport. */
+#define ENEMY_SPAWN_AHEAD_PX 160
+#define ENEMY_SPAWN_BEHIND_BASE_PX 118
 
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
 #define REF_VEL_TO_FIX(v) (REF_POS_TO_FIX(v) / 2)
@@ -321,8 +322,11 @@ static void update_spawns(EnemyManager *manager, const Player *player)
         EnemySpawn *spawn = &manager->spawns[i];
         int spawn_x = FIX16_TO_INT(spawn->x);
 
+        /* The reference stage loader uses the player's scroll-lock point,
+         * not a generic preload range.  Preserve that player-relative distance
+         * after converting its 29px grid to the port's 16px grid. */
         if (!spawn->spawned &&
-            spawn_x >= player_x - ENEMY_SPAWN_BEHIND_PX &&
+            spawn_x + spawn->w >= player_x - ENEMY_SPAWN_BEHIND_BASE_PX &&
             spawn_x <= player_x + ENEMY_SPAWN_AHEAD_PX) {
             spawn_enemy_record(manager, spawn);
         }
