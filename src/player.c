@@ -35,7 +35,7 @@
 #define PLAYER_RUN_LIMIT REF_VEL_TO_FIX(800)
 #define PLAYER_FRICTION REF_ACCEL_TO_FIX(60)
 #define PLAYER_GRAVITY REF_Y_ACCEL_TO_FIX(100)
-#define PLAYER_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1200))
+#define PLAYER_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1150))
 #define PLAYER_FAST_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1400))
 #define PLAYER_EXTRA_FAST_JUMP_SPEED (-REF_Y_VEL_TO_FIX(1500))
 #define PLAYER_MAX_FALL_SPEED REF_Y_VEL_TO_FIX(1600)
@@ -405,6 +405,7 @@ void player_spawn(Player *player)
     }
     player->vx = 0;
     player->vy = 0;
+    player->launch_vx = 0;
     player->on_ground = 0;
     player->facing_right = 1;
     player->alive = 1;
@@ -479,6 +480,16 @@ void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames)
     player->jump_timer = 0;
 }
 
+void player_interrupt_goal(Player *player)
+{
+    player->control_locked = 0;
+    player->hidden = 0;
+    player->goal_clear_done = 0;
+    player->goal_phase = 0;
+    player->goal_timer = 0;
+    player->walk_distance = 0;
+}
+
 uint8_t player_goal_clear_done(const Player *player)
 {
     return player->goal_clear_done;
@@ -496,6 +507,7 @@ void player_kill(Player *player)
     audio_stop_bgm();
     audio_play_death();
     player->vx = 0;
+    player->launch_vx = 0;
     player->vy = PLAYER_DEATH_BOUNCE;
     player->goal_phase = 0;
     player->goal_timer = 0;
@@ -540,6 +552,9 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         launch_locked = 1;
         keys = 0;
         pressed = 0;
+        if (player->launch_vx != 0) {
+            player->vx = player->launch_vx;
+        }
     }
 
     if (player->goal_phase != 0) {
@@ -688,8 +703,9 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
         }
     }
 
-    /* Defrag-san's throw owns horizontal velocity while player input is locked. */
+    /* Defrag-san's launch keeps its authored velocity throughout the lock. */
     if (!launch_locked) {
+        player->launch_vx = 0;
         if (player->vx > PLAYER_RUN_LIMIT) {
             player->vx = PLAYER_RUN_LIMIT;
         } else if (player->vx < -PLAYER_RUN_LIMIT) {

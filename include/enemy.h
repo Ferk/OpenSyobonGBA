@@ -77,6 +77,8 @@ typedef struct Enemy {
     uint8_t palette;
     uint8_t param;
     uint8_t emerge_timer;
+    uint8_t captured_entity;
+    uint8_t hold_timer;
 } Enemy;
 
 typedef struct EnemySpawn {

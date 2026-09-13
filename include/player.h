@@ -17,6 +17,7 @@ typedef struct Player {
     fix16_t y;
     fix16_t vx;
     fix16_t vy;
+    fix16_t launch_vx;
     uint8_t on_ground;
     uint8_t facing_right;
     uint8_t alive;
@@ -48,6 +49,7 @@ void player_spawn_at(Player *player, fix16_t x, fix16_t y);
 void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
 void player_set_supported(Player *player);
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
+void player_interrupt_goal(Player *player);
 void player_power_up(Player *player);
 uint8_t player_goal_clear_done(const Player *player);
 void player_update(Player *player, Level *level, struct TrapManager *traps);

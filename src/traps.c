@@ -47,6 +47,7 @@
 #define UNDERGROUND_TILE_PALETTE_BANK 5
 #define RGB15(r, g, b) ((uint16_t)((r) | ((g) << 5) | ((b) << 10)))
 #define TRAPS_MAX_DYNAMIC_SPRITES 16
+#define DEFRAG_ITEM_HOLD_FRAMES 20
 
 #define REF_POS_TO_FIX(v) ((fix16_t)(((int64_t)(v) * 16 * FIX16_ONE) / (29 * 100)))
 #define REF_STAGE_X_TO_FIX(v) REF_POS_TO_FIX(v)
@@ -1914,6 +1915,78 @@ static void update_moving_item(TrapEntity *entity, const Level *level)
     }
 }
 
+static uint8_t defrag_can_hold_item(const TrapEntity *entity)
+{
+    return entity->kind == TRAP_ENTITY_GOOD_ITEM ||
+           entity->kind == TRAP_ENTITY_BAD_ITEM ||
+           entity->kind == TRAP_ENTITY_STAR_ITEM ||
+           entity->kind == TRAP_ENTITY_HURT_ITEM;
+}
+
+uint8_t traps_defrag_capture_item(TrapManager *manager, Enemy *enemy)
+{
+    int enemy_x = FIX16_TO_INT(enemy->x);
+    int enemy_y = FIX16_TO_INT(enemy->y);
+    int enemy_bottom = enemy_y + enemy->h;
+
+    for (uint8_t i = 0; i < TRAPS_MAX_ENTITIES; ++i) {
+        TrapEntity *entity = &manager->entities[i];
+        int item_x;
+        int item_y;
+
+        if (!entity->active || entity->defrag_held || !defrag_can_hold_item(entity)) {
+            continue;
+        }
+
+        item_x = FIX16_TO_INT(entity->x);
+        item_y = FIX16_TO_INT(entity->y);
+        if (enemy_x + enemy->w > item_x + FIX16_TO_INT(REF_POS_TO_FIX(500)) &&
+            enemy_x < item_x + entity->w - FIX16_TO_INT(REF_POS_TO_FIX(500)) &&
+            enemy_bottom > item_y - FIX16_TO_INT(REF_POS_TO_FIX(800)) &&
+            enemy_bottom < item_y + FIX16_TO_INT(REF_POS_TO_FIX(6300))) {
+            entity->defrag_held = 1;
+            entity->vx = 0;
+            entity->vy = 0;
+            enemy->captured_entity = i;
+            enemy->hold_timer = DEFRAG_ITEM_HOLD_FRAMES;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+uint8_t traps_defrag_capture_goal(TrapManager *manager, const Enemy *enemy,
+                                  Player *player)
+{
+    int enemy_x;
+
+    if (enemy->param != 1 || !enemy->on_ground) {
+        return 0;
+    }
+
+    enemy_x = FIX16_TO_INT(enemy->x);
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        Trap *trap = &manager->traps[i];
+        int goal_x;
+
+        if (trap->kind != TRAP_GOAL || trap->state == TRAP_SPENT) {
+            continue;
+        }
+
+        goal_x = FIX16_TO_INT(trap->x);
+        if (enemy_x >= goal_x + FIX16_TO_INT(REF_POS_TO_FIX(2000)) &&
+            enemy_x <= goal_x + FIX16_TO_INT(REF_POS_TO_FIX(3600))) {
+            trap->state = TRAP_SPENT;
+            manager->stage_clear_requested = 0;
+            player_interrupt_goal(player);
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 static uint8_t player_can_stand_on_platform(const Trap *trap, const Player *player,
                                             int old_platform_y)
 {
@@ -2240,7 +2313,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
     for (uint8_t i = 0; i < TRAPS_MAX_ENTITIES; ++i) {
         TrapEntity *entity = &manager->entities[i];
 
-        if (!entity->active) {
+        if (!entity->active || entity->defrag_held) {
             continue;
         }
 
@@ -2429,7 +2502,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             cull_y -= FIX16_FROM_INT(16);
             cull_w = 48;
             cull_h = 48;
-        } else if (trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) {
+        } else if ((trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) &&
+                   trap->state != TRAP_SPENT) {
             cull_w = 16;
         }
 
@@ -2643,7 +2717,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     dynamic_index++;
                 }
             }
-        } else if (trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) {
+        } else if ((trap->kind == TRAP_GOAL || trap->kind == TRAP_FAKE_GOAL) &&
+                   trap->state != TRAP_SPENT) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
             int base_y = camera_world_to_screen_y(camera, trap->y);
             int rows = FIX16_TO_INT(trap->h) / LEVEL_METATILE_SIZE;

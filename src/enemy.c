@@ -64,6 +64,8 @@
 #define ARAMAKI_FALL_SPEED REF_VEL_TO_FIX(1200)
 #define DEFRAG_CAPTURE_FRAMES 10
 #define DEFRAG_RECOVER_FRAMES 31
+#define DEFRAG_ITEM_THROW_SPEED REF_VEL_TO_FIX(700)
+#define DEFRAG_ITEM_THROW_UP_SPEED (-REF_VEL_TO_FIX(1200))
 #define SUPERJIEN_HOP_SPEED (-REF_VEL_TO_FIX(1600))
 #define SUPERJIEN_HOP_COOLDOWN 40
 #define CEILING_FALL_SPEED REF_VEL_TO_FIX(1200)
@@ -196,7 +198,8 @@ static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
     enemy->palette = 0;
     enemy->param = 0;
     enemy->emerge_timer = 0;
-
+    enemy->captured_entity = 0xff;
+    enemy->hold_timer = 0;
     if (kind == ENEMY_PIPE_SHOT) {
         enemy->vy = (dir < 0) ? PIPE_SHOT_UP_SPEED : PIPE_SHOT_DOWN_SPEED;
     } else if (kind == ENEMY_SUPERJIEN) {
@@ -537,6 +540,42 @@ static void update_giant(Enemy *enemy)
 
 static void update_defrag(Enemy *enemy, const Level *level, Player *player)
 {
+    if (enemy->captured_entity != 0xff) {
+        if (enemy->captured_entity == 0xfe) {
+            if (enemy->hold_timer > 0) {
+                enemy->hold_timer--;
+            }
+            enemy->vx = 0;
+            if (enemy->hold_timer == 0) {
+                enemy->captured_entity = 0xff;
+            }
+            return;
+        }
+
+        TrapEntity *item = &traps_current.entities[enemy->captured_entity];
+        if (!item->active || !item->defrag_held) {
+            enemy->captured_entity = 0xff;
+            enemy->hold_timer = 0;
+        } else {
+            item->x = enemy->x + REF_POS_TO_FIX(300);
+            item->y = enemy->y - REF_POS_TO_FIX(3000);
+            item->vx = 0;
+            item->vy = 0;
+            enemy->vx = 0;
+            if (enemy->hold_timer > 0) {
+                enemy->hold_timer--;
+            }
+            if (enemy->hold_timer == 0) {
+                item->y -= REF_POS_TO_FIX(800);
+                item->vx = DEFRAG_ITEM_THROW_SPEED;
+                item->vy = DEFRAG_ITEM_THROW_UP_SPEED;
+                item->defrag_held = 0;
+                enemy->captured_entity = 0xff;
+            }
+            return;
+        }
+    }
+
     if (enemy->timer > 0) {
         enemy->timer++;
         enemy->vx = 0;
@@ -545,13 +584,15 @@ static void update_defrag(Enemy *enemy, const Level *level, Player *player)
             player->x = enemy->x;
             player->y = enemy->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
             player->vx = 0;
+            player->launch_vx = 0;
             player->vy = 0;
             player->on_ground = 1;
         } else if (player && player->alive &&
                    enemy->timer == DEFRAG_CAPTURE_FRAMES + 1) {
             enemy->sprite = ENEMY_SPRITE_DEFRAG;
             player->y = enemy->y - REF_PLAYER_Y_POS_TO_FIX(4000);
-            player->vx = enemy->throw_vx;
+            player->launch_vx = enemy->throw_vx;
+            player->vx = player->launch_vx;
             player->vy = -REF_PLAYER_Y_VEL_TO_FIX(1200);
             player->input_lock_timer = 24;
             player->facing_right = 1;
@@ -565,9 +606,16 @@ static void update_defrag(Enemy *enemy, const Level *level, Player *player)
         return;
     }
 
-    /* The active original routine simply walks; the firing version is commented out. */
     enemy->vx = (enemy->dir > 0) ? REF_VEL_TO_FIX(120) : -REF_VEL_TO_FIX(120);
     move_enemy_x(enemy, level);
+
+    if (traps_defrag_capture_goal(&traps_current, enemy, player)) {
+        enemy->captured_entity = 0xfe;
+        enemy->hold_timer = 40;
+        enemy->param = 0;
+    } else {
+        traps_defrag_capture_item(&traps_current, enemy);
+    }
 }
 
 static void update_aramaki(Enemy *enemy, const Level *level)
@@ -719,8 +767,10 @@ static void update_firebar(Enemy *enemy, Player *player)
     }
 }
 
-static void stomp_defrag(Enemy *enemy)
+static void stomp_defrag(Enemy *enemy, Player *player)
 {
+    player_interrupt_goal(player);
+    enemy->param = 0;
     enemy->sprite = ENEMY_SPRITE_DEFRAG_STOMPED;
     enemy->timer = 1;
     enemy->vx = 0;
@@ -776,7 +826,7 @@ static void handle_player_collision(Enemy *enemy, Player *player)
 
     if (enemy->kind == ENEMY_DEFRAG) {
         if (enemy->timer == 0) {
-            stomp_defrag(enemy);
+            stomp_defrag(enemy, player);
         }
         return;
     }

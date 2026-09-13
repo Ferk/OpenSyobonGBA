@@ -161,7 +161,7 @@
                         {
                          "name":"throw_vx",
                          "type":"int",
-                         "value":2000
+                         "value":1400
                         }],
                  "rotation":0,
                  "type":"Enemy",
@@ -197,7 +197,7 @@
                  "width":16,
                  "x":1344,
                  "y":128
-                },
+                }, 
                 {
                  "height":16,
                  "id":104,
@@ -208,17 +208,17 @@
                          "name":"dir",
                          "type":"int",
                          "value":-1
-                        },
+                        }, 
                         {
                          "name":"enemy_kind",
                          "type":"string",
                          "value":"jien_cannon"
-                        },
+                        }, 
                         {
                          "name":"enemy_param",
                          "type":"int",
                          "value":0
-                        },
+                        }, 
                         {
                          "name":"enemy_sprite",
                          "type":"string",
@@ -230,7 +230,7 @@
                  "width":16,
                  "x":1536,
                  "y":16
-                },
+                }, 
                 {
                  "height":16,
                  "id":105,
@@ -241,17 +241,17 @@
                          "name":"dir",
                          "type":"int",
                          "value":-1
-                        },
+                        }, 
                         {
                          "name":"enemy_kind",
                          "type":"string",
                          "value":"jien_cannon"
-                        },
+                        }, 
                         {
                          "name":"enemy_param",
                          "type":"int",
                          "value":0
-                        },
+                        }, 
                         {
                          "name":"enemy_sprite",
                          "type":"string",
@@ -500,17 +500,17 @@
                          "name":"spawn_enemy_kind",
                          "type":"string",
                          "value":"superjien"
-                        },
+                        }, 
                         {
                          "name":"spawn_enemy_param",
                          "type":"int",
                          "value":0
-                        },
+                        }, 
                         {
                          "name":"spawn_enemy_sprite",
                          "type":"string",
                          "value":"superjien"
-                        },
+                        }, 
                         {
                          "name":"subtype",
                          "type":"string",
@@ -1061,7 +1061,7 @@
                         {
                          "name":"ref_spawn_x",
                          "type":"int",
-                         "value":134400
+                         "value":266400
                         }, 
                         {
                          "name":"ref_spawn_y",

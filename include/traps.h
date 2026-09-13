@@ -114,6 +114,7 @@ typedef struct TrapEntity {
     uint8_t timer;
     uint8_t frame;
     uint8_t palette;
+    uint8_t defrag_held;
     uint8_t param;
 } TrapEntity;
 
@@ -202,5 +203,8 @@ uint8_t traps_stage_transition_target(const TrapManager *manager);
 void traps_ack_stage_transition(TrapManager *manager);
 uint8_t traps_player_can_enter_pipe(const TrapManager *manager,
                                     const struct Player *player);
+uint8_t traps_defrag_capture_item(TrapManager *manager, struct Enemy *enemy);
+uint8_t traps_defrag_capture_goal(TrapManager *manager, const struct Enemy *enemy,
+                                  struct Player *player);
 
 #endif
