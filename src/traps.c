@@ -11,6 +11,7 @@
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "generated/level1_3_data.h"
+#include "generated/level1_3u_data.h"
 #include "messages.h"
 #include "player.h"
 #include "text.h"
@@ -85,9 +86,6 @@
 #define PIPE_RISE_MAX_SPEED REF_VEL_TO_FIX(1600)
 #define PIPE_TRANSITION_FRAME 20
 #define SIDE_PIPE_KILL_FRAME 48
-#define PIPE_TRANSITION_1_2 1
-#define PIPE_TRANSITION_1_2_UNDERGROUND 2
-#define PIPE_TRANSITION_1_2B 3
 #define KEY_DOWN_MASK 0x0080
 #define KEY_LEFT_MASK 0x0020
 #define KEY_RIGHT_MASK 0x0010
@@ -371,6 +369,7 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->gravity = 0;
     trap->timer = 0;
     trap->subtype = subtype;
+    trap->destination = 0;
     trap->spawn_dir = 0;
     trap->visual_palette = 0;
     trap->visual_metatile = 255;
@@ -580,6 +579,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
 
     trap->source_x = trigger->source_x;
     trap->source_y = trigger->source_y;
+    trap->destination = trigger->destination;
     trap->spawn_dir = trigger->spawn_dir;
     trap->visual_palette = trigger->visual_palette;
     trap->visual_metatile = trigger->visual_metatile;
@@ -1320,9 +1320,9 @@ static void trigger_checkpoint(TrapManager *manager, Trap *trap, Level *level,
     (void)level;
     trap->state = TRAP_SPENT;
     trap->trigger_pending = 0;
-    player_set_checkpoint(player,
-                          trap->x,
-                          trap->y + trap->h - FIX16_FROM_INT(PLAYER_HEIGHT_PX));
+    player_set_checkpoint_flag(player, trap->x, trap->y,
+                               trap->x,
+                               trap->y + trap->h - FIX16_FROM_INT(PLAYER_HEIGHT_PX));
     audio_play_trap_trigger();
     emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
@@ -1626,7 +1626,7 @@ static void update_enter_pipe(TrapManager *manager, Trap *trap, struct Player *p
     if (trap->subtype == 1) {
         if (trap->timer == PIPE_TRANSITION_FRAME) {
             manager->stage_transition_requested = 1;
-            manager->stage_transition_target = PIPE_TRANSITION_1_2_UNDERGROUND;
+            manager->stage_transition_target = trap->destination;
             trap->state = TRAP_SPENT;
         } else if (trap->timer < 255) {
             trap->timer++;
@@ -1729,7 +1729,7 @@ static void update_side_pipe(TrapManager *manager, Trap *trap, struct Player *pl
         }
         if (trap->timer == PIPE_TRANSITION_FRAME) {
             manager->stage_transition_requested = 1;
-            manager->stage_transition_target = PIPE_TRANSITION_1_2B;
+            manager->stage_transition_target = trap->destination;
             trap->state = TRAP_SPENT;
         } else if (trap->timer < 255) {
             trap->timer++;
@@ -1822,6 +1822,15 @@ void traps_load_1_3(TrapManager *manager, Level *level)
 
     for (uint16_t i = 0; i < level1_3_trap_count; ++i) {
         add_generated_trap(manager, level, &level1_3_traps[i]);
+    }
+}
+
+void traps_load_1_3_underground(TrapManager *manager, Level *level)
+{
+    memset(manager, 0, sizeof(*manager));
+
+    for (uint16_t i = 0; i < level1_3u_trap_count; ++i) {
+        add_generated_trap(manager, level, &level1_3u_traps[i]);
     }
 }
 
@@ -2857,6 +2866,26 @@ uint8_t traps_stage_clear_requested(const TrapManager *manager)
 void traps_ack_stage_clear(TrapManager *manager)
 {
     manager->stage_clear_requested = 0;
+}
+
+void traps_restore_checkpoint(TrapManager *manager, const struct Player *player)
+{
+    if (!player->checkpoint_active ||
+        player->checkpoint_source != PLAYER_CHECKPOINT_FLAG) {
+        return;
+    }
+
+    for (uint16_t i = 0; i < manager->trap_count; ++i) {
+        Trap *trap = &manager->traps[i];
+
+        if (trap->kind == TRAP_CHECKPOINT &&
+            trap->x == player->checkpoint_source_x &&
+            trap->y == player->checkpoint_source_y) {
+            trap->state = TRAP_SPENT;
+            trap->trigger_pending = 0;
+            return;
+        }
+    }
 }
 
 uint8_t traps_stage_transition_requested(const TrapManager *manager)

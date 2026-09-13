@@ -11,6 +11,7 @@
 #include "generated/level1_2b_data.h"
 #include "generated/level1_2u_data.h"
 #include "generated/level1_3_data.h"
+#include "generated/level1_3u_data.h"
 #include "level.h"
 #include "messages.h"
 #include "player.h"
@@ -41,6 +42,7 @@ typedef enum StageId {
     STAGE_ID_1_2_UNDERGROUND,
     STAGE_ID_1_2B,
     STAGE_ID_1_3,
+    STAGE_ID_1_3_UNDERGROUND,
     STAGE_ID_COUNT,
 } StageId;
 
@@ -173,6 +175,10 @@ static const char *stage_label(StageId stage)
         return "1-2B ";
     }
 
+    if (stage == STAGE_ID_1_3_UNDERGROUND) {
+        return "1-3U ";
+    }
+
     if (stage == STAGE_ID_1_3) {
         return "1-3 ";
     }
@@ -288,6 +294,10 @@ static void load_stage(StageId stage)
         level_load_1_2b(&level_current);
         traps_load_1_2b(&traps_current, &level_current);
         enemies_load_1_2b(&enemy_current, &level_current);
+    } else if (stage == STAGE_ID_1_3_UNDERGROUND) {
+        level_load_1_3_underground(&level_current);
+        traps_load_1_3_underground(&traps_current, &level_current);
+        enemies_load_1_3_underground(&enemy_current, &level_current);
     } else if (stage == STAGE_ID_1_3) {
         level_load_1_3(&level_current);
         traps_load_1_3(&traps_current, &level_current);
@@ -303,7 +313,8 @@ static void load_stage(StageId stage)
     }
 }
 
-static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, fix16_t *y)
+static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x,
+                                      fix16_t *y, uint8_t *subtype)
 {
     const GeneratedMapObject *objects = level1_objects;
     uint16_t object_count = level1_object_count;
@@ -317,6 +328,9 @@ static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, f
     } else if (stage == STAGE_ID_1_2B) {
         objects = level1_2b_objects;
         object_count = level1_2b_object_count;
+    } else if (stage == STAGE_ID_1_3_UNDERGROUND) {
+        objects = level1_3u_objects;
+        object_count = level1_3u_object_count;
     } else if (stage == STAGE_ID_1_3) {
         objects = level1_3_objects;
         object_count = level1_3_object_count;
@@ -326,6 +340,9 @@ static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, f
         if (objects[i].kind == kind) {
             *x = objects[i].x;
             *y = objects[i].y;
+            if (subtype) {
+                *subtype = objects[i].subtype;
+            }
             return 1;
         }
     }
@@ -333,14 +350,27 @@ static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x, f
     return 0;
 }
 
-static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y)
+static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y,
+                                      uint8_t *checkpoint)
 {
-    return generated_stage_object(stage, GENERATED_OBJECT_PLAYER_START, x, y);
+    return generated_stage_object(stage, GENERATED_OBJECT_PLAYER_START, x, y,
+                                  checkpoint);
 }
 
 static uint8_t generated_pipe_exit(StageId stage, fix16_t *x, fix16_t *y)
 {
-    return generated_stage_object(stage, GENERATED_OBJECT_PIPE_EXIT, x, y);
+    return generated_stage_object(stage, GENERATED_OBJECT_PIPE_EXIT, x, y, NULL);
+}
+
+static void save_player_start_checkpoint(Player *player, StageId stage,
+                                         fix16_t x, fix16_t y,
+                                         uint8_t checkpoint)
+{
+    if (checkpoint) {
+        player_set_checkpoint_start(player, x, y);
+        player->checkpoint_stage = (uint8_t)stage;
+        player->checkpoint_changed = 0;
+    }
 }
 
 static void start_stage(Player *player, Camera *camera, StageId stage)
@@ -352,11 +382,16 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
     if (!player->checkpoint_active) {
         fix16_t start_x = 0;
         fix16_t start_y = 0;
+        uint8_t checkpoint = 0;
 
-        if (generated_player_start(stage, &start_x, &start_y)) {
+        if (generated_player_start(stage, &start_x, &start_y, &checkpoint)) {
             player->x = start_x;
             player->y = start_y;
+            save_player_start_checkpoint(player, stage, start_x, start_y, checkpoint);
         }
+    }
+    if (player->checkpoint_active && player->checkpoint_stage == stage) {
+        traps_restore_checkpoint(&traps_current, player);
     }
     camera_init(camera);
     level_force_stream_update();
@@ -367,16 +402,25 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
 
 static void start_stage_from_pipe(Player *player, Camera *camera, StageId stage)
 {
+    fix16_t entry_x = 0;
+    fix16_t entry_y = 0;
+
     start_stage(player, camera, stage);
 
-    fix16_t exit_x = 0;
-    fix16_t exit_y = 0;
-    if (generated_pipe_exit(stage, &exit_x, &exit_y)) {
-        player->x = exit_x;
-        player->y = exit_y;
-        camera_init(camera);
-        level_force_stream_update();
+    if (generated_pipe_exit(stage, &entry_x, &entry_y)) {
+        player->x = entry_x;
+        player->y = entry_y;
+    } else {
+        uint8_t checkpoint = 0;
+
+        if (generated_player_start(stage, &entry_x, &entry_y, &checkpoint)) {
+            player->x = entry_x;
+            player->y = entry_y;
+            save_player_start_checkpoint(player, stage, entry_x, entry_y, checkpoint);
+        }
     }
+    camera_init(camera);
+    level_force_stream_update();
 }
 
 int main(void)
@@ -417,10 +461,12 @@ int main(void)
             if (select_held && (pressed & KEY_LEFT_MASK)) {
                 change_stage(&current_stage, -1);
                 player.checkpoint_active = 0;
+                player.checkpoint_changed = 0;
                 draw_lives_screen(current_stage, 2 - (int)player.death_count);
             } else if (select_held && (pressed & KEY_RIGHT_MASK)) {
                 change_stage(&current_stage, 1);
                 player.checkpoint_active = 0;
+                player.checkpoint_changed = 0;
                 draw_lives_screen(current_stage, 2 - (int)player.death_count);
             }
 
@@ -480,6 +526,10 @@ int main(void)
 
         player_update(&player, &level_current, &traps_current);
         traps_update(&traps_current, &level_current, &player);
+        if (player.checkpoint_changed) {
+            player.checkpoint_stage = (uint8_t)current_stage;
+            player.checkpoint_changed = 0;
+        }
         enemies_update(&enemy_current, &level_current, &player, &traps_current);
         messages_update();
 
@@ -508,6 +558,9 @@ int main(void)
 #endif
 
         if (!player.alive && player.death_timer == 0) {
+            if (player.checkpoint_active && player.checkpoint_stage < STAGE_ID_COUNT) {
+                current_stage = (StageId)player.checkpoint_stage;
+            }
             show_lives_screen(current_stage, &player, &lives_timer, &game_state);
             VBlankIntrWait();
             audio_update();
@@ -539,7 +592,6 @@ int main(void)
                 target = current_stage;
             }
             current_stage = target;
-            memset(&player, 0, sizeof(player));
             player.death_count = death_count;
             start_stage_from_pipe(&player, &camera, current_stage);
             game_state = GAME_STATE_PLAYING;

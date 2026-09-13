@@ -12,6 +12,12 @@
 struct TrapManager;
 struct Camera;
 
+typedef enum PlayerCheckpointSource {
+    PLAYER_CHECKPOINT_NONE = 0,
+    PLAYER_CHECKPOINT_START,
+    PLAYER_CHECKPOINT_FLAG,
+} PlayerCheckpointSource;
+
 typedef struct Player {
     fix16_t x;
     fix16_t y;
@@ -38,15 +44,22 @@ typedef struct Player {
     uint8_t walk_frame;
     fix16_t walk_distance;
     uint8_t checkpoint_active;
+    uint8_t checkpoint_stage;
+    uint8_t checkpoint_changed;
+    uint8_t checkpoint_source;
     fix16_t checkpoint_x;
     fix16_t checkpoint_y;
+    fix16_t checkpoint_source_x;
+    fix16_t checkpoint_source_y;
     uint16_t death_count;
 } Player;
 
 void player_init_video(void);
 void player_spawn(Player *player);
 void player_spawn_at(Player *player, fix16_t x, fix16_t y);
-void player_set_checkpoint(Player *player, fix16_t x, fix16_t y);
+void player_set_checkpoint_start(Player *player, fix16_t x, fix16_t y);
+void player_set_checkpoint_flag(Player *player, fix16_t flag_x, fix16_t flag_y,
+                                fix16_t spawn_x, fix16_t spawn_y);
 void player_set_supported(Player *player);
 void player_begin_goal(Player *player, fix16_t goal_x, uint16_t walk_frames);
 void player_interrupt_goal(Player *player);

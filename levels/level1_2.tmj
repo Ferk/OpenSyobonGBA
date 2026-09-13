@@ -501,6 +501,12 @@
        "propertytype": "TrapKind",
        "type": "string",
        "value": "enter_pipe"
+      },
+      {
+       "name": "destination",
+       "propertytype": "StageDestination",
+       "type": "string",
+       "value": "1-2u"
       }
      ],
      "rotation": 0,

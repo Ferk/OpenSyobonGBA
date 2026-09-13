@@ -66,6 +66,7 @@ typedef struct Trap {
     fix16_t gravity;
     uint8_t timer;
     uint8_t subtype;
+    uint8_t destination;
     int8_t spawn_dir;
     uint8_t visual_palette;
     uint8_t visual_metatile;
@@ -122,6 +123,7 @@ typedef struct TrapTrigger {
     TrapKind kind;
     uint8_t subtype;
     int8_t spawn_dir;
+    uint8_t destination;
     uint8_t visual_palette;
     uint8_t spawn_interval;
     uint8_t spawn_limit;
@@ -188,6 +190,7 @@ void traps_load_1_2(TrapManager *manager, Level *level);
 void traps_load_1_2_underground(TrapManager *manager, Level *level);
 void traps_load_1_2b(TrapManager *manager, Level *level);
 void traps_load_1_3(TrapManager *manager, Level *level);
+void traps_load_1_3_underground(TrapManager *manager, Level *level);
 void traps_prepare_player_collision(TrapManager *manager, const struct Player *player);
 void traps_update(TrapManager *manager, Level *level, struct Player *player);
 void traps_draw(TrapManager *manager, const struct Camera *camera);
@@ -198,6 +201,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const struct Pl
 void traps_break_brick(TrapManager *manager, Level *level, uint16_t source_x, uint16_t source_y);
 uint8_t traps_stage_clear_requested(const TrapManager *manager);
 void traps_ack_stage_clear(TrapManager *manager);
+void traps_restore_checkpoint(TrapManager *manager, const struct Player *player);
 uint8_t traps_stage_transition_requested(const TrapManager *manager);
 uint8_t traps_stage_transition_target(const TrapManager *manager);
 void traps_ack_stage_transition(TrapManager *manager);

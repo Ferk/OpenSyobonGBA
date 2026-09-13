@@ -393,8 +393,12 @@ void player_spawn(Player *player)
 {
     uint16_t death_count = player->death_count;
     uint8_t checkpoint_active = player->checkpoint_active;
+    uint8_t checkpoint_stage = player->checkpoint_stage;
+    uint8_t checkpoint_source = player->checkpoint_source;
     fix16_t checkpoint_x = player->checkpoint_x;
     fix16_t checkpoint_y = player->checkpoint_y;
+    fix16_t checkpoint_source_x = player->checkpoint_source_x;
+    fix16_t checkpoint_source_y = player->checkpoint_source_y;
 
     if (checkpoint_active) {
         player->x = checkpoint_x;
@@ -426,8 +430,13 @@ void player_spawn(Player *player)
     player->walk_frame = 0;
     player->walk_distance = 0;
     player->checkpoint_active = checkpoint_active;
+    player->checkpoint_stage = checkpoint_stage;
+    player->checkpoint_changed = 0;
+    player->checkpoint_source = checkpoint_source;
     player->checkpoint_x = checkpoint_x;
     player->checkpoint_y = checkpoint_y;
+    player->checkpoint_source_x = checkpoint_source_x;
+    player->checkpoint_source_y = checkpoint_source_y;
     player->death_count = death_count;
     player->powered_up = 0;
     previous_keys = 0;
@@ -447,11 +456,27 @@ void player_spawn_at(Player *player, fix16_t x, fix16_t y)
     previous_keys = 0;
 }
 
-void player_set_checkpoint(Player *player, fix16_t x, fix16_t y)
+void player_set_checkpoint_start(Player *player, fix16_t x, fix16_t y)
 {
     player->checkpoint_active = 1;
+    player->checkpoint_changed = 1;
+    player->checkpoint_source = PLAYER_CHECKPOINT_START;
     player->checkpoint_x = x;
     player->checkpoint_y = y;
+    player->checkpoint_source_x = x;
+    player->checkpoint_source_y = y;
+}
+
+void player_set_checkpoint_flag(Player *player, fix16_t flag_x, fix16_t flag_y,
+                                fix16_t spawn_x, fix16_t spawn_y)
+{
+    player->checkpoint_active = 1;
+    player->checkpoint_changed = 1;
+    player->checkpoint_source = PLAYER_CHECKPOINT_FLAG;
+    player->checkpoint_x = spawn_x;
+    player->checkpoint_y = spawn_y;
+    player->checkpoint_source_x = flag_x;
+    player->checkpoint_source_y = flag_y;
 }
 
 void player_set_supported(Player *player)

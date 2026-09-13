@@ -60,6 +60,16 @@ TRAP_SUBTYPE_NAMES = {
     "platform_vertical_wrap": 5,
 }
 
+STAGE_DESTINATION_NAMES = {
+    "none": 0,
+    "1-1": 0,
+    "1-2": 1,
+    "1-2u": 2,
+    "1-2b": 3,
+    "1-3": 4,
+    "1-3u": 5,
+}
+
 TRAP_SPAWN_DIRECTION_NAMES = {
     "auto": 0,
     "default": 0,
@@ -322,8 +332,10 @@ def enum_name(value, names, default):
 
 
 def enum_int(value, names, default):
-    if value is None:
+    if value is None or value == {}:
         return default
+    if isinstance(value, dict):
+        raise ValueError(f"unknown structured enum value: {value}")
 
     if isinstance(value, bool):
         return int(value)
@@ -390,6 +402,9 @@ def parse_object_layers(map_data, tile_props):
             spawn_dir = enum_int(prop_value(props, "spawn_dir",
                                             tile_prop.get("spawn_dir")),
                                  TRAP_SPAWN_DIRECTION_NAMES, 0)
+            destination = enum_int(prop_value(props, "destination",
+                                             tile_prop.get("destination")),
+                                   STAGE_DESTINATION_NAMES, 0)
             spawn_interval = int(prop_value(
                 props, "spawn_interval",
                 tile_prop.get("spawn_interval",
@@ -580,6 +595,7 @@ def parse_object_layers(map_data, tile_props):
                 traps.append({
                     "kind": trap or "TRAP_INVISIBLE_BLOCK",
                     "subtype": subtype,
+                    "destination": destination,
                     "spawn_dir": spawn_dir,
                     "visual_palette": enum_int(prop_value(props, "visual_palette",
                                                 tile_prop.get("visual_palette",
@@ -637,9 +653,14 @@ def parse_object_layers(map_data, tile_props):
             entity_kind = int(prop_value(props, "entity_kind",
                               ENTITY_KIND_NAMES.get(name, 0)))
             if entity_kind:
+                entity_subtype = subtype
+                if entity_kind == ENTITY_KIND_NAMES["Player Start"]:
+                    checkpoint = prop_value(props, "checkpoint", True)
+                    entity_subtype = int(str(checkpoint).lower() not in
+                                         ("0", "false", "no", "off"))
                 objects.append({
                     "kind": entity_kind,
-                    "subtype": subtype,
+                    "subtype": entity_subtype,
                     "x": x,
                     "y": y,
                     "w": w,
@@ -802,7 +823,7 @@ extern const uint16_t {prefix}_trap_count;
         for trap in traps:
             lines.extend([
                 "    {",
-                f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .spawn_dir = {trap['spawn_dir']},",
+                f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .destination = {trap['destination']}, .spawn_dir = {trap['spawn_dir']},",
                 f"        .visual_palette = {trap['visual_palette']}, .spawn_interval = {trap['spawn_interval']},",
                 f"        .spawn_limit = {trap['spawn_limit']}, .item_variant = {trap['item_variant']},",
                 f"        .spawn_enemy_kind = {trap['spawn_enemy_kind']}, .spawn_enemy_sprite = {trap['spawn_enemy_sprite']},",

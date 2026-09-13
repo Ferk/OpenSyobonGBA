@@ -69,6 +69,21 @@
    ]
   },
   {
+   "id": 11,
+   "name": "StageDestination",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "1-2",
+    "1-2u",
+    "1-2b",
+    "1-3",
+    "1-3u"
+   ]
+  },
+  {
    "id": 3,
    "name": "TrapSpawnDirection",
    "type": "enum",
@@ -111,9 +126,9 @@
    "type": "enum",
    "storageType": "string",
    "valuesAsFlags": false,
-	   "values": [
-	    "none",
-	    "walker",
+   "values": [
+    "none",
+    "walker",
     "shell_walker",
     "shell",
     "static_hazard",
@@ -198,6 +213,12 @@
      "value": "auto"
     },
     {
+     "name": "destination",
+     "type": "string",
+     "propertyType": "StageDestination",
+     "value": "none"
+    },
+    {
      "name": "spawn_interval",
      "type": "int",
      "value": 0
@@ -207,155 +228,155 @@
      "type": "int",
      "value": 1
     },
-	    {
-	     "name": "item_variant",
-	     "type": "int",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_enemy_kind",
-	     "type": "string",
-	     "propertyType": "EnemyKind",
-	     "value": "none"
-	    },
-	    {
-	     "name": "spawn_enemy_sprite",
-	     "type": "string",
-	     "propertyType": "EnemySprite",
-	     "value": "walker"
-	    },
-	    {
-	     "name": "spawn_enemy_palette",
-	     "type": "int",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_enemy_param",
-	     "type": "int",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_enemy_count",
-	     "type": "int",
-	     "value": 1
-	    },
-	    {
-	     "name": "spawn_sound",
-	     "type": "bool",
-	     "value": true
-	    },
-	    {
-	     "name": "spawn_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_offset_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_offset_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_vx",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_vy",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_spacing_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "spawn_spacing_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_offset_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_offset_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_vx",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_vy",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_spacing_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_spawn_spacing_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "repeat_rearm_offset_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "repeat_rearm_offset_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_repeat_rearm_offset_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_repeat_rearm_offset_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_move_offset_x",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "ref_move_offset_y",
-	     "type": "float",
-	     "value": 0
-	    },
-	    {
-	     "name": "trigger_channel",
+    {
+     "name": "item_variant",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_kind",
+     "type": "string",
+     "propertyType": "EnemyKind",
+     "value": "none"
+    },
+    {
+     "name": "spawn_enemy_sprite",
+     "type": "string",
+     "propertyType": "EnemySprite",
+     "value": "walker"
+    },
+    {
+     "name": "spawn_enemy_palette",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_param",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_count",
+     "type": "int",
+     "value": 1
+    },
+    {
+     "name": "spawn_sound",
+     "type": "bool",
+     "value": true
+    },
+    {
+     "name": "spawn_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_vy",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_spacing_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_spacing_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_vy",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_spacing_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_spawn_spacing_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "repeat_rearm_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "repeat_rearm_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_repeat_rearm_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_repeat_rearm_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_move_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "ref_move_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
      "type": "int",
      "value": 0
     },
@@ -487,7 +508,13 @@
    "useAs": [
     "object"
    ],
-   "members": []
+   "members": [
+    {
+     "name": "checkpoint",
+     "type": "bool",
+     "value": true
+    }
+   ]
   },
   {
    "id": 11,
