@@ -1,669 +1,375 @@
-{
- "compressionlevel": -1,
- "height": 17,
- "infinite": false,
- "layers": [
-  {
-   "data": [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    1,
-    1,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    6,
-    2,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    7,
-    2,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1
-   ],
-   "height": 17,
-   "id": 1,
-   "name": "Background",
-   "opacity": 1,
-   "type": "tilelayer",
-   "visible": true,
-   "width": 17,
-   "x": 0,
-   "y": 0,
-   "properties": [
-    {
-     "name": "palette",
-     "propertytype": "BgPalette",
-     "type": "string",
-     "value": "underground"
-    }
-   ]
-  },
-  {
-   "draworder": "topdown",
-   "id": 2,
-   "name": "Objects",
-   "objects": [
-    {
-     "height": 16,
-     "id": 1,
-     "name": "Player Start",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Player Start",
-     "visible": true,
-     "width": 16,
-     "x": 33,
-     "y": 33,
-     "properties": [
-      {
-       "name": "checkpoint",
-       "type": "bool",
-       "value": false
-      }
-     ]
-    }
-   ],
-   "opacity": 1,
-   "type": "objectgroup",
-   "visible": true,
-   "x": 0,
-   "y": 0
-  },
-  {
-   "draworder": "topdown",
-   "id": 3,
-   "name": "Enemies",
-   "objects": [
-    {
-     "height": 16,
-     "id": 101,
-     "name": "ref 1-3U stagedate54 superjien 1,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 16,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 103,
-     "name": "ref 1-3U stagedate54 superjien 3,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 48,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 105,
-     "name": "ref 1-3U stagedate54 superjien 5,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 80,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 107,
-     "name": "ref 1-3U stagedate54 superjien 7,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 112,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 109,
-     "name": "ref 1-3U stagedate54 superjien 9,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 144,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 111,
-     "name": "ref 1-3U stagedate54 superjien 11,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 176,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 113,
-     "name": "ref 1-3U stagedate54 superjien 13,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 208,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    },
-    {
-     "height": 16,
-     "id": 115,
-     "name": "ref 1-3U stagedate54 superjien 15,12",
-     "opacity": 1,
-     "rotation": 0,
-     "type": "Enemy",
-     "visible": true,
-     "width": 16,
-     "x": 240,
-     "y": 192,
-     "properties": [
-      {
-       "name": "dir",
-       "type": "int",
-       "value": -1
-      },
-      {
-       "name": "enemy_kind",
-       "type": "string",
-       "value": "superjien"
-      },
-      {
-       "name": "enemy_param",
-       "type": "int",
-       "value": 0
-      },
-      {
-       "name": "enemy_sprite",
-       "type": "string",
-       "value": "superjien"
-      }
-     ]
-    }
-   ],
-   "opacity": 1,
-   "type": "objectgroup",
-   "visible": true,
-   "x": 0,
-   "y": 0
-  }
- ],
- "nextlayerid": 5,
- "nextobjectid": 42,
- "orientation": "orthogonal",
- "properties": [
-  {
-   "name": "camera_margin_top",
-   "type": "int",
-   "value": 0
-  },
-  {
-   "name": "camera_margin_bottom",
-   "type": "int",
-   "value": 0
-  }
- ],
- "renderorder": "right-down",
- "tiledversion": "1.12.2",
- "tileheight": 16,
- "tilesets": [
-  {
-   "columns": 1,
-   "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1344,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 84,
-   "tileheight": 16,
-   "tilewidth": 16
-  }
- ],
- "tilewidth": 16,
- "type": "map",
- "version": "1.11",
- "width": 17
+{ "compressionlevel":-1,
+ "height":13,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2],
+         "height":13,
+         "id":1,
+         "name":"Background",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"palette",
+                 "propertytype":"BgPalette",
+                 "type":"string",
+                 "value":"underground"
+                }],
+         "type":"tilelayer",
+         "visible":true,
+         "width":17,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":2,
+         "name":"Objects",
+         "objects":[
+                {
+                 "height":16,
+                 "id":1,
+                 "name":"Player Start",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"checkpoint",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"Player Start",
+                 "visible":true,
+                 "width":16,
+                 "x":33,
+                 "y":17
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":3,
+         "name":"Enemies",
+         "objects":[
+                {
+                 "height":16,
+                 "id":101,
+                 "name":"ref 1-3U stagedate54 superjien 1,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":16,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":103,
+                 "name":"ref 1-3U stagedate54 superjien 3,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":48,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":105,
+                 "name":"ref 1-3U stagedate54 superjien 5,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":80,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":107,
+                 "name":"ref 1-3U stagedate54 superjien 7,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":112,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":109,
+                 "name":"ref 1-3U stagedate54 superjien 9,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":144,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":111,
+                 "name":"ref 1-3U stagedate54 superjien 11,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":176,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":113,
+                 "name":"ref 1-3U stagedate54 superjien 13,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":208,
+                 "y":176
+                }, 
+                {
+                 "height":16,
+                 "id":115,
+                 "name":"ref 1-3U stagedate54 superjien 15,12",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"dir",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"enemy_kind",
+                         "type":"string",
+                         "value":"superjien"
+                        }, 
+                        {
+                         "name":"enemy_param",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"enemy_sprite",
+                         "type":"string",
+                         "value":"superjien"
+                        }],
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":240,
+                 "y":176
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":5,
+ "nextobjectid":42,
+ "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"camera_margin_bottom",
+         "type":"int",
+         "value":0
+        }, 
+        {
+         "name":"camera_margin_top",
+         "type":"int",
+         "value":0
+        }],
+ "renderorder":"right-down",
+ "tiledversion":"1.12.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "columns":1,
+         "firstgid":1,
+         "image":"..\/gfx\/tiles_16.png",
+         "imageheight":1344,
+         "imagewidth":16,
+         "margin":0,
+         "name":"tiles_16",
+         "spacing":0,
+         "tilecount":84,
+         "tileheight":16,
+         "tilewidth":16
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.11",
+ "width":17
 }
