@@ -30,7 +30,10 @@
     "pickup_item",
     "fake_goal",
     "moving_block",
-    "breaking_platform"
+    "breaking_platform",
+    "warp_pad",
+    "transition_zone",
+    "coin"
    ]
   },
   {
@@ -65,7 +68,8 @@
     "pipe_fake_kill",
     "pipe_to_underground",
     "hint_stage_1",
-    "platform_vertical_wrap"
+    "platform_vertical_wrap",
+    "warp_launch"
    ]
   },
   {
@@ -80,7 +84,8 @@
     "1-2u",
     "1-2b",
     "1-3",
-    "1-3u"
+    "1-3u",
+    "1-3s"
    ]
   },
   {
@@ -217,6 +222,11 @@
      "type": "string",
      "propertyType": "StageDestination",
      "value": "none"
+    },
+    {
+     "name": "entry_id",
+     "type": "int",
+     "value": 0
     },
     {
      "name": "spawn_interval",
@@ -453,7 +463,13 @@
    "useAs": [
     "object"
    ],
-   "members": []
+   "members": [
+    {
+     "name": "entry_id",
+     "type": "int",
+     "value": 0
+    }
+   ]
   },
   {
    "id": 9,

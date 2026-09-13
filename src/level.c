@@ -9,6 +9,7 @@
 #include "generated/level1_2u_data.h"
 #include "generated/level1_3_data.h"
 #include "generated/level1_3u_data.h"
+#include "generated/level1_3s_data.h"
 #include "tiles_16.h"
 
 #define BG_CHARBLOCK 0
@@ -318,6 +319,20 @@ void level_load_1_3_underground(Level *level)
     level_force_stream_update();
 }
 
+void level_load_1_3_sky(Level *level)
+{
+    memset(level, 0, sizeof(*level));
+    level->width = LEVEL1_3S_WIDTH;
+    level->height = LEVEL1_3S_HEIGHT;
+    level->camera_margin_top = LEVEL1_3S_CAMERA_MARGIN_TOP;
+    level->camera_margin_bottom = LEVEL1_3S_CAMERA_MARGIN_BOTTOM;
+    copy_generated_level_data(level, (const uint8_t *)level1_3s_source,
+                              (const uint8_t *)level1_3s_metatiles,
+                              (const uint8_t *)level1_3s_palettes,
+                              LEVEL1_3S_WIDTH, LEVEL1_3S_HEIGHT);
+    level_force_stream_update();
+}
+
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px)
 {
     int first_world_tile_x = floor_div_int(camera_x_px + LEVEL_STREAM_LEFT_PX, 8);
@@ -419,6 +434,7 @@ LevelCollision level_collision_at(const Level *level, int world_x_px, int world_
     case METATILE_QUESTION:
     case METATILE_SOLID:
     case METATILE_GREEN_SOLID:
+    case METATILE_SKY_STAGE_FLOOR:
     case METATILE_GROUND_TOP:
     case METATILE_GROUND_DIRT:
     case METATILE_PIPE_TOP_LEFT:

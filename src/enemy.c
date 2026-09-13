@@ -11,6 +11,7 @@
 #include "generated/level1_2u_data.h"
 #include "generated/level1_3_data.h"
 #include "generated/level1_3u_data.h"
+#include "generated/level1_3s_data.h"
 #include "messages.h"
 #include "traps.h"
 
@@ -1014,6 +1015,14 @@ void enemies_load_1_3_underground(EnemyManager *manager, const Level *level)
                           level1_3u_enemy_spawn_count);
 }
 
+void enemies_load_1_3_sky(EnemyManager *manager, const Level *level)
+{
+    (void)level;
+    memset(manager, 0, sizeof(*manager));
+    load_generated_spawns(manager, level1_3s_enemy_spawns,
+                          level1_3s_enemy_spawn_count);
+}
+
 void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir)
 {
@@ -1277,10 +1286,14 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
                     continue;
                 }
 
+                /* The enemy rectangle is the hazard area; center the 32x32 face in it. */
+                int face_x = screen_x + ((int)enemy->w - 32) / 2;
+                int face_y = screen_y + ((int)enemy->h - 32) / 2;
+
                 for (uint8_t part = 0; part < 4; ++part) {
                     OBJATTR *part_obj = (part == 0) ? obj : &enemy_extra_oam[extra_index++];
-                    int part_x = screen_x + (part & 1) * 16;
-                    int part_y = screen_y + (part >> 1) * 16;
+                    int part_x = face_x + (part & 1) * 16;
+                    int part_y = face_y + (part >> 1) * 16;
 
                     part_obj->attr0 = (uint16_t)((part_y & 0x00ff) |
                                                  ATTR0_COLOR_16 | ATTR0_SQUARE);

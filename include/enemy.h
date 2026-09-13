@@ -111,6 +111,7 @@ void enemies_load_1_2_underground(EnemyManager *manager, const Level *level);
 void enemies_load_1_2b(EnemyManager *manager, const Level *level);
 void enemies_load_1_3(EnemyManager *manager, const Level *level);
 void enemies_load_1_3_underground(EnemyManager *manager, const Level *level);
+void enemies_load_1_3_sky(EnemyManager *manager, const Level *level);
 void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
                           fix16_t y, uint8_t sprite, int8_t dir);
 void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,

@@ -23,6 +23,9 @@ TRAP_KIND_NAMES = {
     "fake_goal": "TRAP_FAKE_GOAL",
     "moving_block": "TRAP_MOVING_BLOCK",
     "breaking_platform": "TRAP_BREAKING_PLATFORM",
+    "warp_pad": "TRAP_WARP_PAD",
+    "transition_zone": "TRAP_TRANSITION_ZONE",
+    "coin": "TRAP_COIN",
 }
 
 TRAP_SUBTYPE_NAMES = {
@@ -58,6 +61,7 @@ TRAP_SUBTYPE_NAMES = {
     "pipe_to_underground": 1,
     "hint_stage_1": 1,
     "platform_vertical_wrap": 5,
+    "warp_launch": 1,
 }
 
 STAGE_DESTINATION_NAMES = {
@@ -68,6 +72,7 @@ STAGE_DESTINATION_NAMES = {
     "1-2b": 3,
     "1-3": 4,
     "1-3u": 5,
+    "1-3s": 6,
 }
 
 TRAP_SPAWN_DIRECTION_NAMES = {
@@ -402,9 +407,11 @@ def parse_object_layers(map_data, tile_props):
             spawn_dir = enum_int(prop_value(props, "spawn_dir",
                                             tile_prop.get("spawn_dir")),
                                  TRAP_SPAWN_DIRECTION_NAMES, 0)
-            destination = enum_int(prop_value(props, "destination",
-                                             tile_prop.get("destination")),
-                                   STAGE_DESTINATION_NAMES, 0)
+            destination_value = prop_value(props, "destination",
+                                           tile_prop.get("destination"))
+            destination = enum_int(destination_value, STAGE_DESTINATION_NAMES, 0)
+            entry_id = max(0, min(255, int(prop_value(
+                props, "entry_id", tile_prop.get("entry_id", 0)))))
             spawn_interval = int(prop_value(
                 props, "spawn_interval",
                 tile_prop.get("spawn_interval",
@@ -592,10 +599,20 @@ def parse_object_layers(map_data, tile_props):
                 continue
 
             if trap or layer_name.lower().startswith("trap"):
+                needs_destination = (
+                    trap == "TRAP_TRANSITION_ZONE" or
+                    (trap in ("TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE") and subtype == 1)
+                )
+                if needs_destination and (destination_value is None or
+                                          isinstance(destination_value, dict)):
+                    raise ValueError(
+                        f"{obj.get('name', 'unnamed trap')}: destination must be a "
+                        "StageDestination enum value, not an object reference")
                 traps.append({
                     "kind": trap or "TRAP_INVISIBLE_BLOCK",
                     "subtype": subtype,
                     "destination": destination,
+                    "entry_id": entry_id,
                     "spawn_dir": spawn_dir,
                     "visual_palette": enum_int(prop_value(props, "visual_palette",
                                                 tile_prop.get("visual_palette",
@@ -661,6 +678,7 @@ def parse_object_layers(map_data, tile_props):
                 objects.append({
                     "kind": entity_kind,
                     "subtype": entity_subtype,
+                    "entry_id": entry_id,
                     "x": x,
                     "y": y,
                     "w": w,
@@ -734,6 +752,7 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
 typedef struct GeneratedMapObject {{
     uint8_t kind;
     uint8_t subtype;
+    uint8_t entry_id;
     fix16_t x;
     fix16_t y;
     fix16_t w;
@@ -794,11 +813,11 @@ extern const uint16_t {prefix}_trap_count;
     ]
     if objects:
         for obj in objects:
-            lines.append("    { %d, %d, %d, %d, %d, %d }," %
-                         (obj["kind"], obj["subtype"], obj["x"], obj["y"],
-                          obj["w"], obj["h"]))
+            lines.append("    { %d, %d, %d, %d, %d, %d, %d }," %
+                         (obj["kind"], obj["subtype"], obj["entry_id"], obj["x"],
+                          obj["y"], obj["w"], obj["h"]))
     else:
-        lines.append("    { 0, 0, 0, 0, 0, 0 },")
+        lines.append("    { 0, 0, 0, 0, 0, 0, 0 },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_object_count = {len(objects)};",
@@ -823,7 +842,7 @@ extern const uint16_t {prefix}_trap_count;
         for trap in traps:
             lines.extend([
                 "    {",
-                f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .destination = {trap['destination']}, .spawn_dir = {trap['spawn_dir']},",
+                f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .destination = {trap['destination']}, .entry_id = {trap['entry_id']}, .spawn_dir = {trap['spawn_dir']},",
                 f"        .visual_palette = {trap['visual_palette']}, .spawn_interval = {trap['spawn_interval']},",
                 f"        .spawn_limit = {trap['spawn_limit']}, .item_variant = {trap['item_variant']},",
                 f"        .spawn_enemy_kind = {trap['spawn_enemy_kind']}, .spawn_enemy_sprite = {trap['spawn_enemy_sprite']},",

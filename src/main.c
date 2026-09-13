@@ -12,6 +12,7 @@
 #include "generated/level1_2u_data.h"
 #include "generated/level1_3_data.h"
 #include "generated/level1_3u_data.h"
+#include "generated/level1_3s_data.h"
 #include "level.h"
 #include "messages.h"
 #include "player.h"
@@ -43,6 +44,7 @@ typedef enum StageId {
     STAGE_ID_1_2B,
     STAGE_ID_1_3,
     STAGE_ID_1_3_UNDERGROUND,
+    STAGE_ID_1_3_SKY,
     STAGE_ID_COUNT,
 } StageId;
 
@@ -179,6 +181,10 @@ static const char *stage_label(StageId stage)
         return "1-3U ";
     }
 
+    if (stage == STAGE_ID_1_3_SKY) {
+        return "1-3S ";
+    }
+
     if (stage == STAGE_ID_1_3) {
         return "1-3 ";
     }
@@ -298,6 +304,10 @@ static void load_stage(StageId stage)
         level_load_1_3_underground(&level_current);
         traps_load_1_3_underground(&traps_current, &level_current);
         enemies_load_1_3_underground(&enemy_current, &level_current);
+    } else if (stage == STAGE_ID_1_3_SKY) {
+        level_load_1_3_sky(&level_current);
+        traps_load_1_3_sky(&traps_current, &level_current);
+        enemies_load_1_3_sky(&enemy_current, &level_current);
     } else if (stage == STAGE_ID_1_3) {
         level_load_1_3(&level_current);
         traps_load_1_3(&traps_current, &level_current);
@@ -331,6 +341,9 @@ static uint8_t generated_stage_object(StageId stage, uint8_t kind, fix16_t *x,
     } else if (stage == STAGE_ID_1_3_UNDERGROUND) {
         objects = level1_3u_objects;
         object_count = level1_3u_object_count;
+    } else if (stage == STAGE_ID_1_3_SKY) {
+        objects = level1_3s_objects;
+        object_count = level1_3s_object_count;
     } else if (stage == STAGE_ID_1_3) {
         objects = level1_3_objects;
         object_count = level1_3_object_count;
@@ -357,9 +370,42 @@ static uint8_t generated_player_start(StageId stage, fix16_t *x, fix16_t *y,
                                   checkpoint);
 }
 
-static uint8_t generated_pipe_exit(StageId stage, fix16_t *x, fix16_t *y)
+static uint8_t generated_pipe_exit(StageId stage, uint8_t entry_id,
+                                   fix16_t *x, fix16_t *y)
 {
-    return generated_stage_object(stage, GENERATED_OBJECT_PIPE_EXIT, x, y, NULL);
+    const GeneratedMapObject *objects = level1_objects;
+    uint16_t object_count = level1_object_count;
+
+    if (stage == STAGE_ID_1_2) {
+        objects = level1_2_objects;
+        object_count = level1_2_object_count;
+    } else if (stage == STAGE_ID_1_2_UNDERGROUND) {
+        objects = level1_2u_objects;
+        object_count = level1_2u_object_count;
+    } else if (stage == STAGE_ID_1_2B) {
+        objects = level1_2b_objects;
+        object_count = level1_2b_object_count;
+    } else if (stage == STAGE_ID_1_3_UNDERGROUND) {
+        objects = level1_3u_objects;
+        object_count = level1_3u_object_count;
+    } else if (stage == STAGE_ID_1_3_SKY) {
+        objects = level1_3s_objects;
+        object_count = level1_3s_object_count;
+    } else if (stage == STAGE_ID_1_3) {
+        objects = level1_3_objects;
+        object_count = level1_3_object_count;
+    }
+
+    for (uint16_t i = 0; i < object_count; ++i) {
+        if (objects[i].kind == GENERATED_OBJECT_PIPE_EXIT &&
+            objects[i].entry_id == entry_id) {
+            *x = objects[i].x;
+            *y = objects[i].y;
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 static void save_player_start_checkpoint(Player *player, StageId stage,
@@ -400,14 +446,15 @@ static void start_stage(Player *player, Camera *camera, StageId stage)
     REG_DISPCNT = MODE_0 | BG0_ON | BG1_ON | OBJ_ON | OBJ_1D_MAP;
 }
 
-static void start_stage_from_pipe(Player *player, Camera *camera, StageId stage)
+static void start_stage_from_pipe(Player *player, Camera *camera, StageId stage,
+                                  uint8_t entry_id)
 {
     fix16_t entry_x = 0;
     fix16_t entry_y = 0;
 
     start_stage(player, camera, stage);
 
-    if (generated_pipe_exit(stage, &entry_x, &entry_y)) {
+    if (generated_pipe_exit(stage, entry_id, &entry_x, &entry_y)) {
         player->x = entry_x;
         player->y = entry_y;
     } else {
@@ -586,6 +633,7 @@ int main(void)
         if (traps_stage_transition_requested(&traps_current)) {
             uint16_t death_count = player_death_count(&player);
             StageId target = (StageId)traps_stage_transition_target(&traps_current);
+            uint8_t entry_id = traps_stage_transition_entry_id(&traps_current);
 
             traps_ack_stage_transition(&traps_current);
             if (target >= STAGE_ID_COUNT) {
@@ -593,7 +641,7 @@ int main(void)
             }
             current_stage = target;
             player.death_count = death_count;
-            start_stage_from_pipe(&player, &camera, current_stage);
+            start_stage_from_pipe(&player, &camera, current_stage, entry_id);
             game_state = GAME_STATE_PLAYING;
 #ifdef DEBUG_STAGE_SELECT
             menu_previous_keys = 0;

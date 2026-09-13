@@ -89,6 +89,8 @@ typedef enum MetatileId {
     /* Original 1-3 map art: decorative brown, then solid green. */
     METATILE_BROWN_BACKGROUND,
     METATILE_GREEN_SOLID,
+    /* Original stage 1-3S source type 8; tile 84 in tiles_16.png. */
+    METATILE_SKY_STAGE_FLOOR = 84,
 } MetatileId;
 
 typedef enum LevelCollision {
@@ -117,6 +119,7 @@ void level_load_1_2_underground(Level *level);
 void level_load_1_2b(Level *level);
 void level_load_1_3(Level *level);
 void level_load_1_3_underground(Level *level);
+void level_load_1_3_sky(Level *level);
 void level_stream_bg0(const Level *level, int camera_x_px, int camera_y_px);
 void level_force_stream_update(void);
 uint8_t level_metatile_at(const Level *level, int world_x_px, int world_y_px);

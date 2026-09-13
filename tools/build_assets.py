@@ -348,6 +348,19 @@ def append_unique_tile(images, signatures, img):
     return True
 
 
+def recolor_note_block_background(img, sky):
+    """Adapt brock2's lavender backing to the active sky palette."""
+    out = img.convert("RGBA")
+    pixels = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = pixels[x, y]
+            if a and ((r, g, b) == (153, 153, 204) or
+                      (r, g, b) == (51, 51, 153)):
+                pixels[x, y] = sky + (255,)
+    return out
+
+
 def extract_entry(name, source_name, source_img, box, size=(16, 16), transparent=False):
     img = source_img.crop(box)
     if transparent:
@@ -408,7 +421,8 @@ def main():
         crop_resize(brock, (33 * 5, 0, 33 * 5 + 30, 30), (16, 16)),
         crop_resize(brock, (33 * 6, 0, 33 * 6 + 30, 30), (16, 16)),
         crop_resize(brock, (0, 33, 30, 63), (16, 16)),
-        crop_resize(brock2, (33 * 1, 0, 33 * 1 + 30, 30), (16, 16)),
+        recolor_note_block_background(
+            crop_resize(brock2, (33 * 1, 0, 33 * 1 + 30, 30), (16, 16)), sky),
     ]
     tile_sources.extend(decor_tiles(haikei, (0, 0, 150, 90), 5, 3, sky))
     tile_sources.extend(decor_tiles(haikei, (151, 31, 221, 71), 4, 2, sky))
@@ -458,6 +472,9 @@ def main():
             *decor_tiles(haikei, (293, 92, 357, 121), 4, 1, sky),
         ]:
             append_unique_tile(tile_sources, tile_signatures, tile)
+    # Stage 1-3S source type 8: a solid brock.PNG block, not a hill tile.
+    tile_sources.append(crop_resize(brock, (33 * 7, 0, 33 * 7 + 30, 30),
+                                    (16, 16)))
     bg_sheet = sheet_vertical(tile_sources)
     save_png("tiles_16.png", bg_sheet, bg_palette)
 
@@ -474,6 +491,8 @@ def main():
         crop_resize(brock, (0, 0, 30, 30), (16, 16)),
         crop_resize(brock, (33 * 2, 0, 33 * 2 + 30, 30), (16, 16)),
         crop_resize(teki, (33 * 7 + 1, 0, 33 * 7 + 27, 30), (16, 16)),
+        crop_resize(brock2, (33 * 4, 0, 33 * 4 + 30, 30), (16, 16)),
+        crop_resize(brock2, (33 * 3, 0, 33 * 3 + 30, 30), (16, 16)),
     ]
     save_png("traps_16.png", sheet_vertical(trap_sources), obj_palette)
 

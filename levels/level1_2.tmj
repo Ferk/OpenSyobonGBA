@@ -176,13 +176,13 @@
     33,
     4,
     1,
-    40,
+    1,
     41,
     42,
     43,
     44,
     45,
-    1,
+    46,
     1,
     1,
     1,
@@ -193,13 +193,13 @@
     35,
     4,
     1,
-    46,
+    1,
     47,
     48,
     49,
     50,
     51,
-    1,
+    52,
     1,
     1,
     1,
@@ -209,14 +209,14 @@
     34,
     35,
     4,
-    1,
-    52,
+    38,
+    39,
     53,
     54,
     55,
     56,
     57,
-    1,
+    58,
     1,
     1,
     1,
@@ -476,7 +476,7 @@
      "type": "Trap",
      "visible": true,
      "width": 16,
-     "x": 64,
+     "x": 112,
      "y": 144
     },
     {
@@ -485,6 +485,12 @@
      "name": "entry pipe to underground",
      "opacity": 1,
      "properties": [
+      {
+       "name": "destination",
+       "propertytype": "StageDestination",
+       "type": "string",
+       "value": "1-2u"
+      },
       {
        "name": "hidden",
        "type": "bool",
@@ -501,12 +507,6 @@
        "propertytype": "TrapKind",
        "type": "string",
        "value": "enter_pipe"
-      },
-      {
-       "name": "destination",
-       "propertytype": "StageDestination",
-       "type": "string",
-       "value": "1-2u"
       }
      ],
      "rotation": 0,
@@ -559,6 +559,49 @@
        "value": false
       },
       {
+       "name": "ref_spawn_offset_x",
+       "type": "float",
+       "value": 1000
+      },
+      {
+       "name": "ref_spawn_vy",
+       "type": "float",
+       "value": -800
+      },
+      {
+       "name": "ref_spawn_y",
+       "type": "float",
+       "value": 32000
+      },
+      {
+       "name": "spawn_dir",
+       "propertytype": "TrapSpawnDirection",
+       "type": "string",
+       "value": "left"
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "pipe_shot"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "atype3"
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
@@ -569,49 +612,6 @@
        "propertytype": "TrapKind",
        "type": "string",
        "value": "stage_spawner"
-      },
-      {
-       "name": "spawn_enemy_kind",
-       "type": "string",
-       "value": "pipe_shot",
-       "propertytype": "EnemyKind"
-      },
-      {
-       "name": "spawn_enemy_sprite",
-       "type": "string",
-       "value": "atype3",
-       "propertytype": "EnemySprite"
-      },
-      {
-       "name": "spawn_dir",
-       "type": "string",
-       "value": "left",
-       "propertytype": "TrapSpawnDirection"
-      },
-      {
-       "name": "ref_spawn_offset_x",
-       "type": "float",
-       "value": 1000.0
-      },
-      {
-       "name": "ref_spawn_y",
-       "type": "float",
-       "value": 32000.0
-      },
-      {
-       "name": "ref_spawn_vy",
-       "type": "float",
-       "value": -800.0
-      },
-      {
-       "name": "spawn_enemy_count",
-       "type": "int",
-       "value": 1
-      },
-      {
-       "name": "spawn_sound",
-       "type": "bool",
-       "value": true
       }
      ],
      "rotation": 0,
@@ -652,12 +652,12 @@
    "columns": 1,
    "firstgid": 1,
    "image": "../gfx/tiles_16.png",
-   "imageheight": 1280,
+   "imageheight": 1360,
    "imagewidth": 16,
    "margin": 0,
    "name": "tiles_16",
    "spacing": 0,
-   "tilecount": 80,
+   "tilecount": 85,
    "tileheight": 16,
    "tilewidth": 16
   }
