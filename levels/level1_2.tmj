@@ -332,13 +332,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       }
      ],
      "rotation": 0,
@@ -369,13 +369,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       }
      ],
      "rotation": 0,
@@ -486,12 +486,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "destination",
-       "propertytype": "StageDestination",
-       "type": "string",
-       "value": "1-2u"
-      },
-      {
        "name": "hidden",
        "type": "bool",
        "value": false
@@ -507,6 +501,12 @@
        "propertytype": "TrapKind",
        "type": "string",
        "value": "enter_pipe"
+      },
+      {
+       "name": "stage_destination",
+       "type": "string",
+       "propertytype": "StageDestination",
+       "value": "1-2u"
       }
      ],
      "rotation": 0,
@@ -559,19 +559,19 @@
        "value": false
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 1000
+       "value": 5.51724137931
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": -800
+       "value": -2.206896551724
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": 32000
+       "value": 183.172413793103
       },
       {
        "name": "spawn_dir",

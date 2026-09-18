@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 TRAP_KIND_NAMES = {
-    "invisible_block": "TRAP_INVISIBLE_BLOCK",
     "falling_floor": "TRAP_FALLING_FLOOR",
     "bump_shooter": "TRAP_BUMP_SHOOTER",
     "question_block": "TRAP_QUESTION_BLOCK",
@@ -23,16 +22,16 @@ TRAP_KIND_NAMES = {
     "fake_goal": "TRAP_FAKE_GOAL",
     "moving_block": "TRAP_MOVING_BLOCK",
     "breaking_platform": "TRAP_BREAKING_PLATFORM",
-    "warp_pad": "TRAP_WARP_PAD",
     "transition_zone": "TRAP_TRANSITION_ZONE",
     "coin": "TRAP_COIN",
+    "jump_pad": "TRAP_JUMP_PAD",
+    "breakable_block": "TRAP_BREAKABLE_BLOCK",
+    "kill_zone": "TRAP_KILL_ZONE",
 }
 
 TRAP_SUBTYPE_NAMES = {
     "none": 0,
     "default": 0,
-    "invisible_reveal_brick": 1,
-    "invisible_reveal": 1,
     "falling_on_pass_under": 51,
     "falling_when_below": 51,
     "falling_brick_group": 51,
@@ -50,6 +49,7 @@ TRAP_SUBTYPE_NAMES = {
     "question_good_mushroom": 102,
     "question_bad_mushroom": 103,
     "question_star": 104,
+    "question_bad_flower": 105,
     "question_poison_generator": 110,
     "question_coin_generator": 112,
     "question_hidden_poison": 114,
@@ -60,8 +60,11 @@ TRAP_SUBTYPE_NAMES = {
     "pipe_fake_kill": 0,
     "pipe_to_underground": 1,
     "hint_stage_1": 1,
+    "platform_conveyor": 2,
     "platform_vertical_wrap": 5,
-    "warp_launch": 1,
+    "platform_bounce": 12,
+    "warp_pad": 1,
+    "fatal_launch": 2,
 }
 
 STAGE_DESTINATION_NAMES = {
@@ -171,6 +174,67 @@ WORLD_Y_OFFSET_PX = SOURCE_ROW_OFFSET * GBA_METATILE_SIZE
 FIX_SCALE = 1 << 16
 
 
+class MapValidationError(ValueError):
+    """An authoring error with enough context to fix it in Tiled."""
+
+
+_validation_context = {
+    "map": None,
+    "layer": None,
+    "object": None,
+}
+
+
+def set_validation_context(map_path=None, layer=None, obj=None):
+    if map_path is not None:
+        _validation_context["map"] = map_path
+    _validation_context["layer"] = layer
+    _validation_context["object"] = obj
+
+
+def map_error(message, field=None):
+    parts = []
+    map_path = _validation_context["map"]
+    if map_path is not None:
+        parts.append(str(map_path))
+
+    layer = _validation_context["layer"]
+    if layer:
+        parts.append(f"layer {layer!r}")
+
+    obj = _validation_context["object"]
+    if obj is not None:
+        name = obj.get("name") or obj.get("class") or obj.get("type") or "unnamed object"
+        object_id = obj.get("id")
+        suffix = f" (id {object_id})" if object_id is not None else ""
+        parts.append(f"object {name!r}{suffix}")
+
+    if field:
+        parts.append(f"property {field!r}")
+
+    prefix = ": ".join(parts)
+    return MapValidationError(f"{prefix}: {message}" if prefix else message)
+
+
+def fixed(value, field=None):
+    try:
+        return int(round(float(value) * FIX_SCALE))
+    except (TypeError, ValueError) as exc:
+        raise map_error(
+            f"expected a number of pixels, got {value!r}", field) from exc
+
+
+def integer(value, field, default=None):
+    if value is None and default is not None:
+        return default
+    if isinstance(value, (dict, list)):
+        raise map_error(f"expected an integer, got {value!r}", field)
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise map_error(f"expected an integer, got {value!r}", field) from exc
+
+
 def c_ident(name):
     stem = re.sub(r"[^0-9A-Za-z_]", "_", Path(name).stem)
     stem = re.sub(r"_+", "_", stem).strip("_").lower()
@@ -179,21 +243,14 @@ def c_ident(name):
     return stem
 
 
-def fixed(value):
-    return int(round(float(value) * FIX_SCALE))
-
-
-def ref_velocity_fixed(value):
-    return int(round(float(value) * 16 * FIX_SCALE / (29 * 100 * 2)))
-
-
-def ref_position_fixed(value):
-    return int(round(float(value) * 16 * FIX_SCALE / (29 * 100)))
-
-
-def ref_stage_y_fixed(value):
-    adjusted = float(value) + 12 * 100 - (SOURCE_ROW_OFFSET * 29 * 100)
-    return ref_position_fixed(adjusted)
+def throw_velocity_fixed(value):
+    """Convert the original Defrag throw parameter to port fixed-point speed."""
+    try:
+        return int(round(float(value) * 16 * FIX_SCALE / (29 * 100 * 2)))
+    except (TypeError, ValueError) as exc:
+        raise map_error(
+            f"expected a numeric Defrag throw speed, got {value!r}",
+            "throw_vx") from exc
 
 
 def prop_value(props, name, default=None):
@@ -327,20 +384,29 @@ def trap_kind(value):
     return TRAP_KIND_NAMES.get(text.lower())
 
 
-def enum_name(value, names, default):
+def enum_name(value, names, default, field=None):
     if value is None:
         return default
-    text = str(value)
+    if isinstance(value, (dict, list)):
+        raise map_error(f"expected one of {', '.join(sorted(names))}, got {value!r}", field)
+    text = str(value).strip()
+    if not text:
+        return default
     if text in names.values():
         return text
-    return names.get(text.lower(), default)
+    key = text.lower()
+    if key in names:
+        return names[key]
+    raise map_error(f"unknown value {text!r}; expected one of {', '.join(sorted(names))}", field)
 
 
-def enum_int(value, names, default):
-    if value is None or value == {}:
+def enum_int(value, names, default, field=None):
+    if value is None:
         return default
-    if isinstance(value, dict):
-        raise ValueError(f"unknown structured enum value: {value}")
+    if isinstance(value, (dict, list)):
+        raise map_error(
+            f"expected one of {', '.join(sorted(names))}, got structured value {value!r}",
+            field)
 
     if isinstance(value, bool):
         return int(value)
@@ -369,7 +435,7 @@ def enum_int(value, names, default):
     if match:
         return int(match.group(1), 0)
 
-    raise ValueError(f"unknown enum integer value: {text}")
+    raise map_error(f"unknown value {text!r}; expected one of {', '.join(sorted(names))}", field)
 
 
 def object_name(obj):
@@ -387,6 +453,7 @@ def parse_object_layers(map_data, tile_props):
 
         layer_name = layer.get("name", "")
         for obj in layer.get("objects", []):
+            set_validation_context(layer=layer_name, obj=obj)
             props = obj.get("properties", [])
             gid = decode_gid(obj.get("gid", 0))
             tile_prop = tile_props.get(gid, {})
@@ -394,8 +461,11 @@ def parse_object_layers(map_data, tile_props):
             trap = trap_kind(prop_value(props, "trap_type",
                             tile_prop.get("trap_type")))
 
-            tiled_x = float(obj.get("x", 0))
-            tiled_y = float(obj.get("y", 0))
+            try:
+                tiled_x = float(obj.get("x", 0))
+                tiled_y = float(obj.get("y", 0))
+            except (TypeError, ValueError) as exc:
+                raise map_error("object x and y must be numeric pixel coordinates") from exc
             world_y = tiled_y - WORLD_Y_OFFSET_PX
             x = fixed(tiled_x)
             y = fixed(world_y)
@@ -403,42 +473,43 @@ def parse_object_layers(map_data, tile_props):
             h = fixed(obj.get("height", GBA_METATILE_SIZE))
             subtype = enum_int(prop_value(props, "subtype",
                                           tile_prop.get("subtype")),
-                               TRAP_SUBTYPE_NAMES, 0)
+                               TRAP_SUBTYPE_NAMES, 0, "subtype")
             spawn_dir = enum_int(prop_value(props, "spawn_dir",
                                             tile_prop.get("spawn_dir")),
-                                 TRAP_SPAWN_DIRECTION_NAMES, 0)
-            destination_value = prop_value(props, "destination",
-                                           tile_prop.get("destination"))
-            destination = enum_int(destination_value, STAGE_DESTINATION_NAMES, 0)
-            entry_id = max(0, min(255, int(prop_value(
-                props, "entry_id", tile_prop.get("entry_id", 0)))))
-            spawn_interval = int(prop_value(
+                                 TRAP_SPAWN_DIRECTION_NAMES, 0, "spawn_dir")
+            destination_value = prop_value(props, "stage_destination",
+                                           tile_prop.get("stage_destination"))
+            destination = enum_int(destination_value, STAGE_DESTINATION_NAMES, 0,
+                                   "stage_destination")
+            entry_id = max(0, min(255, integer(prop_value(
+                props, "entry_id", tile_prop.get("entry_id", 0)), "entry_id")))
+            spawn_interval = integer(prop_value(
                 props, "spawn_interval",
                 tile_prop.get("spawn_interval",
-                              default_question_spawn_interval(subtype))))
-            spawn_limit = int(prop_value(
+                              default_question_spawn_interval(subtype))), "spawn_interval")
+            spawn_limit = integer(prop_value(
                 props, "spawn_limit",
                 tile_prop.get("spawn_limit",
-                              default_question_spawn_limit(subtype))))
-            item_variant = int(prop_value(
+                              default_question_spawn_limit(subtype))), "spawn_limit")
+            item_variant = integer(prop_value(
                 props, "item_variant",
-                tile_prop.get("item_variant", 0)))
-            trigger_channel = int(prop_value(
+                tile_prop.get("item_variant", 0)), "item_variant")
+            trigger_channel = integer(prop_value(
                 props, "trigger_channel",
-                tile_prop.get("trigger_channel", 0)))
-            listen_channel = int(prop_value(
+                tile_prop.get("trigger_channel", 0)), "trigger_channel")
+            listen_channel = integer(prop_value(
                 props, "listen_channel",
-                tile_prop.get("listen_channel", 0)))
-            channel_spawn_interval = int(prop_value(
+                tile_prop.get("listen_channel", 0)), "listen_channel")
+            channel_spawn_interval = integer(prop_value(
                 props, "channel_spawn_interval",
-                tile_prop.get("channel_spawn_interval", 0)))
-            trigger_delay = int(prop_value(
+                tile_prop.get("channel_spawn_interval", 0)), "channel_spawn_interval")
+            trigger_delay = integer(prop_value(
                 props, "trigger_delay",
-                tile_prop.get("trigger_delay", 0)))
-            goal_walk_frames = int(prop_value(
+                tile_prop.get("trigger_delay", 0)), "trigger_delay")
+            goal_walk_frames = integer(prop_value(
                 props, "goal_walk_frames",
                 tile_prop.get("goal_walk_frames",
-                              default_goal_walk_frames(trap))))
+                              default_goal_walk_frames(trap))), "goal_walk_frames")
             hint_text = prop_value(props, "hint_text",
                                    tile_prop.get("hint_text"))
             source_x = int(round(tiled_x / GBA_METATILE_SIZE))
@@ -446,134 +517,70 @@ def parse_object_layers(map_data, tile_props):
             trigger_x = fixed(prop_value(props, "trigger_x", tiled_x))
             trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
                               WORLD_Y_OFFSET_PX)
-            vx = 0
+            vx = fixed(prop_value(props, "vx", tile_prop.get("vx", 0)) or 0)
             vy = fixed(prop_value(props, "vy", tile_prop.get("vy", 0)) or 0)
             gravity = fixed(prop_value(props, "gravity", tile_prop.get("gravity", 0)) or 0)
-            move_offset_x_prop = prop_value(props, "move_offset_x",
-                                             tile_prop.get("move_offset_x"))
-            move_offset_y_prop = prop_value(props, "move_offset_y",
-                                             tile_prop.get("move_offset_y"))
-            ref_move_offset_x_prop = prop_value(props, "ref_move_offset_x",
-                                                 tile_prop.get("ref_move_offset_x"))
-            ref_move_offset_y_prop = prop_value(props, "ref_move_offset_y",
-                                                 tile_prop.get("ref_move_offset_y"))
-            move_offset_x = (ref_position_fixed(ref_move_offset_x_prop)
-                             if ref_move_offset_x_prop is not None
-                             else fixed(move_offset_x_prop or 0))
-            move_offset_y = (ref_position_fixed(ref_move_offset_y_prop)
-                             if ref_move_offset_y_prop is not None
-                             else fixed(move_offset_y_prop or 0))
+            move_offset_x = fixed(prop_value(
+                props, "move_offset_x", tile_prop.get("move_offset_x", 0)) or 0)
+            move_offset_y = fixed(prop_value(
+                props, "move_offset_y", tile_prop.get("move_offset_y", 0)) or 0)
             spawn_enemy_kind = enum_name(prop_value(
                 props, "spawn_enemy_kind", tile_prop.get("spawn_enemy_kind")),
-                ENEMY_KIND_NAMES, "ENEMY_NONE")
+                ENEMY_KIND_NAMES, "ENEMY_NONE", "spawn_enemy_kind")
             spawn_enemy_sprite = enum_name(prop_value(
                 props, "spawn_enemy_sprite", tile_prop.get("spawn_enemy_sprite")),
-                ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER")
-            spawn_enemy_palette = int(prop_value(
+                ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER", "spawn_enemy_sprite")
+            spawn_enemy_palette = integer(prop_value(
                 props, "spawn_enemy_palette",
                 tile_prop.get("spawn_enemy_palette",
-                              tile_prop.get("enemy_palette", 0))))
-            spawn_enemy_param = int(prop_value(
+                              tile_prop.get("enemy_palette", 0))), "spawn_enemy_palette")
+            spawn_enemy_param = integer(prop_value(
                 props, "spawn_enemy_param",
                 tile_prop.get("spawn_enemy_param",
-                              tile_prop.get("enemy_param", 0))))
-            spawn_enemy_count = int(prop_value(
+                              tile_prop.get("enemy_param", 0))), "spawn_enemy_param")
+            spawn_enemy_count = integer(prop_value(
                 props, "spawn_enemy_count",
-                tile_prop.get("spawn_enemy_count", 1)))
-            spawn_sound = int(prop_value(
-                props, "spawn_sound", tile_prop.get("spawn_sound", 1)))
-            spawn_offset_x_prop = prop_value(
-                props, "spawn_offset_x", tile_prop.get("spawn_offset_x"))
-            spawn_offset_y_prop = prop_value(
-                props, "spawn_offset_y", tile_prop.get("spawn_offset_y"))
-            ref_spawn_offset_x_prop = prop_value(
-                props, "ref_spawn_offset_x", tile_prop.get("ref_spawn_offset_x"))
-            ref_spawn_offset_y_prop = prop_value(
-                props, "ref_spawn_offset_y", tile_prop.get("ref_spawn_offset_y"))
-            spawn_vx_prop = prop_value(
-                props, "spawn_vx", tile_prop.get("spawn_vx"))
-            spawn_vy_prop = prop_value(
-                props, "spawn_vy", tile_prop.get("spawn_vy"))
-            spawn_random_vx_prop = prop_value(
-                props, "spawn_random_vx", tile_prop.get("spawn_random_vx"))
-            spawn_random_vy_prop = prop_value(
-                props, "spawn_random_vy", tile_prop.get("spawn_random_vy"))
-            ref_spawn_vx_prop = prop_value(
-                props, "ref_spawn_vx", tile_prop.get("ref_spawn_vx"))
-            ref_spawn_vy_prop = prop_value(
-                props, "ref_spawn_vy", tile_prop.get("ref_spawn_vy"))
-            ref_spawn_random_vx_prop = prop_value(
-                props, "ref_spawn_random_vx", tile_prop.get("ref_spawn_random_vx"))
-            ref_spawn_random_vy_prop = prop_value(
-                props, "ref_spawn_random_vy", tile_prop.get("ref_spawn_random_vy"))
-            spawn_spacing_x_prop = prop_value(
-                props, "spawn_spacing_x", tile_prop.get("spawn_spacing_x"))
-            spawn_spacing_y_prop = prop_value(
-                props, "spawn_spacing_y", tile_prop.get("spawn_spacing_y"))
-            ref_spawn_spacing_x_prop = prop_value(
-                props, "ref_spawn_spacing_x", tile_prop.get("ref_spawn_spacing_x"))
-            ref_spawn_spacing_y_prop = prop_value(
-                props, "ref_spawn_spacing_y", tile_prop.get("ref_spawn_spacing_y"))
-            repeat_rearm_offset_x_prop = prop_value(
-                props, "repeat_rearm_offset_x", tile_prop.get("repeat_rearm_offset_x"))
-            repeat_rearm_offset_y_prop = prop_value(
-                props, "repeat_rearm_offset_y", tile_prop.get("repeat_rearm_offset_y"))
-            ref_repeat_rearm_offset_x_prop = prop_value(
-                props, "ref_repeat_rearm_offset_x", tile_prop.get("ref_repeat_rearm_offset_x"))
-            ref_repeat_rearm_offset_y_prop = prop_value(
-                props, "ref_repeat_rearm_offset_y", tile_prop.get("ref_repeat_rearm_offset_y"))
-
-            spawn_offset_x = (ref_position_fixed(ref_spawn_offset_x_prop)
-                              if ref_spawn_offset_x_prop is not None
-                              else fixed(spawn_offset_x_prop or 0))
-            spawn_offset_y = (ref_position_fixed(ref_spawn_offset_y_prop)
-                              if ref_spawn_offset_y_prop is not None
-                              else fixed(spawn_offset_y_prop or 0))
-            spawn_vx = (ref_velocity_fixed(ref_spawn_vx_prop)
-                        if ref_spawn_vx_prop is not None
-                        else fixed(spawn_vx_prop or 0))
-            spawn_vy = (ref_velocity_fixed(ref_spawn_vy_prop)
-                        if ref_spawn_vy_prop is not None
-                        else fixed(spawn_vy_prop or 0))
-            spawn_random_vx = (ref_velocity_fixed(ref_spawn_random_vx_prop)
-                               if ref_spawn_random_vx_prop is not None
-                               else fixed(spawn_random_vx_prop or 0))
-            spawn_random_vy = (ref_velocity_fixed(ref_spawn_random_vy_prop)
-                               if ref_spawn_random_vy_prop is not None
-                               else fixed(spawn_random_vy_prop or 0))
-            spawn_spacing_x = (ref_position_fixed(ref_spawn_spacing_x_prop)
-                               if ref_spawn_spacing_x_prop is not None
-                               else fixed(spawn_spacing_x_prop or 0))
-            spawn_spacing_y = (ref_position_fixed(ref_spawn_spacing_y_prop)
-                               if ref_spawn_spacing_y_prop is not None
-                               else fixed(spawn_spacing_y_prop or 0))
-            repeat_rearm_offset_x = (ref_position_fixed(ref_repeat_rearm_offset_x_prop)
-                                     if ref_repeat_rearm_offset_x_prop is not None
-                                     else fixed(repeat_rearm_offset_x_prop or 0))
-            repeat_rearm_offset_y = (ref_position_fixed(ref_repeat_rearm_offset_y_prop)
-                                     if ref_repeat_rearm_offset_y_prop is not None
-                                     else fixed(repeat_rearm_offset_y_prop or 0))
+                tile_prop.get("spawn_enemy_count", 1)), "spawn_enemy_count")
+            spawn_sound = integer(prop_value(
+                props, "spawn_sound", tile_prop.get("spawn_sound", 1)), "spawn_sound")
+            spawn_offset_x = fixed(prop_value(
+                props, "spawn_offset_x", tile_prop.get("spawn_offset_x", 0)) or 0)
+            spawn_offset_y = fixed(prop_value(
+                props, "spawn_offset_y", tile_prop.get("spawn_offset_y", 0)) or 0)
+            spawn_vx = fixed(prop_value(
+                props, "spawn_vx", tile_prop.get("spawn_vx", 0)) or 0)
+            spawn_vy = fixed(prop_value(
+                props, "spawn_vy", tile_prop.get("spawn_vy", 0)) or 0)
+            spawn_random_vx = fixed(prop_value(
+                props, "spawn_random_vx", tile_prop.get("spawn_random_vx", 0)) or 0)
+            spawn_random_vy = fixed(prop_value(
+                props, "spawn_random_vy", tile_prop.get("spawn_random_vy", 0)) or 0)
+            spawn_spacing_x = fixed(prop_value(
+                props, "spawn_spacing_x", tile_prop.get("spawn_spacing_x", 0)) or 0)
+            spawn_spacing_y = fixed(prop_value(
+                props, "spawn_spacing_y", tile_prop.get("spawn_spacing_y", 0)) or 0)
+            repeat_rearm_offset_x = fixed(prop_value(
+                props, "repeat_rearm_offset_x",
+                tile_prop.get("repeat_rearm_offset_x", 0)) or 0)
+            repeat_rearm_offset_y = fixed(prop_value(
+                props, "repeat_rearm_offset_y",
+                tile_prop.get("repeat_rearm_offset_y", 0)) or 0)
 
             spawn_x_prop = prop_value(props, "spawn_x", tile_prop.get("spawn_x"))
             spawn_y_prop = prop_value(props, "spawn_y", tile_prop.get("spawn_y"))
-            ref_spawn_x_prop = prop_value(props, "ref_spawn_x", tile_prop.get("ref_spawn_x"))
-            ref_spawn_y_prop = prop_value(props, "ref_spawn_y", tile_prop.get("ref_spawn_y"))
-            if ref_spawn_x_prop is not None:
-                spawn_offset_x = ref_position_fixed(ref_spawn_x_prop) - x
-            elif spawn_x_prop is not None:
+            if spawn_x_prop is not None:
                 spawn_offset_x = fixed(spawn_x_prop) - x
-            if ref_spawn_y_prop is not None:
-                spawn_offset_y = ref_stage_y_fixed(ref_spawn_y_prop) - y
-            elif spawn_y_prop is not None:
+            if spawn_y_prop is not None:
                 spawn_offset_y = fixed(float(spawn_y_prop) - WORLD_Y_OFFSET_PX) - y
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
                 enemy_kind = enum_name(prop_value(props, "enemy_kind",
                                        tile_prop.get("enemy_kind")),
-                                       ENEMY_KIND_NAMES, "ENEMY_WALKER")
+                                       ENEMY_KIND_NAMES, "ENEMY_WALKER", "enemy_kind")
                 enemy_sprite = enum_name(prop_value(props, "enemy_sprite",
                                         tile_prop.get("enemy_sprite")),
-                                         ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER")
+                                         ENEMY_SPRITE_NAMES, "ENEMY_SPRITE_WALKER",
+                                         "enemy_sprite")
 
                 if (enemy_kind == "ENEMY_WALKER" and
                         enemy_sprite == "ENEMY_SPRITE_SHELL_WALKER"):
@@ -591,7 +598,7 @@ def parse_object_layers(map_data, tile_props):
                     "param": max(0, min(255, int(prop_value(
                         props, "enemy_param",
                         tile_prop.get("enemy_param", 0))))),
-                    "throw_vx": ref_velocity_fixed(prop_value(
+                    "throw_vx": throw_velocity_fixed(prop_value(
                         props, "throw_vx", tile_prop.get("throw_vx", 700))),
                     "x": x,
                     "y": y,
@@ -605,11 +612,12 @@ def parse_object_layers(map_data, tile_props):
                 )
                 if needs_destination and (destination_value is None or
                                           isinstance(destination_value, dict)):
-                    raise ValueError(
-                        f"{obj.get('name', 'unnamed trap')}: destination must be a "
-                        "StageDestination enum value, not an object reference")
+                    raise map_error(
+                        "must be a StageDestination value (for example '1-3u'), not an "
+                        "empty value or an object/class reference",
+                        "stage_destination")
                 traps.append({
-                    "kind": trap or "TRAP_INVISIBLE_BLOCK",
+                    "kind": trap or "TRAP_QUESTION_BLOCK",
                     "subtype": subtype,
                     "destination": destination,
                     "entry_id": entry_id,
@@ -617,7 +625,7 @@ def parse_object_layers(map_data, tile_props):
                     "visual_palette": enum_int(prop_value(props, "visual_palette",
                                                 tile_prop.get("visual_palette",
                                                               tile_prop.get("palette"))),
-                                               BG_PALETTE_NAMES, 0),
+                                               BG_PALETTE_NAMES, 0, "visual_palette"),
                     "spawn_interval": max(0, min(255, spawn_interval)),
                     "spawn_limit": max(0, min(255, spawn_limit)),
                     "item_variant": max(0, min(255, item_variant)),
@@ -645,14 +653,14 @@ def parse_object_layers(map_data, tile_props):
                     "move_offset_y": move_offset_y,
                     "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
                     "hint_text": c_string_literal(hint_text),
-                    "visual_metatile": int(prop_value(props, "visual_metatile",
-                                           tile_prop.get("visual_metatile", 255))),
-                    "spent_metatile": int(prop_value(props, "spent_metatile",
-                                          tile_prop.get("spent_metatile", 255))),
-                    "collision": int(prop_value(props, "collision",
-                                     tile_prop.get("collision", 255))),
-                    "hidden": int(prop_value(props, "hidden",
-                                  tile_prop.get("hidden", 0))),
+                    "visual_metatile": integer(prop_value(props, "visual_metatile",
+                                           tile_prop.get("visual_metatile", 255)), "visual_metatile"),
+                    "spent_metatile": integer(prop_value(props, "spent_metatile",
+                                          tile_prop.get("spent_metatile", 255)), "spent_metatile"),
+                    "collision": integer(prop_value(props, "collision",
+                                     tile_prop.get("collision", 255)), "collision"),
+                    "hidden": integer(prop_value(props, "hidden",
+                                  tile_prop.get("hidden", 0)), "hidden"),
                     "source_x": source_x,
                     "source_y": source_y,
                     "x": x,
@@ -697,9 +705,24 @@ def format_u8_array(name, rows):
 
 
 def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
-    map_data = json.loads(tmj_path.read_text())
-    width = int(map_data["width"])
-    height = int(map_data["height"])
+    set_validation_context(map_path=tmj_path, layer=None, obj=None)
+    try:
+        map_data = json.loads(tmj_path.read_text())
+    except OSError as exc:
+        raise map_error(f"could not read map: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise map_error(
+            f"invalid JSON at line {exc.lineno}, column {exc.colno}: {exc.msg}") from exc
+
+    if not isinstance(map_data, dict):
+        raise map_error("map root must be a JSON object")
+    try:
+        width = int(map_data["width"])
+        height = int(map_data["height"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise map_error("map width and height must be integer properties") from exc
+    if width <= 0 or height <= 0:
+        raise map_error(f"map dimensions must be positive, got {width} x {height}")
     map_props = map_properties(map_data)
     camera_margin_top = max(0, min(65535, int(map_props.get("camera_margin_top", 0))))
     camera_margin_bottom = max(0, min(65535, int(map_props.get("camera_margin_bottom", 0))))
@@ -866,7 +889,7 @@ extern const uint16_t {prefix}_trap_count;
                 "    },",
             ])
     else:
-        lines.append("    { .kind = TRAP_INVISIBLE_BLOCK },")
+        lines.append("    { .kind = TRAP_QUESTION_BLOCK },")
     lines.extend([
         "};",
         f"const uint16_t {prefix}_trap_count = {len(traps)};",
@@ -884,7 +907,12 @@ def main():
     parser.add_argument("--symbol-prefix")
     args = parser.parse_args()
 
-    write_outputs(args.map, args.header, args.source, args.symbol_prefix)
+    try:
+        write_outputs(args.map, args.header, args.source, args.symbol_prefix)
+    except MapValidationError as exc:
+        parser.exit(2, f"compile_map.py: error: {exc}\n")
+    except (KeyError, TypeError, ValueError) as exc:
+        parser.exit(2, f"compile_map.py: error: {args.map}: invalid map data: {exc}\n")
 
 
 if __name__ == "__main__":

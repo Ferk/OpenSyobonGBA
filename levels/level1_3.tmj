@@ -2757,13 +2757,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3044,9 +3044,9 @@
        "value": 1
       },
       {
-       "name": "ref_move_offset_y",
+       "name": "move_offset_y",
        "type": "float",
-       "value": 9000
+       "value": 49.655172413793
       },
       {
        "name": "subtype",
@@ -3124,19 +3124,19 @@
       {
        "name": "hidden",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "warp_launch"
+       "value": "warp_pad"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "warp_pad"
+       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3165,19 +3165,19 @@
       {
        "name": "hidden",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "warp_launch"
+       "value": "warp_pad"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "warp_pad"
+       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3206,19 +3206,19 @@
       {
        "name": "hidden",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "warp_launch"
+       "value": "warp_pad"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "warp_pad"
+       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3301,12 +3301,12 @@
       {
        "name": "collision",
        "type": "int",
-       "value": 1
+       "value": 0
       },
       {
        "name": "hidden",
        "type": "bool",
-       "value": false
+       "value": true
       },
       {
        "name": "subtype",
@@ -3321,7 +3321,7 @@
       {
        "name": "visual_metatile",
        "type": "int",
-       "value": 2
+       "value": 0
       }
      ],
      "rotation": 0,
@@ -3399,7 +3399,7 @@
       {
        "name": "subtype",
        "type": "string",
-       "value": "question_enemy"
+       "value": "question_bad_flower"
       },
       {
        "name": "trap_type",
@@ -3603,13 +3603,14 @@
       },
       {
        "name": "trap_type",
+       "propertytype": "TrapKind",
        "type": "string",
-       "value": "question_block"
+       "value": "breakable_block"
       },
       {
        "name": "visual_metatile",
        "type": "int",
-       "value": 2
+       "value": 7
       }
      ],
      "rotation": 0,
@@ -3628,7 +3629,7 @@
       {
        "name": "collision",
        "type": "int",
-       "value": 1
+       "value": 0
       },
       {
        "name": "hidden",
@@ -3638,17 +3639,18 @@
       {
        "name": "subtype",
        "type": "string",
-       "value": "none"
+       "value": "fatal_launch"
       },
       {
        "name": "trap_type",
+       "propertytype": "TrapKind",
        "type": "string",
-       "value": "question_block"
+       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
        "type": "int",
-       "value": 2
+       "value": 0
       }
      ],
      "rotation": 0,
@@ -3733,12 +3735,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "destination",
-       "propertytype": "StageDestination",
-       "type": "string",
-       "value": "1-3u"
-      },
-      {
        "name": "subtype",
        "type": "string",
        "value": "pipe_to_underground"
@@ -3747,6 +3743,12 @@
        "name": "trap_type",
        "type": "string",
        "value": "enter_pipe"
+      },
+      {
+       "name": "stage_destination",
+       "type": "string",
+       "propertytype": "StageDestination",
+       "value": "1-3u"
       }
      ],
      "rotation": 0,
@@ -3762,21 +3764,6 @@
      "name": "ref 1-3 stage spawner stype103 sx1 74,8",
      "opacity": 1,
      "properties": [
-      {
-       "name": "ref_spawn_offset_x",
-       "type": "int",
-       "value": -12000
-      },
-      {
-       "name": "ref_spawn_vx",
-       "type": "int",
-       "value": 1600
-      },
-      {
-       "name": "ref_spawn_y",
-       "type": "int",
-       "value": 22500
-      },
       {
        "name": "spawn_dir",
        "type": "string",
@@ -3798,9 +3785,24 @@
        "value": 1
       },
       {
+       "name": "spawn_offset_x",
+       "type": "float",
+       "value": -66.206896551724
+      },
+      {
        "name": "spawn_sound",
        "type": "bool",
        "value": false
+      },
+      {
+       "name": "spawn_vx",
+       "type": "float",
+       "value": 4.413793103448
+      },
+      {
+       "name": "spawn_y",
+       "type": "float",
+       "value": 130.758620689655
       },
       {
        "name": "subtype",
@@ -3827,24 +3829,9 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "ref_move_offset_x",
-       "type": "int",
-       "value": -15000
-      },
-      {
-       "name": "ref_spawn_vy",
-       "type": "int",
-       "value": 1200
-      },
-      {
-       "name": "ref_spawn_x",
-       "type": "int",
-       "value": 266400
-      },
-      {
-       "name": "ref_spawn_y",
-       "type": "int",
-       "value": -4000
+       "name": "move_offset_x",
+       "type": "float",
+       "value": -82.758620689655
       },
       {
        "name": "spawn_dir",
@@ -3855,6 +3842,11 @@
        "name": "spawn_enemy_kind",
        "type": "string",
        "value": "aramaki"
+      },
+      {
+       "name": "spawn_enemy_param",
+       "type": "int",
+       "value": 1
       },
       {
        "name": "spawn_enemy_sprite",
@@ -3870,6 +3862,21 @@
        "name": "spawn_sound",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "spawn_vy",
+       "type": "float",
+       "value": 0
+      },
+      {
+       "name": "spawn_x",
+       "type": "float",
+       "value": 1469.79310344828
+      },
+      {
+       "name": "spawn_y",
+       "type": "float",
+       "value": -15.448275862069
       },
       {
        "name": "subtype",
@@ -3896,11 +3903,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "ref_spawn_vy",
-       "type": "int",
-       "value": -800
-      },
-      {
        "name": "spawn_dir",
        "type": "string",
        "value": "left"
@@ -3924,6 +3926,11 @@
        "name": "spawn_sound",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "spawn_vy",
+       "type": "float",
+       "value": -2.206896551724
       },
       {
        "name": "subtype",
@@ -4057,7 +4064,7 @@
       {
        "name": "subtype",
        "type": "string",
-       "value": "platform_vertical_wrap"
+       "value": "platform_conveyor"
       },
       {
        "name": "trap_type",
@@ -4070,9 +4077,9 @@
        "value": 6
       },
       {
-       "name": "vy",
+       "name": "vx",
        "type": "float",
-       "value": 0.827586
+       "value": -6.62069
       }
      ],
      "rotation": 0,
@@ -4090,8 +4097,9 @@
      "properties": [
       {
        "name": "subtype",
+       "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "platform_vertical_wrap"
+       "value": "platform_bounce"
       },
       {
        "name": "trap_type",
@@ -4101,12 +4109,7 @@
       {
        "name": "visual_metatile",
        "type": "int",
-       "value": 6
-      },
-      {
-       "name": "vy",
-       "type": "float",
-       "value": 0.827586
+       "value": 255
       }
      ],
      "rotation": 0,
@@ -4235,24 +4238,44 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "destination",
-       "propertytype": "StageDestination",
-       "type": "string",
-       "value": "1-3s"
-      },
-      {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
        "value": "transition_zone"
+      },
+      {
+       "name": "stage_destination",
+       "type": "string",
+       "propertytype": "StageDestination",
+       "value": "1-3s"
       }
      ],
      "rotation": 0,
      "type": "Trap",
      "visible": true,
-     "width": 2400,
-     "x": 0,
-     "y": -33
+     "width": 481,
+     "x": -1,
+     "y": -47
+    },
+    {
+     "height": 16,
+     "id": 1000,
+     "name": "1-3 type120 upper kill zone",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "kill_zone"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 292,
+     "x": 1668,
+     "y": -48
     }
    ],
    "opacity": 1,

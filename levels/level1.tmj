@@ -2950,13 +2950,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -2992,13 +2992,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3034,13 +3034,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3076,13 +3076,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3118,13 +3118,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3160,13 +3160,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3202,13 +3202,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3244,13 +3244,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_metatile",
@@ -3821,19 +3821,19 @@
        "propertytype": "TrapSpawnDirection"
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 1000.0
+       "value": 5.51724137931
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": 32000.0
+       "value": 183.172413793103
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": -800.0
+       "value": -2.206896551724
       },
       {
        "name": "spawn_enemy_count",
@@ -3890,19 +3890,19 @@
        "propertytype": "TrapSpawnDirection"
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 6000.0
+       "value": 33.103448275862
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": -4000.0
+       "value": -15.448275862069
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": 1200.0
+       "value": 3.310344827586
       },
       {
        "name": "spawn_enemy_count",
@@ -3959,14 +3959,14 @@
        "propertytype": "TrapSpawnDirection"
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": -3000.0
+       "value": -9.931034482759
       },
       {
-       "name": "ref_spawn_spacing_x",
+       "name": "spawn_spacing_x",
        "type": "float",
-       "value": 3000.0
+       "value": 16.551724137931
       },
       {
        "name": "spawn_enemy_count",
@@ -4023,19 +4023,19 @@
        "propertytype": "TrapSpawnDirection"
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 6000.0
+       "value": 33.103448275862
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": -4000.0
+       "value": -15.448275862069
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": 1200.0
+       "value": 3.310344827586
       },
       {
        "name": "spawn_enemy_count",

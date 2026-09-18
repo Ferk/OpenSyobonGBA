@@ -24,7 +24,8 @@
 #define FIRST_TRAP_SPRITE 16
 #define TRAP_TILE_INDEX 48
 #define PROJECTILE_TILE_INDEX 56
-#define WARP_PAD_TILE_INDEX 60
+#define NOTE_PAD_TILE_INDEX 60
+#define JUMP_PAD_TILE_INDEX 72
 #define EVASIVE_BLOCK_TILE_INDEX 80
 #define PIPE_TILE_INDEX 84
 #define ITEM_TILE_INDEX 100
@@ -33,6 +34,7 @@
 #define BAD_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 8)
 #define STAR_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 12)
 #define QUESTION_BALL_TILE_INDEX (ITEM_TILE_INDEX + 16)
+#define BAD_FLOWER_ITEM_TILE_INDEX 240
 #define BRICK_FRAGMENT_TILE_INDEX 120
 #define SPIKE_BLOCK_TOP_TILE_INDEX 124
 #define SPIKE_BLOCK_LEFT_TILE_INDEX 128
@@ -93,6 +95,8 @@
 #define KEY_DOWN_MASK 0x0080
 #define KEY_LEFT_MASK 0x0020
 #define KEY_RIGHT_MASK 0x0010
+#define PLATFORM_CONVEYOR 2
+#define PLATFORM_BOUNCE 12
 #define FALLING_ON_PASS_UNDER 51
 #define FALLING_WHEN_APPROACHED 52
 #define STAGE_UPWARD_HAZARD 181
@@ -103,6 +107,7 @@
 #define QUESTION_GOOD_MUSHROOM 102
 #define QUESTION_BAD_MUSHROOM 103
 #define QUESTION_STAR 104
+#define QUESTION_BAD_FLOWER 105
 #define QUESTION_POISON_GENERATOR 110
 #define QUESTION_COIN_GENERATOR 112
 #define QUESTION_HIDDEN_POISON 114
@@ -492,6 +497,22 @@ static void carry_player_on_falling_tile(const TrapEntity *entity,
     player_set_supported(player);
 }
 
+static void resolve_moving_platform_visual(Trap *trap, const Level *level)
+{
+    if (trap->visual_metatile != 255) {
+        return;
+    }
+
+    if (trap->source_x < level->width && trap->source_y < level->height) {
+        trap->visual_metatile = level->metatiles[trap->source_y][trap->source_x];
+        trap->visual_palette = level->palettes[trap->source_y][trap->source_x];
+    }
+
+    if (trap->visual_metatile == 255 || trap->visual_metatile == METATILE_EMPTY) {
+        trap->visual_metatile = METATILE_SOLID;
+    }
+}
+
 static void apply_generated_cells(TrapManager *manager, Level *level,
                                   const TrapTrigger *trigger)
 {
@@ -618,9 +639,14 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
     trap->trigger_pending = 0;
+    trap->hidden = trigger->hidden;
     trap->vx = trigger->vx;
     trap->vy = trigger->vy;
     trap->gravity = trigger->gravity;
+
+    if (trigger->kind == TRAP_MOVING_PLATFORM) {
+        resolve_moving_platform_visual(trap, level);
+    }
 
     apply_generated_cells(manager, level, trigger);
 
@@ -631,6 +657,7 @@ static void add_generated_trap(TrapManager *manager, Level *level,
 
     if (trigger->kind == TRAP_ENTER_PIPE || trigger->kind == TRAP_SIDE_PIPE ||
         trigger->kind == TRAP_EVASIVE_BLOCK ||
+        (trigger->kind == TRAP_JUMP_PAD && trigger->subtype == 0) ||
         trigger->kind == TRAP_MOVING_PLATFORM ||
         trigger->kind == TRAP_BREAKING_PLATFORM ||
         trigger->kind == TRAP_MOVING_BLOCK) {
@@ -702,6 +729,10 @@ static void load_trap_tiles(void)
            4 * 16 * sizeof(uint16_t));
     build_side_pipe_tiles();
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
+    memcpy(&SPRITE_GFX[BAD_FLOWER_ITEM_TILE_INDEX * 16],
+           &items_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
+    memcpy(&SPRITE_GFX[JUMP_PAD_TILE_INDEX * 16],
+           &traps_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
     memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
            spike_block_16Tiles, spike_block_16TilesLen);
     reset_platform_visual_cache();
@@ -845,19 +876,6 @@ static void update_spike_block(Trap *trap, Player *player)
                       trap->x + FIX16_FROM_INT(16), trap->y, 45);
         player_kill(player);
     }
-}
-
-static void reveal_hidden_block(TrapManager *manager, Trap *trap, Level *level)
-{
-    if (trap->state != TRAP_IDLE) {
-        return;
-    }
-
-    trap->state = TRAP_ACTIVE;
-    audio_play_block_hit();
-    set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_BRICK);
-    set_cell_collision(manager, trap->source_x, trap->source_y,
-                       LEVEL_COLLISION_SOLID, 0);
 }
 
 static void trigger_falling_floor(TrapManager *manager, Trap *trap, Level *level,
@@ -1066,7 +1084,7 @@ static void spawn_question_ball_star(TrapManager *manager, fix16_t x, fix16_t y,
 static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap,
                                       const Player *player)
 {
-    static const int16_t ref_offsets[][2] = {
+    static const int16_t burst_offsets[][2] = {
         { -8 * 3000 - 1000, -4 * 3000 },
         { -10 * 3000 + 1000, -1 * 3000 },
         { 4 * 3000 + 1000, -2 * 3000 },
@@ -1076,15 +1094,22 @@ static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap,
         { 8 * 3000 + 1000, -2 * 3000 - 1000 },
     };
 
-    for (uint8_t i = 0; i < sizeof(ref_offsets) / sizeof(ref_offsets[0]); ++i) {
+    for (uint8_t i = 0; i < sizeof(burst_offsets) / sizeof(burst_offsets[0]); ++i) {
         spawn_question_ball_star(manager,
-                                 trap->x + REF_POS_TO_FIX(ref_offsets[i][0]),
-                                 trap->y + REF_POS_TO_FIX(ref_offsets[i][1]),
+                                 trap->x + REF_POS_TO_FIX(burst_offsets[i][0]),
+                                 trap->y + REF_POS_TO_FIX(burst_offsets[i][1]),
                                  player);
     }
 }
 
-static void update_warp_pad(TrapManager *manager, Trap *trap, Player *player)
+static uint8_t player_can_stand_on_platform(const Trap *trap,
+                                            const Player *player,
+                                            int old_platform_y);
+
+#define JUMP_PAD_WARP_LAUNCH 1
+#define JUMP_PAD_FATAL_LAUNCH 2
+
+static uint8_t player_lands_on_launch_pad(const Trap *trap, const Player *player)
 {
     int trap_x = FIX16_TO_INT(trap->x);
     int trap_y = FIX16_TO_INT(trap->y);
@@ -1093,21 +1118,69 @@ static void update_warp_pad(TrapManager *manager, Trap *trap, Player *player)
     int player_x = FIX16_TO_INT(player->x);
     int player_bottom = FIX16_TO_INT(player->y) + PLAYER_HEIGHT_PX;
 
-    /* Type 117 is non-solid: it launches only when the player lands on it. */
-    if (trap->state == TRAP_IDLE && player->vy >= 0 &&
-        player_x + PLAYER_WIDTH_PX - 4 > trap_x + 2 &&
-        player_x + 4 < trap_x + trap_w - 2 &&
-        player_bottom >= trap_y && player_bottom <= trap_y + trap_h) {
+    return player->vy >= 0 &&
+           player_x + PLAYER_WIDTH_PX - 4 > trap_x + 2 &&
+           player_x + 4 < trap_x + trap_w - 2 &&
+           player_bottom >= trap_y && player_bottom <= trap_y + trap_h;
+}
+
+static void update_jump_pad(Trap *trap, Player *player)
+{
+    int platform_y = FIX16_TO_INT(trap->y);
+
+    if (!player->alive ||
+        !player_can_stand_on_platform(trap, player, platform_y)) {
+        return;
+    }
+
+    trap->hidden = 0;
+    player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    player->vy = REF_VEL_TO_FIX(-1600);
+    player->on_ground = 0;
+    audio_play_trap_trigger();
+}
+
+static void update_warp_pad(Trap *trap, Player *player)
+{
+    /* Original type 117 skips terrain collision during the sustained ascent. */
+    if (trap->state == TRAP_IDLE && player_lands_on_launch_pad(trap, player)) {
         trap->state = TRAP_ACTIVE;
         trap->trigger_pending = 0;
+        trap->hidden = 0;
         audio_play_trap_trigger();
     }
 
     if (trap->state == TRAP_ACTIVE) {
-        /* Keep the original forced upward velocity, but do not freeze motion. */
         player->vy = WARP_PAD_SPEED;
         player->on_ground = 0;
-        (void)manager;
+        player->phase_through_terrain = 1;
+    }
+}
+
+static void update_fatal_launch_pad(Trap *trap, Player *player)
+{
+    /* Original type 120 continuously drives the player above the visible map. */
+    if (trap->state == TRAP_IDLE && player_lands_on_launch_pad(trap, player)) {
+        trap->state = TRAP_ACTIVE;
+        trap->trigger_pending = 0;
+        trap->hidden = 0;
+        audio_play_trap_trigger();
+    }
+
+    if (trap->state == TRAP_ACTIVE) {
+        player->vy = REF_VEL_TO_FIX(-2400);
+        player->on_ground = 0;
+    }
+}
+
+static void update_kill_zone(Trap *trap, Player *player)
+{
+    if (player->alive &&
+        aabb_overlap(FIX16_TO_INT(player->x), FIX16_TO_INT(player->y),
+                     PLAYER_WIDTH_PX, PLAYER_HEIGHT_PX,
+                     FIX16_TO_INT(trap->x), FIX16_TO_INT(trap->y),
+                     FIX16_TO_INT(trap->w), FIX16_TO_INT(trap->h))) {
+        player_kill(player);
     }
 }
 
@@ -1201,6 +1274,11 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
     case QUESTION_STAR:
         audio_play_trap_trigger();
         spawn_block_item(manager, trap, TRAP_ENTITY_STAR_ITEM, ITEM_FAST_SPEED);
+        spend_question_block(manager, trap, level);
+        break;
+    case QUESTION_BAD_FLOWER:
+        audio_play_trap_trigger();
+        spawn_block_item(manager, trap, TRAP_ENTITY_BAD_FLOWER, 0);
         spend_question_block(manager, trap, level);
         break;
     case QUESTION_POISON_GENERATOR:
@@ -2084,8 +2162,11 @@ static void update_moving_platform(Trap *trap, const Level *level, Player *playe
     int min_y = level_camera_min_y_px(level) - 32;
     int max_y = level_camera_max_y_px(level) + LEVEL_SCREEN_METATILE_ROWS * 16 + 32;
 
-    trap->x += trap->vx;
-    trap->y += trap->vy;
+    if (trap->subtype != PLATFORM_BOUNCE &&
+        trap->subtype != PLATFORM_CONVEYOR) {
+        trap->x += trap->vx;
+        trap->y += trap->vy;
+    }
 
     if (trap->subtype == PLATFORM_VERTICAL_WRAP) {
         int platform_y = FIX16_TO_INT(trap->y);
@@ -2100,11 +2181,30 @@ static void update_moving_platform(Trap *trap, const Level *level, Player *playe
     }
 
     if (!player->alive || !player_can_stand_on_platform(trap, player, old_platform_y)) {
+        if (trap->subtype == PLATFORM_CONVEYOR) {
+            trap->timer = 0;
+        }
         return;
     }
 
     player->x += trap->x - old_x;
     player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    if (trap->subtype == PLATFORM_BOUNCE) {
+        player->vy = REF_VEL_TO_FIX(-800);
+        player->on_ground = 0;
+        return;
+    }
+    if (trap->subtype == PLATFORM_CONVEYOR) {
+        player->x += trap->vx;
+        if (trap->timer < 100) {
+            trap->timer++;
+        }
+        if (trap->timer >= 100) {
+            player_kill(player);
+            trap->timer = 0;
+            return;
+        }
+    }
     player->vy = 0;
     player_set_supported(player);
 }
@@ -2236,6 +2336,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
     int player_x = FIX16_TO_INT(player->x);
     int player_y = FIX16_TO_INT(player->y);
 
+    /* Active type-117 pads re-enable this below for the next player update. */
+    player->phase_through_terrain = 0;
     update_linked_traps(manager, level, player);
 
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
@@ -2311,8 +2413,16 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             update_enter_pipe(manager, trap, player);
         } else if (trap->kind == TRAP_SIDE_PIPE) {
             update_side_pipe(manager, trap, player);
-        } else if (trap->kind == TRAP_WARP_PAD) {
-            update_warp_pad(manager, trap, player);
+        } else if (trap->kind == TRAP_JUMP_PAD) {
+            if (trap->subtype == JUMP_PAD_WARP_LAUNCH) {
+                update_warp_pad(trap, player);
+            } else if (trap->subtype == JUMP_PAD_FATAL_LAUNCH) {
+                update_fatal_launch_pad(trap, player);
+            } else {
+                update_jump_pad(trap, player);
+            }
+        } else if (trap->kind == TRAP_KILL_ZONE) {
+            update_kill_zone(trap, player);
         } else if (trap->kind == TRAP_TRANSITION_ZONE) {
             update_transition_zone(manager, trap, player);
         } else if (trap->kind == TRAP_MOVING_PLATFORM) {
@@ -2414,6 +2524,11 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
             entity->kind == TRAP_ENTITY_STAR_ITEM ||
             entity->kind == TRAP_ENTITY_HURT_ITEM) {
             update_moving_item(entity, level);
+        } else if (entity->kind == TRAP_ENTITY_BAD_FLOWER) {
+            if (entity->timer > 0) {
+                entity->y -= FIX16_FROM_INT(1);
+                entity->timer--;
+            }
         } else {
             entity->x += entity->vx;
             entity->y += entity->vy;
@@ -2485,7 +2600,9 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                 entity->active = 0;
                 audio_play_trap_trigger();
             } else {
-                MessageId message = MESSAGE_PLAYER_BAD_MUSHROOM;
+                MessageId message = entity->kind == TRAP_ENTITY_BAD_FLOWER
+                    ? MESSAGE_PLAYER_BAD_FLOWER
+                    : MESSAGE_PLAYER_BAD_MUSHROOM;
                 if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
                     message = MESSAGE_PLAYER_STABBED;
                 } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
@@ -2524,6 +2641,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                 tile = GOOD_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_BAD_ITEM) {
                 tile = BAD_ITEM_TILE_INDEX;
+            } else if (entity->kind == TRAP_ENTITY_BAD_FLOWER) {
+                tile = BAD_FLOWER_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_STAR_ITEM) {
                 tile = STAR_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
@@ -2547,6 +2666,7 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             } else if (entity->kind == TRAP_ENTITY_COIN_POPUP ||
                        entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                        entity->kind == TRAP_ENTITY_BAD_ITEM ||
+                       entity->kind == TRAP_ENTITY_BAD_FLOWER ||
                        entity->kind == TRAP_ENTITY_STAR_ITEM ||
                        entity->kind == TRAP_ENTITY_HURT_ITEM) {
                 palette = ITEM_PALETTE_BANK;
@@ -2600,14 +2720,17 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
             continue;
         }
 
-        if (trap->kind == TRAP_WARP_PAD && trap->state != TRAP_IDLE) {
-            int screen_x = camera_world_to_screen_x(camera, trap->x);
-            int screen_y = camera_world_to_screen_y(camera, trap->y);
+        if (trap->kind == TRAP_JUMP_PAD && !trap->hidden) {
+            uint8_t note_launch = trap->subtype == JUMP_PAD_WARP_LAUNCH;
+            int screen_x = camera_world_to_screen_x(camera, trap->x) + (note_launch ? 0 : 1);
+            int screen_y = camera_world_to_screen_y(camera, trap->y) + (note_launch ? 0 : 1);
+            uint16_t tile_index = note_launch ? NOTE_PAD_TILE_INDEX : JUMP_PAD_TILE_INDEX;
             OBJATTR *obj = &dynamic_trap_oam[dynamic_index];
 
             obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
             obj->attr1 = (uint16_t)((screen_x & 0x01ff) | ATTR1_SIZE_16);
-            obj->attr2 = (uint16_t)(OBJ_CHAR(WARP_PAD_TILE_INDEX) | ATTR2_PALETTE(TRAP_PALETTE_BANK));
+            obj->attr2 = (uint16_t)(OBJ_CHAR(tile_index) |
+                                    ATTR2_PALETTE(TRAP_PALETTE_BANK));
             OAM[DYNAMIC_TRAP_OAM_BASE + dynamic_index] = *obj;
             dynamic_index++;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
@@ -2884,7 +3007,8 @@ LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, in
             continue;
         }
 
-        if (trap->kind == TRAP_EVASIVE_BLOCK) {
+        if (trap->kind == TRAP_EVASIVE_BLOCK ||
+            (trap->kind == TRAP_JUMP_PAD && trap->subtype == 0)) {
             return LEVEL_COLLISION_SOLID;
         }
 
@@ -2930,10 +3054,7 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
             continue;
         }
 
-        if (trap->kind == TRAP_INVISIBLE_BLOCK) {
-            reveal_hidden_block(manager, trap, level);
-            triggered = 1;
-        } else if (trap->kind == TRAP_BUMP_SHOOTER) {
+        if (trap->kind == TRAP_BUMP_SHOOTER) {
             trigger_bump_shooter(manager, trap, level, (Player *)player);
             triggered = 1;
         } else if (trap->kind == TRAP_QUESTION_BLOCK) {
@@ -2943,6 +3064,12 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
             bump_evasive_block(trap, world_x_px, world_y_px);
         } else if (trap->kind == TRAP_HINT_BLOCK) {
             trigger_hint_block(manager, trap, level, (Player *)player);
+            triggered = 1;
+        } else if (trap->kind == TRAP_BREAKABLE_BLOCK &&
+                   trap->state == TRAP_IDLE) {
+            /* Type 301 keeps its hint-block art but breaks like a brick. */
+            traps_break_brick(manager, level, trap->source_x, trap->source_y);
+            trap->state = TRAP_SPENT;
             triggered = 1;
         }
     }

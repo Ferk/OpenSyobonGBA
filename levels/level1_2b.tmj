@@ -1130,24 +1130,24 @@
        "value": true
       },
       {
-       "name": "ref_spawn_x",
-       "type": "int",
-       "value": 7000
+       "name": "spawn_x",
+       "type": "float",
+       "value": 38.620689655172
       },
       {
-       "name": "ref_spawn_y",
-       "type": "int",
-       "value": 26000
+       "name": "spawn_y",
+       "type": "float",
+       "value": 150.068965517241
       },
       {
-       "name": "ref_spawn_vx",
-       "type": "int",
+       "name": "spawn_vx",
+       "type": "float",
        "value": 0
       },
       {
-       "name": "ref_spawn_vy",
-       "type": "int",
-       "value": -1600
+       "name": "spawn_vy",
+       "type": "float",
+       "value": -4.413793103448
       }
      ]
     }

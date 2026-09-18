@@ -15,7 +15,6 @@ struct Camera;
 #define TRAPS_MAX_DYNAMIC_COLLIDERS 16
 
 typedef enum TrapKind {
-    TRAP_INVISIBLE_BLOCK = 0,
     TRAP_FALLING_FLOOR,
     TRAP_BUMP_SHOOTER,
     TRAP_QUESTION_BLOCK,
@@ -32,9 +31,11 @@ typedef enum TrapKind {
     TRAP_FAKE_GOAL,
     TRAP_MOVING_BLOCK,
     TRAP_BREAKING_PLATFORM,
-    TRAP_WARP_PAD,
     TRAP_TRANSITION_ZONE,
     TRAP_COIN,
+    TRAP_JUMP_PAD,
+    TRAP_BREAKABLE_BLOCK,
+    TRAP_KILL_ZONE,
 } TrapKind;
 
 typedef enum TrapState {
@@ -50,6 +51,7 @@ typedef enum TrapEntityKind {
     TRAP_ENTITY_COIN_POPUP,
     TRAP_ENTITY_GOOD_ITEM,
     TRAP_ENTITY_BAD_ITEM,
+    TRAP_ENTITY_BAD_FLOWER,
     TRAP_ENTITY_STAR_ITEM,
     TRAP_ENTITY_BRICK_FRAGMENT,
     TRAP_ENTITY_HURT_ITEM,
@@ -104,6 +106,7 @@ typedef struct Trap {
     const char *hint_text;
     uint8_t spawn_count;
     uint8_t trigger_pending;
+    uint8_t hidden;
 } Trap;
 
 typedef struct TrapEntity {

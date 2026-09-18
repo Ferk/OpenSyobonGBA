@@ -2987,13 +2987,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3030,13 +3030,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3073,13 +3073,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3116,13 +3116,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3159,13 +3159,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3202,13 +3202,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3245,13 +3245,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3288,13 +3288,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3331,13 +3331,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3374,13 +3374,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3417,13 +3417,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3460,13 +3460,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3503,13 +3503,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3546,13 +3546,13 @@
        "name": "subtype",
        "propertytype": "TrapSubtype",
        "type": "string",
-       "value": "invisible_reveal"
+       "value": "none"
       },
       {
        "name": "trap_type",
        "propertytype": "TrapKind",
        "type": "string",
-       "value": "invisible_block"
+       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -4170,24 +4170,24 @@
        "value": 26
       },
       {
-       "name": "ref_spawn_random_vx",
+       "name": "spawn_random_vx",
        "type": "float",
-       "value": 600
+       "value": 1.655172413793
       },
       {
-       "name": "ref_spawn_random_vy",
+       "name": "spawn_random_vy",
        "type": "float",
-       "value": 900
+       "value": 2.48275862069
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": -1600
+       "value": -4.413793103448
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": 30000
+       "value": 172.137931034483
       },
       {
        "name": "spawn_dir",
@@ -4410,19 +4410,19 @@
        "value": ""
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 1500
+       "value": 8.275862068966
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": -2000
+       "value": -5.51724137931
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": 44000
+       "value": 249.379310344828
       },
       {
        "name": "spawn_dir",
@@ -4516,29 +4516,29 @@
        "value": ""
       },
       {
-       "name": "ref_repeat_rearm_offset_x",
+       "name": "repeat_rearm_offset_x",
        "type": "float",
-       "value": -12000
+       "value": -66.206896551724
       },
       {
-       "name": "ref_repeat_rearm_offset_y",
+       "name": "repeat_rearm_offset_y",
        "type": "float",
        "value": 0
       },
       {
-       "name": "ref_spawn_offset_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 4500
+       "value": 24.827586206897
       },
       {
-       "name": "ref_spawn_vy",
+       "name": "spawn_vy",
        "type": "float",
-       "value": -1600
+       "value": -4.413793103448
       },
       {
-       "name": "ref_spawn_y",
+       "name": "spawn_y",
        "type": "float",
-       "value": 24200
+       "value": 140.137931034483
       },
       {
        "name": "spawn_dir",
@@ -4813,9 +4813,9 @@
        "value": "underground"
       },
       {
-       "name": "destination",
-       "propertytype": "StageDestination",
+       "name": "stage_destination",
        "type": "string",
+       "propertytype": "StageDestination",
        "value": "1-2b"
       }
      ],

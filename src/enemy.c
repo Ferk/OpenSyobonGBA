@@ -620,10 +620,30 @@ static void update_defrag(Enemy *enemy, const Level *level, Player *player)
     }
 }
 
-static void update_aramaki(Enemy *enemy, const Level *level)
+static void update_aramaki(Enemy *enemy, const Level *level,
+                           const Player *player)
 {
+    const fix16_t oscillation_step = REF_POS_TO_FIX(10);
+    const fix16_t oscillation_limit = REF_POS_TO_FIX(100);
+    const fix16_t player_pull = REF_POS_TO_FIX(100);
+
     enemy->x += enemy->vx;
+    if (enemy->timer == 0) {
+        enemy->vy += oscillation_step;
+    } else {
+        enemy->vy -= oscillation_step;
+    }
+    if (enemy->vy >= oscillation_limit) {
+        enemy->timer = 1;
+    } else if (enemy->vy <= -oscillation_limit) {
+        enemy->timer = 0;
+    }
+
     enemy->y += enemy->vy;
+    /* Original atype 3/axtype 1 drops an extra step while above the player. */
+    if (enemy->param == 1 && player && enemy->y < player->y) {
+        enemy->y += player_pull;
+    }
 
     if (FIX16_TO_INT(enemy->y) < -96 ||
         FIX16_TO_INT(enemy->y) > level_death_y_px(level) + 64) {
@@ -1069,7 +1089,7 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
         }
 
         if (enemy->kind == ENEMY_ARAMAKI) {
-            update_aramaki(enemy, level);
+            update_aramaki(enemy, level, player);
             if (enemy->state == ENEMY_STATE_ACTIVE) {
                 handle_player_collision(enemy, player);
             }

@@ -64,6 +64,8 @@ static const char *message_text(MessageId id)
         return TXT_MSG_NOT_POISON;
     case MESSAGE_PLAYER_BAD_MUSHROOM:
         return TXT_MSG_BAD_MUSHROOM;
+    case MESSAGE_PLAYER_BAD_FLOWER:
+        return TXT_MSG_BAD_FLOWER;
     case MESSAGE_PLAYER_STABBED:
         return TXT_MSG_STABBED;
     case MESSAGE_ENEMY_SLEEP:

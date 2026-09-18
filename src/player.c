@@ -418,6 +418,7 @@ void player_spawn(Player *player)
     player->coyote_timer = 0;
     player->jump_timer = 0;
     player->control_locked = 0;
+    player->phase_through_terrain = 0;
     player->input_lock_timer = 0;
     player->hidden = 0;
     player->powered_up = 0;
@@ -544,6 +545,7 @@ void player_kill(Player *player)
     player->jump_timer = 0;
     player->on_ground = 0;
     player->control_locked = 0;
+    player->phase_through_terrain = 0;
     player->input_lock_timer = 0;
     player->hidden = 0;
     player->walk_frame = 0;
@@ -764,8 +766,14 @@ void player_update(Player *player, Level *level, struct TrapManager *traps)
 
     traps_prepare_player_collision(traps, player);
 
-    move_x(player, level, traps);
-    move_y(player, level, traps);
+    if (player->phase_through_terrain) {
+        player->x += player->vx;
+        player->y += player->vy;
+        player->on_ground = 0;
+    } else {
+        move_x(player, level, traps);
+        move_y(player, level, traps);
+    }
 
     if (aabb_hits_death(level, traps, FIX16_TO_INT(player->x), FIX16_TO_INT(player->y))) {
         player_kill(player);

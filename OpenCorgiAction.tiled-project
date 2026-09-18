@@ -14,7 +14,6 @@
    "storageType": "string",
    "valuesAsFlags": false,
    "values": [
-    "invisible_block",
     "falling_floor",
     "bump_shooter",
     "question_block",
@@ -31,9 +30,11 @@
     "fake_goal",
     "moving_block",
     "breaking_platform",
-    "warp_pad",
     "transition_zone",
-    "coin"
+    "coin",
+    "jump_pad",
+    "breakable_block",
+    "kill_zone"
    ]
   },
   {
@@ -44,7 +45,6 @@
    "valuesAsFlags": false,
    "values": [
     "none",
-    "invisible_reveal",
     "falling_on_pass_under",
     "falling_when_approached",
     "stage_pipe_shot",
@@ -59,6 +59,7 @@
     "question_good_mushroom",
     "question_bad_mushroom",
     "question_star",
+    "question_bad_flower",
     "question_poison_generator",
     "question_coin_generator",
     "question_hidden_poison",
@@ -68,8 +69,11 @@
     "pipe_fake_kill",
     "pipe_to_underground",
     "hint_stage_1",
+    "platform_conveyor",
     "platform_vertical_wrap",
-    "warp_launch"
+    "platform_bounce",
+    "warp_pad",
+    "fatal_launch"
    ]
   },
   {
@@ -203,7 +207,7 @@
      "name": "trap_type",
      "type": "string",
      "propertyType": "TrapKind",
-     "value": "invisible_block"
+     "value": "question_block"
     },
     {
      "name": "subtype",
@@ -218,7 +222,7 @@
      "value": "auto"
     },
     {
-     "name": "destination",
+     "name": "stage_destination",
      "type": "string",
      "propertyType": "StageDestination",
      "value": "none"
@@ -316,72 +320,12 @@
      "value": 0
     },
     {
-     "name": "ref_spawn_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_offset_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_offset_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_vx",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_vy",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_spacing_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_spawn_spacing_y",
-     "type": "float",
-     "value": 0
-    },
-    {
      "name": "repeat_rearm_offset_x",
      "type": "float",
      "value": 0
     },
     {
      "name": "repeat_rearm_offset_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_repeat_rearm_offset_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_repeat_rearm_offset_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_move_offset_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "ref_move_offset_y",
      "type": "float",
      "value": 0
     },
@@ -441,6 +385,11 @@
      "name": "hidden",
      "type": "bool",
      "value": false
+    },
+    {
+     "name": "vx",
+     "type": "float",
+     "value": 0
     },
     {
      "name": "vy",
