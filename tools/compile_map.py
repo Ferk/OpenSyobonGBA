@@ -139,6 +139,7 @@ ENEMY_KIND_NAMES = {
     "defrag": "ENEMY_DEFRAG",
     "aramaki": "ENEMY_ARAMAKI",
     "laser": "ENEMY_LASER",
+    "super_boon": "ENEMY_SUPER_BOON",
 }
 
 ENEMY_SPRITE_NAMES = {
@@ -165,6 +166,7 @@ ENEMY_SPRITE_NAMES = {
     "defrag": "ENEMY_SPRITE_DEFRAG",
     "defrag_stomped": "ENEMY_SPRITE_DEFRAG_STOMPED",
     "laser": "ENEMY_SPRITE_LASER",
+    "super_boon": "ENEMY_SPRITE_SUPER_BOON",
 }
 
 FLIP_MASK = 0xE0000000

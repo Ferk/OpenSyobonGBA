@@ -29,6 +29,8 @@ typedef enum EnemySprite {
     ENEMY_SPRITE_DEFRAG,
     ENEMY_SPRITE_DEFRAG_STOMPED,
     ENEMY_SPRITE_LASER,
+    ENEMY_SPRITE_SUPER_BOON,
+    ENEMY_SPRITE_NORMAL_BOON,
 } EnemySprite;
 
 struct Camera;
@@ -50,6 +52,8 @@ typedef enum EnemyKind {
     ENEMY_DEFRAG,
     ENEMY_ARAMAKI,
     ENEMY_LASER,
+    ENEMY_SUPER_BOON,
+    ENEMY_NORMAL_BOON,
 } EnemyKind;
 
 typedef enum EnemyState {

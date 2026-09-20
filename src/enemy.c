@@ -41,6 +41,8 @@
 #define ENEMY_LASER_LEFT_TILE (ENEMY_EXTRA_TILE_INDEX + 16)
 #define ENEMY_LASER_MIDDLE_TILE (ENEMY_EXTRA_TILE_INDEX + 20)
 #define ENEMY_LASER_RIGHT_TILE (ENEMY_EXTRA_TILE_INDEX + 24)
+#define ENEMY_SUPER_BOON_TILE (ENEMY_EXTRA_TILE_INDEX + 32)
+#define ENEMY_NORMAL_BOON_TILE (ENEMY_EXTRA_TILE_INDEX + 40)
 #define ENEMY_BASE_SHEET_BYTES (26 * 16 * 16 / 2)
 #define FIRST_ENEMY_EXTRA_SPRITE 96
 /* Staged enemies activate relative to the player, not the camera viewport. */
@@ -59,6 +61,8 @@
 #define WALKER_SPEED REF_VEL_TO_FIX(100)
 #define SHELL_SPEED REF_VEL_TO_FIX(800)
 #define SUPERJIEN_SPEED REF_VEL_TO_FIX(120)
+#define SUPER_BOON_ACCEL REF_ACCEL_TO_FIX(20)
+#define SUPER_BOON_MAX_SPEED REF_VEL_TO_FIX(300)
 #define JIEN_CANNON_SPEED REF_VEL_TO_FIX(400)
 #define KUMA_SPEED REF_VEL_TO_FIX(160)
 #define GIANT_SPEED REF_VEL_TO_FIX(160)
@@ -97,13 +101,15 @@ static uint8_t default_enemy_width(EnemyKind kind)
             kind == ENEMY_SHELL_WALKER ||
             kind == ENEMY_SHELL) ? 17 :
            (kind == ENEMY_SUPERJIEN) ? 18 :
+           (kind == ENEMY_SUPER_BOON || kind == ENEMY_NORMAL_BOON) ? 16 :
            (kind == ENEMY_DEFRAG) ? 16 :
            (kind == ENEMY_LASER) ? 64 : 16;
 }
 
 static uint8_t default_enemy_height(EnemyKind kind)
 {
-    return (kind == ENEMY_KUMA) ? 32 :
+    return (kind == ENEMY_KUMA || kind == ENEMY_SUPER_BOON ||
+            kind == ENEMY_NORMAL_BOON) ? 32 :
            (kind == ENEMY_DEFRAG) ? 32 :
            (kind == ENEMY_LASER) ? 8 : 16;
 }
@@ -425,6 +431,27 @@ static void update_superjien(Enemy *enemy, const Level *level,
 
     enemy->vx = (enemy->dir > 0) ? SUPERJIEN_SPEED : -SUPERJIEN_SPEED;
     move_enemy_x(enemy, level);
+}
+
+static void update_super_boon(Enemy *enemy)
+{
+    if (enemy->param == 0) {
+        enemy->vy += SUPER_BOON_ACCEL;
+    } else {
+        enemy->vy -= SUPER_BOON_ACCEL;
+    }
+
+    if (enemy->vy > SUPER_BOON_MAX_SPEED) {
+        enemy->vy = SUPER_BOON_MAX_SPEED;
+    } else if (enemy->vy < -SUPER_BOON_MAX_SPEED) {
+        enemy->vy = -SUPER_BOON_MAX_SPEED;
+    }
+
+    enemy->y += enemy->vy;
+    if (++enemy->timer >= 60) {
+        enemy->timer = 0;
+        enemy->param ^= 1;
+    }
 }
 
 static void update_jien_cannon(Enemy *enemy, const Level *level)
@@ -854,10 +881,31 @@ static void handle_player_collision(Enemy *enemy, Player *player)
     }
 
     if (player->vy > 0 && player_y + PLAYER_HEIGHT_PX <= enemy_y + 8 &&
+        enemy->kind == ENEMY_SUPER_BOON) {
+        enemy->kind = ENEMY_NORMAL_BOON;
+        enemy->sprite = ENEMY_SPRITE_NORMAL_BOON;
+        enemy->vy = 0;
+        enemy->timer = 0;
+        player->y = FIX16_FROM_INT(enemy_y - PLAYER_HEIGHT_PX - 1);
+        player->vy = PLAYER_STOMP_BOUNCE;
+        player->on_ground = 0;
+        return;
+    }
+
+    if (player->vy > 0 && player_y + PLAYER_HEIGHT_PX <= enemy_y + 8 &&
+        enemy->kind == ENEMY_NORMAL_BOON) {
+        player->y = FIX16_FROM_INT(enemy_y - PLAYER_HEIGHT_PX - 1);
+        player->vy = PLAYER_STOMP_BOUNCE;
+        player->on_ground = 0;
+        return;
+    }
+
+    if (player->vy > 0 && player_y + PLAYER_HEIGHT_PX <= enemy_y + 8 &&
         enemy->kind != ENEMY_CEILING_FALLER &&
         enemy->kind != ENEMY_STATIC_HAZARD &&
         enemy->kind != ENEMY_PIPE_SHOT &&
         enemy->kind != ENEMY_SUPERJIEN &&
+        enemy->kind != ENEMY_SUPER_BOON &&
         enemy->kind != ENEMY_GIANT &&
         enemy->kind != ENEMY_LASER) {
         if (enemy->kind == ENEMY_SHELL_WALKER) {
@@ -1147,6 +1195,8 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
             update_walker(enemy, level);
         } else if (enemy->kind == ENEMY_SUPERJIEN) {
             update_superjien(enemy, level, player);
+        } else if (enemy->kind == ENEMY_SUPER_BOON) {
+            update_super_boon(enemy);
         } else if (enemy->kind == ENEMY_JIEN_CANNON) {
             update_jien_cannon(enemy, level);
         } else if (enemy->kind == ENEMY_KUMA) {
@@ -1173,10 +1223,12 @@ void enemies_update(EnemyManager *manager, Level *level, Player *player,
         }
 
         if (enemy->kind != ENEMY_CEILING_FALLER &&
-            enemy->kind != ENEMY_JIEN_CANNON) {
+            enemy->kind != ENEMY_JIEN_CANNON &&
+            enemy->kind != ENEMY_SUPER_BOON) {
             apply_gravity(enemy);
         }
-        if (!moved_before_gravity && enemy->kind != ENEMY_JIEN_CANNON) {
+        if (!moved_before_gravity && enemy->kind != ENEMY_JIEN_CANNON &&
+            enemy->kind != ENEMY_SUPER_BOON) {
             move_enemy_y(enemy, level);
         }
 
@@ -1364,10 +1416,18 @@ void enemies_draw(EnemyManager *manager, const struct Camera *camera)
             }
 
             if (enemy->sprite == ENEMY_SPRITE_KUMA ||
-                enemy->sprite == ENEMY_SPRITE_CUCKOO32) {
+                enemy->sprite == ENEMY_SPRITE_CUCKOO32 ||
+                enemy->sprite == ENEMY_SPRITE_SUPER_BOON ||
+                enemy->sprite == ENEMY_SPRITE_NORMAL_BOON) {
                 uint16_t base_tile = (enemy->sprite == ENEMY_SPRITE_KUMA)
                     ? ENEMY_KUMA_TILE
                     : ENEMY_CUCKOO32_TILE;
+
+                if (enemy->sprite == ENEMY_SPRITE_SUPER_BOON) {
+                    base_tile = ENEMY_SUPER_BOON_TILE;
+                } else if (enemy->sprite == ENEMY_SPRITE_NORMAL_BOON) {
+                    base_tile = ENEMY_NORMAL_BOON_TILE;
+                }
 
                 if (extra_index + 1 > ENEMY_MAX_ACTIVE) {
                     obj->attr0 = ATTR0_DISABLED;

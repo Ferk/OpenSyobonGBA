@@ -150,7 +150,8 @@
     "giant",
     "defrag",
     "aramaki",
-    "laser"
+    "laser",
+    "super_boon"
    ]
   },
   {
@@ -177,7 +178,8 @@
     "giant",
     "defrag",
     "defrag_stomped",
-    "laser"
+    "laser",
+    "super_boon"
    ]
   },
   {

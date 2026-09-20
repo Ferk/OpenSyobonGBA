@@ -2981,6 +2981,37 @@
     },
     {
      "height": 32,
+     "id": 106,
+     "name": "ref 1-3 stagedate58 super boon 122,5",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "super_boon"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "super_boon"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 16,
+     "x": 1952,
+     "y": 80
+    },
+    {
+     "height": 32,
      "id": 43,
      "name": "enemy cloud hazard",
      "opacity": 1,
