@@ -34,7 +34,8 @@
     "coin",
     "jump_pad",
     "breakable_block",
-    "kill_zone"
+    "kill_zone",
+    "p_switch_block"
    ]
   },
   {

@@ -27,6 +27,7 @@ TRAP_KIND_NAMES = {
     "jump_pad": "TRAP_JUMP_PAD",
     "breakable_block": "TRAP_BREAKABLE_BLOCK",
     "kill_zone": "TRAP_KILL_ZONE",
+    "p_switch_block": "TRAP_P_SWITCH_BLOCK",
 }
 
 TRAP_SUBTYPE_NAMES = {

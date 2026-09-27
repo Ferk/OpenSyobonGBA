@@ -35,6 +35,7 @@
 #define STAR_ITEM_TILE_INDEX (ITEM_TILE_INDEX + 12)
 #define QUESTION_BALL_TILE_INDEX (ITEM_TILE_INDEX + 16)
 #define BAD_FLOWER_ITEM_TILE_INDEX 240
+#define P_SWITCH_TILE_INDEX 232
 #define BRICK_FRAGMENT_TILE_INDEX 120
 #define SPIKE_BLOCK_TOP_TILE_INDEX 124
 #define SPIKE_BLOCK_LEFT_TILE_INDEX 128
@@ -731,6 +732,8 @@ static void load_trap_tiles(void)
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
     memcpy(&SPRITE_GFX[BAD_FLOWER_ITEM_TILE_INDEX * 16],
            &items_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
+    /* Original ttype 400: grap[2][5], imported as metatile 36. */
+    copy_metatile_to_obj_tiles(P_SWITCH_TILE_INDEX, 36);
     memcpy(&SPRITE_GFX[JUMP_PAD_TILE_INDEX * 16],
            &traps_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
     memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
@@ -1311,6 +1314,46 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
     }
 
     emit_trap_channel(manager, level, (Player *)player, trap->trigger_channel);
+}
+
+static void convert_block_traps_to_coins(TrapManager *manager, Level *level)
+{
+    for (uint8_t i = 0; i < manager->trap_count; ++i) {
+        Trap *trap = &manager->traps[i];
+
+        /* The original P-switch changes visible tyobi block objects, not terrain. */
+        if (trap->hidden ||
+            (trap->kind != TRAP_QUESTION_BLOCK &&
+             trap->kind != TRAP_HINT_BLOCK &&
+             trap->kind != TRAP_BREAKABLE_BLOCK)) {
+            continue;
+        }
+
+        trap->kind = TRAP_COIN;
+        trap->state = TRAP_IDLE;
+        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y,
+                               METATILE_EMPTY);
+        set_cell_collision(manager, trap->source_x, trap->source_y,
+                           LEVEL_COLLISION_EMPTY, 0);
+    }
+}
+
+static void trigger_p_switch_block(TrapManager *manager, Trap *trap, Level *level)
+{
+    TrapEntity *p_switch;
+
+    if (trap->state != TRAP_IDLE) {
+        return;
+    }
+
+    audio_play_block_hit();
+    spend_question_block(manager, trap, level);
+    p_switch = spawn_entity(manager, TRAP_ENTITY_P_SWITCH,
+                            trap->x, trap->y - FIX16_FROM_INT(LEVEL_METATILE_SIZE),
+                            0, 0, LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE);
+    if (p_switch) {
+        p_switch->palette = EVASIVE_BLOCK_PALETTE_BANK;
+    }
 }
 
 static fix16_t random_fixed_positive(fix16_t range)
@@ -2585,6 +2628,10 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                                                 entity_y, player_y)) {
                     player_kill(player);
                 }
+            } else if (entity->kind == TRAP_ENTITY_P_SWITCH) {
+                entity->active = 0;
+                convert_block_traps_to_coins(manager, level);
+                audio_play_trap_trigger();
             } else if (entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                 entity->kind == TRAP_ENTITY_COIN_POPUP) {
                 if (entity->kind == TRAP_ENTITY_GOOD_ITEM) {
@@ -2647,6 +2694,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                 tile = STAR_ITEM_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_HURT_ITEM) {
                 tile = HURT_ITEM_TILE_INDEX;
+            } else if (entity->kind == TRAP_ENTITY_P_SWITCH) {
+                tile = P_SWITCH_TILE_INDEX;
             } else if (entity->kind == TRAP_ENTITY_BRICK_FRAGMENT) {
                 tile = entity->param == FRAGMENT_ART_PLATFORM
                            ? entity->frame
@@ -2670,6 +2719,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                        entity->kind == TRAP_ENTITY_STAR_ITEM ||
                        entity->kind == TRAP_ENTITY_HURT_ITEM) {
                 palette = ITEM_PALETTE_BANK;
+            } else if (entity->kind == TRAP_ENTITY_P_SWITCH) {
+                palette = EVASIVE_BLOCK_PALETTE_BANK;
             }
 
             obj->attr0 = (uint16_t)((screen_y & 0x00ff) | ATTR0_COLOR_16 | ATTR0_SQUARE);
@@ -3059,6 +3110,9 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
             triggered = 1;
         } else if (trap->kind == TRAP_QUESTION_BLOCK) {
             trigger_question_block(manager, trap, level, player);
+            triggered = 1;
+        } else if (trap->kind == TRAP_P_SWITCH_BLOCK) {
+            trigger_p_switch_block(manager, trap, level);
             triggered = 1;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
             bump_evasive_block(trap, world_x_px, world_y_px);

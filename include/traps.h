@@ -36,6 +36,7 @@ typedef enum TrapKind {
     TRAP_JUMP_PAD,
     TRAP_BREAKABLE_BLOCK,
     TRAP_KILL_ZONE,
+    TRAP_P_SWITCH_BLOCK,
 } TrapKind;
 
 typedef enum TrapState {
@@ -55,6 +56,7 @@ typedef enum TrapEntityKind {
     TRAP_ENTITY_STAR_ITEM,
     TRAP_ENTITY_BRICK_FRAGMENT,
     TRAP_ENTITY_HURT_ITEM,
+    TRAP_ENTITY_P_SWITCH,
 } TrapEntityKind;
 
 typedef struct Trap {

@@ -1,0 +1,738 @@
+{
+ "compressionlevel": -1,
+ "height": 14,
+ "infinite": false,
+ "layers": [
+  {
+   "data": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    8,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    32,
+    32,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    34,
+    35,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    85,
+    34,
+    35
+   ],
+   "height": 14,
+   "id": 1,
+   "name": "Background",
+   "opacity": 1,
+   "properties": [
+    {
+     "name": "palette",
+     "propertytype": "BgPalette",
+     "type": "string",
+     "value": "normal"
+    }
+   ],
+   "type": "tilelayer",
+   "visible": true,
+   "width": 16,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 2,
+   "name": "Objects",
+   "objects": [
+    {
+     "height": 16,
+     "id": 1,
+     "name": "Player Start",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "checkpoint",
+       "type": "bool",
+       "value": false
+      }
+     ],
+     "rotation": 0,
+     "type": "Player Start",
+     "visible": true,
+     "width": 16,
+     "x": 17,
+     "y": 182
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 3,
+   "name": "Enemies",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 4,
+   "name": "Traps",
+   "objects": [
+    {
+     "height": 16,
+     "id": 4,
+     "name": "ref 1-3S source9 coin 2,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 32,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 5,
+     "name": "ref 1-3S source9 coin 4,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 64,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 6,
+     "name": "ref 1-3S source9 coin 6,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 96,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 7,
+     "name": "ref 1-3S source9 coin 8,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 128,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 8,
+     "name": "ref 1-3S source9 coin 10,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 160,
+     "y": 128
+    },
+    {
+     "height": 16,
+     "id": 9,
+     "name": "ref 1-3S source9 coin 3,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 48,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 10,
+     "name": "ref 1-3S source9 coin 5,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 80,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 11,
+     "name": "ref 1-3S source9 coin 7,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 112,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 12,
+     "name": "ref 1-3S source9 coin 9,9",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 144,
+     "y": 144
+    },
+    {
+     "height": 16,
+     "id": 13,
+     "name": "ref 1-3S source9 coin 2,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 32,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 14,
+     "name": "ref 1-3S source9 coin 4,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 64,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 15,
+     "name": "ref 1-3S source9 coin 6,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 96,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 16,
+     "name": "ref 1-3S source9 coin 8,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 128,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 17,
+     "name": "ref 1-3S source9 coin 10,10",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "coin"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 160,
+     "y": 160
+    },
+    {
+     "height": 16,
+     "id": 18,
+     "name": "ref 1-3S tyobi type112 12,4",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "spent_metatile",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "question_coin_generator"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "question_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 2
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 192,
+     "y": 64
+    },
+    {
+     "height": 16,
+     "id": 19,
+     "name": "ref 1-3S tyobi type300 12,8",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "hint_text",
+       "type": "string",
+       "value": "THE SKY IS NOT SAFE.\nKEEP MOVING."
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "hint_stage_1"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "hint_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 7
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 192,
+     "y": 128
+    },
+    {
+     "height": 32,
+     "id": 21,
+     "name": "ref 1-3S return pipe stype50 sx1 14,11",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "entry_id",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "pipe_to_underground"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "enter_pipe"
+      },
+      {
+       "name": "stage_destination",
+       "type": "string",
+       "propertytype": "StageDestination",
+       "value": "1-3"
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 32,
+     "x": 224,
+     "y": 176
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "nextlayerid": 5,
+ "nextobjectid": 22,
+ "orientation": "orthogonal",
+ "properties": [
+  {
+   "name": "camera_margin_bottom",
+   "type": "int",
+   "value": 0
+  },
+  {
+   "name": "camera_margin_top",
+   "type": "int",
+   "value": 0
+  }
+ ],
+ "renderorder": "right-down",
+ "tiledversion": "1.12.2",
+ "tileheight": 16,
+ "tilesets": [
+  {
+   "columns": 1,
+   "firstgid": 1,
+   "image": "../gfx/tiles_16.png",
+   "imageheight": 1360,
+   "imagewidth": 16,
+   "margin": 0,
+   "name": "tiles_16",
+   "spacing": 0,
+   "tilecount": 85,
+   "tileheight": 16,
+   "tilewidth": 16
+  }
+ ],
+ "tilewidth": 16,
+ "type": "map",
+ "version": "1.11",
+ "width": 16
+}

@@ -3011,6 +3011,134 @@
      "y": 80
     },
     {
+     "height": 16,
+     "id": 107,
+     "name": "ref 1-3 stagedate54 superjien 26,2",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "propertytype": "EnemyDirection",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "superjien"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "superjien"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 18,
+     "x": 416,
+     "y": 32
+    },
+    {
+     "height": 16,
+     "id": 108,
+     "name": "ref 1-3 stagedate50 walker 68,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "propertytype": "EnemyDirection",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 17,
+     "x": 1088,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 109,
+     "name": "ref 1-3 stagedate50 walker 70,12",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "propertytype": "EnemyDirection",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 17,
+     "x": 1120,
+     "y": 192
+    },
+    {
+     "height": 16,
+     "id": 110,
+     "name": "ref 1-3 stagedate51 shell walker 128,2",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "dir",
+       "propertytype": "EnemyDirection",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "enemy_kind",
+       "propertytype": "EnemyKind",
+       "type": "string",
+       "value": "shell_walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "propertytype": "EnemySprite",
+       "type": "string",
+       "value": "shell_walker"
+      }
+     ],
+     "rotation": 0,
+     "type": "Enemy",
+     "visible": true,
+     "width": 17,
+     "x": 2048,
+     "y": 32
+    },
+    {
      "height": 32,
      "id": 43,
      "name": "enemy cloud hazard",
@@ -3053,6 +3181,48 @@
    "id": 4,
    "name": "Traps",
    "objects": [
+    {
+     "height": 16,
+     "id": 111,
+     "name": "ref 1-3 btype82 hidden spike block 43,11",
+     "opacity": 1,
+     "properties": [
+      {
+       "name": "collision",
+       "propertytype": "LevelCollision",
+       "type": "int",
+       "value": 255
+      },
+      {
+       "name": "hidden",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "subtype",
+       "propertytype": "TrapSubtype",
+       "type": "string",
+       "value": "none"
+      },
+      {
+       "name": "trap_type",
+       "propertytype": "TrapKind",
+       "type": "string",
+       "value": "spike_block"
+      },
+      {
+       "name": "visual_metatile",
+       "type": "int",
+       "value": 255
+      }
+     ],
+     "rotation": 0,
+     "type": "Trap",
+     "visible": true,
+     "width": 16,
+     "x": 688,
+     "y": 176
+    },
     {
      "height": 16,
      "id": 10,
@@ -3126,7 +3296,7 @@
       {
        "name": "trap_type",
        "type": "string",
-       "value": "question_block"
+       "value": "p_switch_block"
       },
       {
        "name": "visual_metatile",
