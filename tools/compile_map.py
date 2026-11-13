@@ -2,6 +2,8 @@
 import argparse
 import json
 import re
+import struct
+import tempfile
 from pathlib import Path
 
 
@@ -69,7 +71,7 @@ TRAP_SUBTYPE_NAMES = {
 }
 
 STAGE_DESTINATION_NAMES = {
-    "none": 0,
+    "none": 255,
     "1-1": 0,
     "1-2": 1,
     "1-2u": 2,
@@ -170,11 +172,39 @@ ENEMY_SPRITE_NAMES = {
     "super_boon": "ENEMY_SPRITE_SUPER_BOON",
 }
 
-FLIP_MASK = 0xE0000000
+FLIP_MASK = 0xF0000000
 GBA_METATILE_SIZE = 16
 SOURCE_ROW_OFFSET = 5
 WORLD_Y_OFFSET_PX = SOURCE_ROW_OFFSET * GBA_METATILE_SIZE
 FIX_SCALE = 1 << 16
+MAX_MAP_WIDTH = 160
+MAX_MAP_HEIGHT = 17
+MAX_TRAPS = 48
+MAX_ENEMY_SPAWNS = 64
+MAX_DYNAMIC_COLLIDERS = 16
+STAGE_MAPS = ("level1.tmj", "level1_2.tmj", "level1_2u.tmj",
+              "level1_2b.tmj", "level1_3.tmj", "level1_3u.tmj", "level1_3s.tmj")
+
+TRAP_SUBTYPES = {
+    "TRAP_FALLING_FLOOR": {0, 51, 52},
+    "TRAP_QUESTION_BLOCK": {0, 101, 102, 103, 104, 105, 110, 112, 114},
+    "TRAP_EVASIVE_BLOCK": {0, 1},
+    "TRAP_STAGE_SPAWNER": {0, 100, 101, 102, 180, 181, 182, 187, 188},
+    "TRAP_ENTER_PIPE": {0, 1}, "TRAP_SIDE_PIPE": {0, 1},
+    "TRAP_HINT_BLOCK": {0, 1}, "TRAP_MOVING_PLATFORM": {0, 2, 5, 12},
+    "TRAP_JUMP_PAD": {0, 1, 2},
+}
+TRAP_SUBTYPE_NAMES_BY_KIND = {
+    "TRAP_FALLING_FLOOR": {"falling_on_pass_under", "falling_when_below", "falling_brick_group", "falling_when_approached"},
+    "TRAP_QUESTION_BLOCK": {"question_enemy", "question_good_mushroom", "question_bad_mushroom", "question_star", "question_bad_flower", "question_poison_generator", "question_coin_generator", "question_hidden_poison"},
+    "TRAP_EVASIVE_BLOCK": {"evasive_vertical", "evasive_horizontal"},
+    "TRAP_STAGE_SPAWNER": {"stage_pipe_shot", "stage_flying_enemy", "stage_walker_swarm", "stage_ghost_swarm", "stage_upward_hazard", "stage_upward_hazard_toggle", "stage_upward_hazard_left", "stage_hint_message", "stage_pipe_hazard"},
+    "TRAP_ENTER_PIPE": {"pipe_fake_kill", "pipe_to_underground"},
+    "TRAP_SIDE_PIPE": {"pipe_fake_kill", "pipe_to_underground"},
+    "TRAP_HINT_BLOCK": {"hint_stage_1"},
+    "TRAP_MOVING_PLATFORM": {"platform_conveyor", "platform_vertical_wrap", "platform_bounce"},
+    "TRAP_JUMP_PAD": {"warp_pad", "fatal_launch"},
+}
 
 
 class MapValidationError(ValueError):
@@ -221,8 +251,11 @@ def map_error(message, field=None):
 
 def fixed(value, field=None):
     try:
-        return int(round(float(value) * FIX_SCALE))
-    except (TypeError, ValueError) as exc:
+        result = int(round(float(value) * FIX_SCALE))
+        if not -(1 << 31) <= result < (1 << 31):
+            raise ValueError("outside 16.16 fixed-point range")
+        return result
+    except (TypeError, ValueError, OverflowError) as exc:
         raise map_error(
             f"expected a number of pixels, got {value!r}", field) from exc
 
@@ -233,9 +266,30 @@ def integer(value, field, default=None):
     if isinstance(value, (dict, list)):
         raise map_error(f"expected an integer, got {value!r}", field)
     try:
-        return int(value)
+        result = int(value)
+        if isinstance(value, float) and value != result:
+            raise ValueError("fractional integer")
+        return result
     except (TypeError, ValueError) as exc:
         raise map_error(f"expected an integer, got {value!r}", field) from exc
+
+
+def bounded(value, field, low, high):
+    value = integer(value, field)
+    if not low <= value <= high:
+        raise map_error(f"must be between {low} and {high}, got {value}", field)
+    return value
+
+
+def palette_value(value, field):
+    return bounded(enum_int(value, BG_PALETTE_NAMES, 0, field), field, 0, 3)
+
+
+def enemy_palette_value(value, field):
+    value = bounded(value, field, 0, 15)
+    if value not in (0, 4):
+        raise map_error(f"enemy palette bank {value} is not loaded; use 0 or 4", field)
+    return value
 
 
 def c_ident(name):
@@ -384,7 +438,9 @@ def trap_kind(value):
     text = str(value)
     if text in TRAP_KIND_NAMES.values():
         return text
-    return TRAP_KIND_NAMES.get(text.lower())
+    if text.lower() not in TRAP_KIND_NAMES:
+        raise map_error(f"unknown value {text!r}; expected one of {', '.join(sorted(TRAP_KIND_NAMES))}", "trap_type")
+    return TRAP_KIND_NAMES[text.lower()]
 
 
 def enum_name(value, names, default, field=None):
@@ -434,10 +490,6 @@ def enum_int(value, names, default, field=None):
     if key in names:
         return names[key]
 
-    match = re.match(r"^(-?\d+)", text)
-    if match:
-        return int(match.group(1), 0)
-
     raise map_error(f"unknown value {text!r}; expected one of {', '.join(sorted(names))}", field)
 
 
@@ -445,10 +497,55 @@ def object_name(obj):
     return obj.get("class") or obj.get("type") or obj.get("name") or ""
 
 
-def parse_object_layers(map_data, tile_props):
+def validate_map_format(map_data, width, height):
+    if map_data.get("orientation") != "orthogonal":
+        raise map_error("only orthogonal maps are supported", "orientation")
+    if (map_data.get("tilewidth"), map_data.get("tileheight")) != (16, 16):
+        raise map_error("map tiles must be 16 x 16 pixels")
+    if map_data.get("infinite", False):
+        raise map_error("infinite maps are not supported", "infinite")
+    tilesets = map_data.get("tilesets", [])
+    if len(tilesets) != 1 or tilesets[0].get("firstgid", 1) != 1:
+        raise map_error("exactly one embedded tileset with firstgid 1 is supported", "tilesets")
+    for layer in map_data.get("layers", []):
+        set_validation_context(layer=layer.get("name"), obj=None)
+        kind = layer.get("type")
+        if kind not in ("tilelayer", "objectgroup"):
+            raise map_error(f"layer type {kind!r} is not supported; ungroup layers before export")
+        if any(layer.get(key, 0) != 0 for key in ("x", "y", "offsetx", "offsety")):
+            raise map_error("layer position and offsets must be zero; move its contents instead")
+        if layer.get("opacity", 1) != 1 or any(layer.get(key, 1) != 1 for key in ("parallaxx", "parallaxy")):
+            raise map_error("layer opacity and parallax are not supported")
+        if kind == "tilelayer":
+            if "chunks" in layer or layer.get("encoding") or layer.get("compression"):
+                raise map_error("chunked, encoded, or compressed tile layers are not supported")
+            if (layer.get("width", width), layer.get("height", height)) != (width, height):
+                raise map_error(f"tile layer dimensions must match the map ({width} x {height})")
+            data = layer.get("data")
+            if not isinstance(data, list) or len(data) != width * height:
+                raise map_error(f"tile layer data must contain exactly {width * height} cells")
+            for index, gid in enumerate(data):
+                if not isinstance(gid, int) or isinstance(gid, bool) or not 0 <= gid <= 0xffffffff:
+                    raise map_error(f"tile ({index % width}, {index // width}) has an invalid GID")
+                if gid & FLIP_MASK:
+                    raise map_error(f"tile ({index % width}, {index // width}) uses unsupported flip/rotation flags")
+        else:
+            for obj in layer.get("objects", []):
+                set_validation_context(layer=layer.get("name"), obj=obj)
+                if obj.get("rotation", 0) != 0:
+                    raise map_error("object rotation is not supported", "rotation")
+                if any(obj.get(shape) for shape in ("ellipse", "point", "polygon", "polyline", "text")):
+                    raise map_error("only rectangular objects are supported")
+                if int(obj.get("gid", 0)) & FLIP_MASK:
+                    raise map_error("tile object flip/rotation flags are not supported", "gid")
+    set_validation_context(layer=None, obj=None)
+
+
+def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
     objects = []
     enemy_spawns = []
     traps = []
+    dynamic_colliders = 0
 
     for layer in map_data.get("layers", []):
         if layer.get("type") != "objectgroup":
@@ -474,18 +571,24 @@ def parse_object_layers(map_data, tile_props):
             y = fixed(world_y)
             w = fixed(obj.get("width", GBA_METATILE_SIZE))
             h = fixed(obj.get("height", GBA_METATILE_SIZE))
-            subtype = enum_int(prop_value(props, "subtype",
-                                          tile_prop.get("subtype")),
+            subtype_value = prop_value(props, "subtype", tile_prop.get("subtype"))
+            subtype = enum_int(subtype_value,
                                TRAP_SUBTYPE_NAMES, 0, "subtype")
+            if trap:
+                if subtype not in TRAP_SUBTYPES.get(trap, {0}):
+                    raise map_error(f"subtype {subtype_value!r} is not valid for {trap}", "subtype")
+                if isinstance(subtype_value, str) and subtype_value.lower() in TRAP_SUBTYPE_NAMES:
+                    if subtype_value.lower() not in {"none", "default"} | TRAP_SUBTYPE_NAMES_BY_KIND.get(trap, set()):
+                        raise map_error(f"subtype {subtype_value!r} is not valid for {trap}", "subtype")
             spawn_dir = enum_int(prop_value(props, "spawn_dir",
                                             tile_prop.get("spawn_dir")),
                                  TRAP_SPAWN_DIRECTION_NAMES, 0, "spawn_dir")
+            bounded(spawn_dir, "spawn_dir", -1, 1)
             destination_value = prop_value(props, "stage_destination",
                                            tile_prop.get("stage_destination"))
-            destination = enum_int(destination_value, STAGE_DESTINATION_NAMES, 0,
+            destination = enum_int(destination_value, STAGE_DESTINATION_NAMES, 255,
                                    "stage_destination")
-            entry_id = max(0, min(255, integer(prop_value(
-                props, "entry_id", tile_prop.get("entry_id", 0)), "entry_id")))
+            entry_id = bounded(prop_value(props, "entry_id", tile_prop.get("entry_id", 0)), "entry_id", 0, 255)
             spawn_interval = integer(prop_value(
                 props, "spawn_interval",
                 tile_prop.get("spawn_interval",
@@ -517,9 +620,9 @@ def parse_object_layers(map_data, tile_props):
                                    tile_prop.get("hint_text"))
             source_x = int(round(tiled_x / GBA_METATILE_SIZE))
             source_y = int(round(tiled_y / GBA_METATILE_SIZE))
-            trigger_x = fixed(prop_value(props, "trigger_x", tiled_x))
-            trigger_y = fixed(float(prop_value(props, "trigger_y", tiled_y)) -
-                              WORLD_Y_OFFSET_PX)
+            for field in ("trigger_x", "trigger_y"):
+                if prop_value(props, field, tile_prop.get(field)) is not None:
+                    raise map_error("move the object rectangle to set the trigger position", field)
             vx = fixed(prop_value(props, "vx", tile_prop.get("vx", 0)) or 0)
             vy = fixed(prop_value(props, "vy", tile_prop.get("vy", 0)) or 0)
             gravity = fixed(prop_value(props, "gravity", tile_prop.get("gravity", 0)) or 0)
@@ -577,6 +680,8 @@ def parse_object_layers(map_data, tile_props):
                 spawn_offset_y = fixed(float(spawn_y_prop) - WORLD_Y_OFFSET_PX) - y
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
+                if len(enemy_spawns) >= MAX_ENEMY_SPAWNS:
+                    raise map_error(f"exceeds the limit of {MAX_ENEMY_SPAWNS} enemy spawns")
                 enemy_kind = enum_name(prop_value(props, "enemy_kind",
                                        tile_prop.get("enemy_kind")),
                                        ENEMY_KIND_NAMES, "ENEMY_WALKER", "enemy_kind")
@@ -592,15 +697,15 @@ def parse_object_layers(map_data, tile_props):
                 enemy_spawns.append({
                     "kind": enemy_kind,
                     "sprite": enemy_sprite,
-                    "dir": int(prop_value(props, "dir", tile_prop.get("dir", -1))),
-                    "w": max(1, min(255, int(round(float(obj.get("width", 16)))))),
-                    "h": max(1, min(255, int(round(float(obj.get("height", 16)))))),
-                    "palette": max(0, min(15, int(prop_value(
+                    "dir": bounded(prop_value(props, "dir", tile_prop.get("dir", -1)), "dir", -1, 1),
+                    "w": bounded(round(float(obj.get("width", 16))), "width", 1, 255),
+                    "h": bounded(round(float(obj.get("height", 16))), "height", 1, 255),
+                    "palette": enemy_palette_value(prop_value(
                         props, "enemy_palette",
-                        tile_prop.get("enemy_palette", 0))))),
-                    "param": max(0, min(255, int(prop_value(
+                        tile_prop.get("enemy_palette", 0)), "enemy_palette"),
+                    "param": bounded(prop_value(
                         props, "enemy_param",
-                        tile_prop.get("enemy_param", 0))))),
+                        tile_prop.get("enemy_param", 0)), "enemy_param", 0, 255),
                     "throw_vx": throw_velocity_fixed(prop_value(
                         props, "throw_vx", tile_prop.get("throw_vx", 700))),
                     "x": x,
@@ -609,39 +714,71 @@ def parse_object_layers(map_data, tile_props):
                 continue
 
             if trap or layer_name.lower().startswith("trap"):
+                if trap is None:
+                    raise map_error("trap objects require a trap_type", "trap_type")
+                if len(traps) >= MAX_TRAPS:
+                    raise map_error(f"exceeds the limit of {MAX_TRAPS} traps")
+                if (trap in {"TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE", "TRAP_EVASIVE_BLOCK", "TRAP_MOVING_PLATFORM", "TRAP_BREAKING_PLATFORM", "TRAP_MOVING_BLOCK"} or
+                    (trap == "TRAP_JUMP_PAD" and subtype == 0)):
+                    dynamic_colliders += 1
+                    if dynamic_colliders > MAX_DYNAMIC_COLLIDERS:
+                        raise map_error(f"exceeds the limit of {MAX_DYNAMIC_COLLIDERS} dynamic colliders")
                 needs_destination = (
                     trap == "TRAP_TRANSITION_ZONE" or
                     (trap in ("TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE") and subtype == 1)
                 )
-                if needs_destination and (destination_value is None or
-                                          isinstance(destination_value, dict)):
+                if needs_destination and destination == 255:
                     raise map_error(
                         "must be a StageDestination value (for example '1-3u'), not an "
                         "empty value or an object/class reference",
                         "stage_destination")
+                if destination != 255:
+                    bounded(destination, "stage_destination", 0, len(STAGE_MAPS) - 1)
+                if needs_destination and map_path is not None:
+                    destination_path = map_path.parent / STAGE_MAPS[destination]
+                    try:
+                        target_map = json.loads(destination_path.read_text())
+                    except (OSError, ValueError) as exc:
+                        raise map_error(f"cannot read destination {destination_path}: {exc}", "stage_destination") from exc
+                    exits = [o for layer in target_map.get("layers", [])
+                             for o in layer.get("objects", [])
+                             if object_name(o) in ("Pipe Exit", "PipeExit", "pipe_exit")]
+                    if entry_id and not any(integer(prop_value(o.get("properties", []), "entry_id", 0), "entry_id") == entry_id for o in exits):
+                        raise map_error(f"destination {destination_path.name} has no Pipe Exit with entry_id {entry_id}", "entry_id")
+                    has_default_exit = any(integer(prop_value(o.get("properties", []), "entry_id", 0), "entry_id") == 0 for o in exits)
+                    if not entry_id and not has_default_exit and not any(object_name(o) in ("Player Start", "PlayerStart", "player_start") for layer in target_map.get("layers", []) for o in layer.get("objects", [])):
+                        raise map_error(f"destination {destination_path.name} has no default entry", "stage_destination")
+                visual_metatile = integer(prop_value(props, "visual_metatile", tile_prop.get("visual_metatile", 255)), "visual_metatile")
+                spent_metatile = integer(prop_value(props, "spent_metatile", tile_prop.get("spent_metatile", 255)), "spent_metatile")
+                for field, value in (("visual_metatile", visual_metatile), ("spent_metatile", spent_metatile)):
+                    if value != 255:
+                        bounded(value, field, 0, metatile_count - 1)
+                collision = integer(prop_value(props, "collision", tile_prop.get("collision", 255)), "collision")
+                if collision not in (0, 1, 2, 3, 255):
+                    raise map_error(f"invalid collision {collision}", "collision")
                 traps.append({
                     "kind": trap or "TRAP_QUESTION_BLOCK",
                     "subtype": subtype,
                     "destination": destination,
                     "entry_id": entry_id,
                     "spawn_dir": spawn_dir,
-                    "visual_palette": enum_int(prop_value(props, "visual_palette",
+                    "visual_palette": palette_value(prop_value(props, "visual_palette",
                                                 tile_prop.get("visual_palette",
                                                               tile_prop.get("palette"))),
-                                               BG_PALETTE_NAMES, 0, "visual_palette"),
-                    "spawn_interval": max(0, min(255, spawn_interval)),
-                    "spawn_limit": max(0, min(255, spawn_limit)),
-                    "item_variant": max(0, min(255, item_variant)),
+                                               "visual_palette"),
+                    "spawn_interval": bounded(spawn_interval, "spawn_interval", 0, 255),
+                    "spawn_limit": bounded(spawn_limit, "spawn_limit", 0, 255),
+                    "item_variant": bounded(item_variant, "item_variant", 0, 255),
                     "spawn_enemy_kind": spawn_enemy_kind,
                     "spawn_enemy_sprite": spawn_enemy_sprite,
-                    "spawn_enemy_palette": max(0, min(15, spawn_enemy_palette)),
-                    "spawn_enemy_param": max(0, min(255, spawn_enemy_param)),
-                    "spawn_enemy_count": max(0, min(255, spawn_enemy_count)),
-                    "spawn_sound": max(0, min(1, spawn_sound)),
-                    "trigger_channel": max(0, min(255, trigger_channel)),
-                    "listen_channel": max(0, min(255, listen_channel)),
-                    "channel_spawn_interval": max(0, min(255, channel_spawn_interval)),
-                    "trigger_delay": max(0, min(255, trigger_delay)),
+                    "spawn_enemy_palette": enemy_palette_value(spawn_enemy_palette, "spawn_enemy_palette"),
+                    "spawn_enemy_param": bounded(spawn_enemy_param, "spawn_enemy_param", 0, 255),
+                    "spawn_enemy_count": bounded(spawn_enemy_count, "spawn_enemy_count", 0, 255),
+                    "spawn_sound": bounded(spawn_sound, "spawn_sound", 0, 1),
+                    "trigger_channel": bounded(trigger_channel, "trigger_channel", 0, 255),
+                    "listen_channel": bounded(listen_channel, "listen_channel", 0, 255),
+                    "channel_spawn_interval": bounded(channel_spawn_interval, "channel_spawn_interval", 0, 255),
+                    "trigger_delay": bounded(trigger_delay, "trigger_delay", 0, 255),
                     "spawn_offset_x": spawn_offset_x,
                     "spawn_offset_y": spawn_offset_y,
                     "spawn_vx": spawn_vx,
@@ -654,16 +791,12 @@ def parse_object_layers(map_data, tile_props):
                     "repeat_rearm_offset_y": repeat_rearm_offset_y,
                     "move_offset_x": move_offset_x,
                     "move_offset_y": move_offset_y,
-                    "goal_walk_frames": max(0, min(65535, goal_walk_frames)),
+                    "goal_walk_frames": bounded(goal_walk_frames, "goal_walk_frames", 0, 65535),
                     "hint_text": c_string_literal(hint_text),
-                    "visual_metatile": integer(prop_value(props, "visual_metatile",
-                                           tile_prop.get("visual_metatile", 255)), "visual_metatile"),
-                    "spent_metatile": integer(prop_value(props, "spent_metatile",
-                                          tile_prop.get("spent_metatile", 255)), "spent_metatile"),
-                    "collision": integer(prop_value(props, "collision",
-                                     tile_prop.get("collision", 255)), "collision"),
-                    "hidden": integer(prop_value(props, "hidden",
-                                  tile_prop.get("hidden", 0)), "hidden"),
+                    "visual_metatile": visual_metatile,
+                    "spent_metatile": spent_metatile,
+                    "collision": collision,
+                    "hidden": bounded(prop_value(props, "hidden", tile_prop.get("hidden", 0)), "hidden", 0, 1),
                     "source_x": source_x,
                     "source_y": source_y,
                     "x": x,
@@ -673,8 +806,6 @@ def parse_object_layers(map_data, tile_props):
                     "vx": vx,
                     "vy": vy,
                     "gravity": gravity,
-                    "trigger_x": trigger_x,
-                    "trigger_y": trigger_y,
                 })
                 continue
 
@@ -726,37 +857,80 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
         raise map_error("map width and height must be integer properties") from exc
     if width <= 0 or height <= 0:
         raise map_error(f"map dimensions must be positive, got {width} x {height}")
+    if width > MAX_MAP_WIDTH or height > MAX_MAP_HEIGHT:
+        raise map_error(f"map dimensions {width} x {height} exceed runtime limit {MAX_MAP_WIDTH} x {MAX_MAP_HEIGHT}")
+    validate_map_format(map_data, width, height)
+    ids = set()
+    for layer in map_data.get("layers", []):
+        for obj in layer.get("objects", []):
+            set_validation_context(layer=layer.get("name"), obj=obj)
+            object_id = integer(obj.get("id"), "id")
+            if object_id in ids:
+                raise map_error(f"duplicate object id {object_id}", "id")
+            ids.add(object_id)
+    set_validation_context(layer=None, obj=None)
+    if ids and integer(map_data.get("nextobjectid"), "nextobjectid") <= max(ids):
+        raise map_error(f"must be greater than existing object id {max(ids)}", "nextobjectid")
     map_props = map_properties(map_data)
-    camera_margin_top = max(0, min(65535, int(map_props.get("camera_margin_top", 0))))
-    camera_margin_bottom = max(0, min(65535, int(map_props.get("camera_margin_bottom", 0))))
+    camera_margin_top = bounded(map_props.get("camera_margin_top", 0), "camera_margin_top", 0, 65535)
+    camera_margin_bottom = bounded(map_props.get("camera_margin_bottom", 0), "camera_margin_bottom", 0, 65535)
+    tileset_ranges = []
+    for tileset in map_data.get("tilesets", []):
+        if tileset.get("source"):
+            raise map_error("external tilesets are not supported; embed the tileset in the map")
+        image = tileset.get("image")
+        if not image:
+            raise map_error("tileset must specify an image")
+        image_path = tmj_path.parent / image
+        try:
+            with image_path.open("rb") as png:
+                header = png.read(24)
+            if header[:8] != b"\x89PNG\r\n\x1a\n" or len(header) < 24:
+                raise ValueError("not a PNG image")
+            image_width, image_height = struct.unpack(">II", header[16:24])
+        except (OSError, ValueError) as exc:
+            raise map_error(f"cannot read tileset image {image!r}: {exc}") from exc
+        count = (image_width // 16) * (image_height // 16)
+        if (tileset.get("imagewidth"), tileset.get("imageheight"), tileset.get("tilecount")) != (image_width, image_height, count):
+            raise map_error(f"tileset {tileset.get('name')!r} metadata does not match image {image_width}x{image_height}, {count} tiles")
+        firstgid = int(tileset.get("firstgid", 1))
+        tileset_ranges.append((firstgid, firstgid + count))
     props = tile_properties(map_data)
 
     metatiles = [[0 for _ in range(width)] for _ in range(height)]
     palettes = [[0 for _ in range(width)] for _ in range(height)]
     source = [[0 for _ in range(width)] for _ in range(height)]
+    switch_cells = [[0 for _ in range(width)] for _ in range(height)]
 
     for layer in map_data.get("layers", []):
         if layer.get("type") != "tilelayer":
             continue
         layer_name = layer.get("name", "").lower()
+        set_validation_context(layer=layer.get("name"), obj=None)
+        is_switch_layer = layer_name == "p-switch blocks"
         is_source_layer = layer_name in ("source", "reference", "originalsource",
                                          "original_source")
-        if layer.get("visible", True) is False and not is_source_layer:
+        if layer.get("visible", True) is False and not is_source_layer and not is_switch_layer:
             continue
 
         for x, y, raw_gid in iter_tile_layer_cells(layer, width, height):
             gid = decode_gid(raw_gid)
             if gid == 0:
                 continue
-            if is_source_layer:
+            if not any(first <= gid < end for first, end in tileset_ranges):
+                raise map_error(f"tile ({x}, {y}) uses unknown GID {gid}")
+            if is_switch_layer:
+                switch_cells[y][x] = 1
+            elif is_source_layer:
                 source[y][x] = source_from_gid(gid, props) or (gid - 1)
             else:
-                layer_palette = enum_int(layer_properties(layer).get("palette"),
-                                         BG_PALETTE_NAMES, 0)
-                metatiles[y][x] = metatile_from_gid(gid, props)
-                palettes[y][x] = palette_from_gid(gid, props, layer_palette)
+                layer_palette = palette_value(layer_properties(layer).get("palette"), "palette")
+                metatiles[y][x] = bounded(metatile_from_gid(gid, props), "metatile", 0, count - 1)
+                palettes[y][x] = bounded(palette_from_gid(gid, props, layer_palette), "palette", 0, 3)
 
-    objects, enemy_spawns, traps = parse_object_layers(map_data, props)
+    if not tileset_ranges:
+        raise map_error("map must contain an embedded tileset")
+    objects, enemy_spawns, traps = parse_object_layers(map_data, props, count, tmj_path)
     prefix = symbol_prefix or c_ident(tmj_path.name)
     guard = f"GENERATED_{prefix.upper()}_DATA_H"
 
@@ -816,6 +990,7 @@ typedef struct GeneratedEnemySpawn {{
 extern const uint8_t {prefix}_metatiles[{height}][{width}];
 extern const uint8_t {prefix}_palettes[{height}][{width}];
 extern const uint8_t {prefix}_source[{height}][{width}];
+extern const uint8_t {prefix}_switch_cells[{height}][{width}];
 extern const GeneratedMapObject {prefix}_objects[{max(1, len(objects))}];
 extern const uint16_t {prefix}_object_count;
 extern const GeneratedEnemySpawn {prefix}_enemy_spawns[{max(1, len(enemy_spawns))}];
@@ -834,6 +1009,8 @@ extern const uint16_t {prefix}_trap_count;
         format_u8_array(f"{prefix}_palettes", palettes),
         "",
         format_u8_array(f"{prefix}_source", source),
+        "",
+        format_u8_array(f"{prefix}_switch_cells", switch_cells),
         "",
         f"const GeneratedMapObject {prefix}_objects[{max(1, len(objects))}] = {{",
     ]
@@ -882,7 +1059,6 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .source_x = {trap['source_x']}, .source_y = {trap['source_y']},",
                 f"        .x = {trap['x']}, .y = {trap['y']}, .w = {trap['w']}, .h = {trap['h']},",
                 f"        .vx = {trap['vx']}, .vy = {trap['vy']}, .gravity = {trap['gravity']},",
-                f"        .trigger_x = {trap['trigger_x']}, .trigger_y = {trap['trigger_y']},",
                 f"        .spawn_offset_x = {trap['spawn_offset_x']}, .spawn_offset_y = {trap['spawn_offset_y']},",
                 f"        .spawn_vx = {trap['spawn_vx']}, .spawn_vy = {trap['spawn_vy']},",
                 f"        .spawn_random_vx = {trap['spawn_random_vx']}, .spawn_random_vy = {trap['spawn_random_vy']},",
@@ -905,13 +1081,22 @@ extern const uint16_t {prefix}_trap_count;
 def main():
     parser = argparse.ArgumentParser(description="Compile Tiled JSON maps to GBA C data.")
     parser.add_argument("map", type=Path)
-    parser.add_argument("--header", type=Path, required=True)
-    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument("--header", type=Path)
+    parser.add_argument("--source", type=Path)
+    parser.add_argument("--check", action="store_true", help="validate without writing generated files")
     parser.add_argument("--symbol-prefix")
     args = parser.parse_args()
+    if args.check and (args.header or args.source):
+        parser.error("--check cannot be combined with --header or --source")
+    if not args.check and (not args.header or not args.source):
+        parser.error("--header and --source are required unless --check is used")
 
     try:
-        write_outputs(args.map, args.header, args.source, args.symbol_prefix)
+        if args.check:
+            with tempfile.TemporaryDirectory() as temp:
+                write_outputs(args.map, Path(temp) / "map.h", Path(temp) / "map.c", args.symbol_prefix)
+        else:
+            write_outputs(args.map, args.header, args.source, args.symbol_prefix)
     except MapValidationError as exc:
         parser.exit(2, f"compile_map.py: error: {exc}\n")
     except (KeyError, TypeError, ValueError) as exc:

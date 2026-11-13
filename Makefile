@@ -11,6 +11,7 @@ LEVELS      := levels
 DEVKITPRO ?= /opt/devkitpro
 DEVKITARM ?= $(DEVKITPRO)/devkitARM
 
+ifneq ($(MAKECMDGOALS),check-maps)
 ifeq ($(wildcard $(strip $(DEVKITPRO))),)
 $(error DEVKITPRO not found in $(DEVKITPRO). Please set the correct path in the DEVKITPRO environment variable)
 endif
@@ -35,6 +36,7 @@ $(error libgba was not found at $(LIBGBA). Install the devkitPro gba-dev package
 endif
 
 include $(DEVKITARM)/gba_rules
+endif
 
 ARCH        := -mthumb -mthumb-interwork
 SPECS       := -specs=gba.specs
@@ -56,7 +58,7 @@ MAP_H       := $(patsubst $(LEVELS)/%.tmj,$(INCLUDES)/generated/%_data.h,$(MAP_S
 ROOT_CFILES := $(wildcard $(SOURCES)/*.c)
 CFILES      := $(ROOT_CFILES) $(MAP_C)
 SFILES      := $(wildcard $(SOURCES)/*.s)
-PNGFILES    := $(DATA)/player_16.png $(DATA)/tiles_16.png $(DATA)/traps_16.png \
+PNGFILES    := $(DATA)/player_16.png $(DATA)/tiles_16.png $(DATA)/traps_16.png $(DATA)/p_switch_16.png $(DATA)/p_coin_16.png \
                $(DATA)/items_16.png $(DATA)/enemies_16.png $(DATA)/spike_block_16.png
 AUDIOFILES  := $(AUDIO)/block_hit.wav $(AUDIO)/brick_break.wav \
                $(AUDIO)/death.wav $(AUDIO)/jump.wav \
@@ -89,7 +91,9 @@ LIBS        := -lgba
 SOUND_HEADERS :=
 SOUND_STAMP :=
 ifneq ($(strip $(AUDIOFILES)),)
+ifneq ($(MAKECMDGOALS),check-maps)
 $(warning Maxmod audio assets found, but mmutil/maxmod.h/libmm.a is missing; audio will compile as stubs)
+endif
 endif
 endif
 
@@ -99,7 +103,7 @@ endif
 
 DEPS        := $(OFILES:.o=.d)
 
-.PHONY: all clean assets dirs prepare-assets prepare-audio
+.PHONY: all clean assets dirs prepare-assets prepare-audio check-maps
 .SECONDARY: $(MAP_C) $(MAP_H)
 
 all: dirs $(TARGET).gba
@@ -114,6 +118,9 @@ prepare-assets:
 
 prepare-audio:
 	python3 tools/build_audio.py
+
+check-maps:
+	@set -e; for map in $(MAP_SOURCES); do python3 tools/compile_map.py "$$map" --check; done
 
 $(TARGET).gba: $(BUILD)/$(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
@@ -136,7 +143,7 @@ $(BUILD)/level.o $(BUILD)/player.o $(BUILD)/traps.o $(BUILD)/enemy.o: $(GFX_HEAD
 $(ROOT_OFILES): $(MAP_H)
 $(BUILD)/audio.o: $(SOUND_HEADERS)
 
-$(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py | dirs
+$(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py $(MAP_SOURCES) $(DATA)/tiles_16.png | dirs
 	python3 tools/compile_map.py $< --source $(SOURCES)/generated/$*_data.c --header $(INCLUDES)/generated/$*_data.h --symbol-prefix $*
 
 $(BUILD)/%.o: $(SOURCES)/%.s | dirs

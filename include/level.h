@@ -91,6 +91,7 @@ typedef enum MetatileId {
     METATILE_GREEN_SOLID,
     /* Original stage 1-3S source type 8; tile 84 in tiles_16.png. */
     METATILE_SKY_STAGE_FLOOR = 84,
+    METATILE_SWITCH_COIN = 85,
 } MetatileId;
 
 typedef enum LevelCollision {
@@ -108,6 +109,7 @@ typedef struct Level {
     uint8_t source[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
     uint8_t metatiles[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
     uint8_t palettes[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
+    uint8_t switch_cells[LEVEL_SOURCE_ROWS][LEVEL_SOURCE_COLS];
 } Level;
 
 extern Level level_current;

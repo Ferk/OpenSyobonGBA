@@ -3750,7 +3750,7 @@
        "name": "visual_palette",
        "propertytype": "BgPalette",
        "type": "string",
-       "value": "palette4"
+       "value": "underground"
       }
      ],
      "rotation": 0,
@@ -5193,7 +5193,7 @@
   }
  ],
  "nextlayerid": 5,
- "nextobjectid": 64,
+ "nextobjectid": 63,
  "orientation": "orthogonal",
  "properties": [
   {
@@ -5215,12 +5215,12 @@
    "columns": 1,
    "firstgid": 1,
    "image": "../gfx/tiles_16.png",
-   "imageheight": 1280,
+   "imageheight": 1360,
    "imagewidth": 16,
    "margin": 0,
    "name": "tiles_16",
    "spacing": 0,
-   "tilecount": 80,
+   "tilecount": 85,
    "tileheight": 16,
    "tilewidth": 16
   }

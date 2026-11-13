@@ -175,8 +175,6 @@ typedef struct TrapTrigger {
     fix16_t vx;
     fix16_t vy;
     fix16_t gravity;
-    fix16_t trigger_x;
-    fix16_t trigger_y;
 } TrapTrigger;
 
 typedef struct TrapManager {
@@ -191,6 +189,8 @@ typedef struct TrapManager {
     uint8_t stage_transition_requested;
     uint8_t stage_transition_target;
     uint8_t stage_transition_entry_id;
+    fix16_t previous_player_y;
+    uint8_t previous_player_valid;
 } TrapManager;
 
 extern TrapManager traps_current;

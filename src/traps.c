@@ -17,6 +17,7 @@
 #include "player.h"
 #include "text.h"
 #include "items_16.h"
+#include "p_switch_16.h"
 #include "spike_block_16.h"
 #include "tiles_16.h"
 #include "traps_16.h"
@@ -691,6 +692,7 @@ static TrapEntity *spawn_entity(TrapManager *manager, TrapEntityKind kind,
             entity->timer = 0;
             entity->frame = 0;
             entity->palette = 0;
+            entity->defrag_held = 0;
             entity->param = 0;
             return entity;
         }
@@ -732,8 +734,8 @@ static void load_trap_tiles(void)
     memcpy(&SPRITE_GFX[ITEM_TILE_INDEX * 16], items_16Tiles, items_16TilesLen);
     memcpy(&SPRITE_GFX[BAD_FLOWER_ITEM_TILE_INDEX * 16],
            &items_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
-    /* Original ttype 400: grap[2][5], imported as metatile 36. */
-    copy_metatile_to_obj_tiles(P_SWITCH_TILE_INDEX, 36);
+    memcpy(&SPRITE_GFX[P_SWITCH_TILE_INDEX * 16], p_switch_16Tiles,
+           p_switch_16TilesLen);
     memcpy(&SPRITE_GFX[JUMP_PAD_TILE_INDEX * 16],
            &traps_16Tiles[5 * 4 * 8], 4 * 16 * sizeof(uint16_t));
     memcpy(&SPRITE_GFX[SPIKE_BLOCK_TOP_TILE_INDEX * 16],
@@ -1038,6 +1040,7 @@ static void spend_question_block(TrapManager *manager, Trap *trap, Level *level)
         : trap->spent_metatile;
 
     trap->state = TRAP_SPENT;
+    trap->hidden = 0;
     set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, spent_metatile);
     set_cell_collision(manager, trap->source_x, trap->source_y,
                        spent_metatile == METATILE_EMPTY
@@ -1246,6 +1249,7 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
 
     audio_play_block_hit();
     trap->trigger_pending = 0;
+    trap->hidden = 0;
 
     switch (trap->subtype) {
     case QUESTION_ENEMY:
@@ -1321,20 +1325,48 @@ static void convert_block_traps_to_coins(TrapManager *manager, Level *level)
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *trap = &manager->traps[i];
 
-        /* The original P-switch changes visible tyobi block objects, not terrain. */
         if (trap->hidden ||
             (trap->kind != TRAP_QUESTION_BLOCK &&
              trap->kind != TRAP_HINT_BLOCK &&
-             trap->kind != TRAP_BREAKABLE_BLOCK)) {
+             trap->kind != TRAP_BREAKABLE_BLOCK &&
+             trap->kind != TRAP_P_SWITCH_BLOCK) ||
+            trap->source_x >= level->width || trap->source_y >= level->height ||
+            level->metatiles[trap->source_y][trap->source_x] == METATILE_EMPTY) {
             continue;
         }
-
+        level->switch_cells[trap->source_y][trap->source_x] = 1;
         trap->kind = TRAP_COIN;
-        trap->state = TRAP_IDLE;
-        set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y,
-                               METATILE_EMPTY);
-        set_cell_collision(manager, trap->source_x, trap->source_y,
-                           LEVEL_COLLISION_EMPTY, 0);
+        trap->state = TRAP_SPENT;
+    }
+
+    for (uint16_t y = 0; y < level->height; ++y) {
+        for (uint16_t x = 0; x < level->width; ++x) {
+            if (!level->switch_cells[y][x] || manager->cell_hidden[y][x] ||
+                level->metatiles[y][x] == METATILE_EMPTY) {
+                continue;
+            }
+            level_set_metatile_cell_palette(level, x, y, METATILE_SWITCH_COIN, 0);
+            set_cell_collision(manager, x, y, LEVEL_COLLISION_EMPTY, 0);
+        }
+    }
+}
+
+static void collect_switch_coins(TrapManager *manager, Level *level, const Player *player)
+{
+    int left = floor_div_int(FIX16_TO_INT(player->x), LEVEL_METATILE_SIZE);
+    int right = floor_div_int(FIX16_TO_INT(player->x) + PLAYER_WIDTH_PX - 1, LEVEL_METATILE_SIZE);
+    int top = floor_div_int(FIX16_TO_INT(player->y), LEVEL_METATILE_SIZE) + LEVEL_VIEW_SOURCE_ROW_OFFSET;
+    int bottom = floor_div_int(FIX16_TO_INT(player->y) + PLAYER_HEIGHT_PX - 1, LEVEL_METATILE_SIZE) + LEVEL_VIEW_SOURCE_ROW_OFFSET;
+    (void)manager;
+    if (!player->alive) return;
+    for (int y = top; y <= bottom; ++y) {
+        for (int x = left; x <= right; ++x) {
+            if (x >= 0 && x < level->width && y >= 0 && y < level->height &&
+                level->metatiles[y][x] == METATILE_SWITCH_COIN) {
+                level_set_metatile_cell(level, x, y, METATILE_EMPTY);
+                audio_play_trap_trigger();
+            }
+        }
     }
 }
 
@@ -1346,14 +1378,15 @@ static void trigger_p_switch_block(TrapManager *manager, Trap *trap, Level *leve
         return;
     }
 
-    audio_play_block_hit();
-    spend_question_block(manager, trap, level);
     p_switch = spawn_entity(manager, TRAP_ENTITY_P_SWITCH,
                             trap->x, trap->y - FIX16_FROM_INT(LEVEL_METATILE_SIZE),
                             0, 0, LEVEL_METATILE_SIZE, LEVEL_METATILE_SIZE);
-    if (p_switch) {
-        p_switch->palette = EVASIVE_BLOCK_PALETTE_BANK;
+    if (!p_switch) {
+        return;
     }
+    audio_play_block_hit();
+    spend_question_block(manager, trap, level);
+    p_switch->palette = EVASIVE_BLOCK_PALETTE_BANK;
 }
 
 static fix16_t random_fixed_positive(fix16_t range)
@@ -2378,6 +2411,11 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
 {
     int player_x = FIX16_TO_INT(player->x);
     int player_y = FIX16_TO_INT(player->y);
+    int previous_player_y = manager->previous_player_valid
+        ? FIX16_TO_INT(manager->previous_player_y) : player_y;
+    manager->previous_player_y = player->y;
+    manager->previous_player_valid = 1;
+    collect_switch_coins(manager, level, player);
 
     /* Active type-117 pads re-enable this below for the next player update. */
     player->phase_through_terrain = 0;
@@ -2629,9 +2667,14 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                     player_kill(player);
                 }
             } else if (entity->kind == TRAP_ENTITY_P_SWITCH) {
-                entity->active = 0;
-                convert_block_traps_to_coins(manager, level);
-                audio_play_trap_trigger();
+                if (player->vy >= 0 && previous_player_y + PLAYER_HEIGHT_PX <= entity_y + 2 &&
+                    player_y + PLAYER_HEIGHT_PX > entity_y) {
+                    entity->active = 0;
+                    player->vy = 0;
+                    convert_block_traps_to_coins(manager, level);
+                    audio_stop_bgm();
+                    audio_play_trap_trigger();
+                }
             } else if (entity->kind == TRAP_ENTITY_GOOD_ITEM ||
                 entity->kind == TRAP_ENTITY_COIN_POPUP) {
                 if (entity->kind == TRAP_ENTITY_GOOD_ITEM) {

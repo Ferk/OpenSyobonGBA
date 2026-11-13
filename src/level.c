@@ -11,6 +11,7 @@
 #include "generated/level1_3u_data.h"
 #include "generated/level1_3s_data.h"
 #include "tiles_16.h"
+#include "p_coin_16.h"
 
 #define BG_CHARBLOCK 0
 #define BG_SCREENBLOCK 28
@@ -208,6 +209,7 @@ static void copy_generated_level_data(Level *level,
                                       const uint8_t *source,
                                       const uint8_t *metatiles,
                                       const uint8_t *palettes,
+                                      const uint8_t *switch_cells,
                                       uint16_t width,
                                       uint16_t height)
 {
@@ -215,6 +217,7 @@ static void copy_generated_level_data(Level *level,
         memcpy(level->source[y], source + y * width, width);
         memcpy(level->metatiles[y], metatiles + y * width, width);
         memcpy(level->palettes[y], palettes + y * width, width);
+        memcpy(level->switch_cells[y], switch_cells + y * width, width);
     }
 }
 
@@ -223,6 +226,8 @@ void level_init_video(void)
     memcpy(BG_PALETTE, bg_palette_banks, sizeof(bg_palette_banks));
     memcpy(BG_PALETTE, tiles_16Pal, 16 * sizeof(uint16_t));
     memcpy(CHAR_BASE_BLOCK(BG_CHARBLOCK), tiles_16Tiles, tiles_16TilesLen);
+    memcpy((uint16_t *)CHAR_BASE_BLOCK(BG_CHARBLOCK) + METATILE_SWITCH_COIN * 4 * 16,
+           p_coin_16Tiles, p_coin_16TilesLen);
 
     REG_BG0CNT = BG_16_COLOR | CHAR_BASE(BG_CHARBLOCK) | BG_PRIORITY(1) |
                  SCREEN_BASE(BG_SCREENBLOCK) | TEXTBG_SIZE_512x256;
@@ -245,6 +250,7 @@ void level_load_1_1(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_source,
                               (const uint8_t *)level1_metatiles,
                               (const uint8_t *)level1_palettes,
+                              (const uint8_t *)level1_switch_cells,
                               LEVEL1_WIDTH, LEVEL1_HEIGHT);
     level_force_stream_update();
 }
@@ -259,6 +265,7 @@ void level_load_1_2(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_2_source,
                               (const uint8_t *)level1_2_metatiles,
                               (const uint8_t *)level1_2_palettes,
+                              (const uint8_t *)level1_2_switch_cells,
                               LEVEL1_2_WIDTH, LEVEL1_2_HEIGHT);
     level_force_stream_update();
 }
@@ -273,6 +280,7 @@ void level_load_1_2_underground(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_2u_source,
                               (const uint8_t *)level1_2u_metatiles,
                               (const uint8_t *)level1_2u_palettes,
+                              (const uint8_t *)level1_2u_switch_cells,
                               LEVEL1_2U_WIDTH, LEVEL1_2U_HEIGHT);
     level_force_stream_update();
 }
@@ -287,6 +295,7 @@ void level_load_1_2b(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_2b_source,
                               (const uint8_t *)level1_2b_metatiles,
                               (const uint8_t *)level1_2b_palettes,
+                              (const uint8_t *)level1_2b_switch_cells,
                               LEVEL1_2B_WIDTH, LEVEL1_2B_HEIGHT);
     level_force_stream_update();
 }
@@ -301,6 +310,7 @@ void level_load_1_3(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_3_source,
                               (const uint8_t *)level1_3_metatiles,
                               (const uint8_t *)level1_3_palettes,
+                              (const uint8_t *)level1_3_switch_cells,
                               LEVEL1_3_WIDTH, LEVEL1_3_HEIGHT);
     level_force_stream_update();
 }
@@ -315,6 +325,7 @@ void level_load_1_3_underground(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_3u_source,
                               (const uint8_t *)level1_3u_metatiles,
                               (const uint8_t *)level1_3u_palettes,
+                              (const uint8_t *)level1_3u_switch_cells,
                               LEVEL1_3U_WIDTH, LEVEL1_3U_HEIGHT);
     level_force_stream_update();
 }
@@ -329,6 +340,7 @@ void level_load_1_3_sky(Level *level)
     copy_generated_level_data(level, (const uint8_t *)level1_3s_source,
                               (const uint8_t *)level1_3s_metatiles,
                               (const uint8_t *)level1_3s_palettes,
+                              (const uint8_t *)level1_3s_switch_cells,
                               LEVEL1_3S_WIDTH, LEVEL1_3S_HEIGHT);
     level_force_stream_update();
 }
