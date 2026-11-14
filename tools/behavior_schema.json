@@ -1,0 +1,88 @@
+{
+  "metatiles": {
+    "empty": 0, "brick": 1, "question": 2, "solid": 3,
+    "ground_top": 4, "ground_dirt": 5, "white_platform": 6, "hint_block": 7,
+    "hill_00": 8, "hill_01": 9, "hill_02": 10, "hill_03": 11, "hill_04": 12,
+    "hill_10": 13, "hill_11": 14, "hill_12": 15, "hill_13": 16, "hill_14": 17,
+    "hill_20": 18, "hill_21": 19, "hill_22": 20, "hill_23": 21, "hill_24": 22,
+    "cloud_00": 23, "cloud_01": 24, "cloud_02": 25, "cloud_03": 26,
+    "cloud_10": 27, "cloud_11": 28, "cloud_12": 29, "cloud_13": 30,
+    "pipe_top_left": 31, "pipe_top_right": 32, "pipe_body_left": 33, "pipe_body_right": 34,
+    "spikes": 35, "bg_spikes_00": 36, "bg_spikes_01": 37, "bg_spikes_02": 38, "bg_spikes_03": 39,
+    "castle_00": 40, "castle_01": 41, "castle_02": 42, "castle_03": 43, "castle_04": 44, "castle_05": 45,
+    "castle_10": 46, "castle_11": 47, "castle_12": 48, "castle_13": 49, "castle_14": 50, "castle_15": 51,
+    "castle_20": 52, "castle_21": 53, "castle_22": 54, "castle_23": 55, "castle_24": 56, "castle_25": 57,
+    "checkpoint_00": 58, "checkpoint_01": 59, "checkpoint_10": 60, "checkpoint_11": 61,
+    "checkpoint_20": 62, "checkpoint_21": 63, "goal_00": 64, "goal_10": 65, "goal_20": 66, "goal_30": 67,
+    "brown_background": 68, "green_solid": 69,
+    "art_70": 70, "art_71": 71, "art_72": 72, "art_73": 73, "art_74": 74,
+    "art_75": 75, "art_76": 76, "art_77": 77, "art_78": 78, "art_79": 79,
+    "art_80": 80, "art_81": 81, "art_82": 82, "art_83": 83, "sky_stage_floor": 84
+  },
+  "previews": [
+    {"name": "walker", "sheet": "enemies_16.png", "cells": [0], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "walker", "enemy_sprite": "walker", "body_width": 17, "body_height": 16}},
+    {"name": "shell_walker", "sheet": "enemies_16.png", "cells": [1], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "shell_walker", "enemy_sprite": "shell_walker", "body_width": 17, "body_height": 16}},
+    {"name": "shell", "sheet": "enemies_16.png", "cells": [2], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "shell", "enemy_sprite": "shell", "body_width": 17, "body_height": 16}},
+    {"name": "aramaki", "sheet": "enemies_16.png", "cells": [3], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "aramaki", "enemy_sprite": "atype3", "body_width": 16, "body_height": 16}},
+    {"name": "face_hidden", "sheet": "enemies_16.png", "cells": [4, 5, 6, 7], "columns": 2, "class": "Enemy", "properties": {"enemy_kind": "static_hazard", "enemy_sprite": "face_hidden", "body_width": 32, "body_height": 32}},
+    {"name": "nyassun", "sheet": "enemies_16.png", "cells": [8, 9, 10, 11], "columns": 2, "class": "Enemy", "properties": {"enemy_kind": "ceiling_faller", "enemy_sprite": "nyassun", "body_width": 32, "body_height": 32}},
+    {"name": "kuma", "sheet": "enemies_16.png", "cells": [16, 17], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "kuma", "enemy_sprite": "kuma", "body_width": 16, "body_height": 32}},
+    {"name": "fire_projectile", "sheet": "enemies_16.png", "cells": [20], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "pipe_shot", "enemy_sprite": "fire_projectile", "body_width": 16, "body_height": 16}},
+    {"name": "superjien", "sheet": "enemies_16.png", "cells": [21], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "superjien", "enemy_sprite": "superjien", "body_width": 18, "body_height": 16}},
+    {"name": "giant", "sheet": "enemies_16.png", "cells": [22, 23, 24, 25], "columns": 2, "class": "Enemy", "properties": {"enemy_kind": "giant", "enemy_sprite": "giant", "body_width": 32, "body_height": 32}},
+    {"name": "defrag", "sheet": "enemies_16.png", "cells": [26, 27], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "defrag", "enemy_sprite": "defrag", "body_width": 16, "body_height": 32}},
+    {"name": "laser", "sheet": "enemies_16.png", "cells": [30, 31, 31, 32], "columns": 4, "class": "Enemy", "properties": {"enemy_kind": "laser", "enemy_sprite": "laser", "body_width": 64, "body_height": 8}},
+    {"name": "jien_cannon", "sheet": "enemies_16.png", "cells": [33], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "jien_cannon", "enemy_sprite": "jien_cannon", "body_width": 16, "body_height": 16}},
+    {"name": "super_boon", "sheet": "enemies_16.png", "cells": [34, 35], "columns": 1, "class": "Enemy", "properties": {"enemy_kind": "super_boon", "enemy_sprite": "super_boon", "body_width": 16, "body_height": 32}},
+    {"name": "question_ball", "sheet": "items_16.png", "cells": [4], "columns": 1, "class": "Trap", "properties": {"trap_type": "pickup_item", "body_width": 16, "body_height": 16}},
+    {"name": "coin", "sheet": "items_16.png", "cells": [0], "columns": 1, "class": "Trap", "properties": {"trap_type": "coin", "body_width": 16, "body_height": 16}}
+  ],
+  "presets": {
+    "hidden_coin_block": {"name": "Hidden Coin Block", "class": "Question Block", "width": 16, "height": 16, "properties": {"subtype": "none", "hidden": true, "visual_metatile": "empty", "collision": 0, "spawn_limit": 1}},
+    "star_block": {"name": "Star Block", "class": "Question Block", "width": 16, "height": 16, "properties": {"subtype": "question_star", "visual_metatile": "question", "collision": 1, "spawn_limit": 1}},
+    "poison_generator": {"name": "Poison Generator", "class": "Question Block", "width": 16, "height": 16, "properties": {"subtype": "question_poison_generator", "visual_metatile": "question", "collision": 1, "spawn_interval": 16, "spawn_limit": 0}},
+    "coin_generator": {"name": "Coin Generator", "class": "Question Block", "width": 16, "height": 16, "properties": {"subtype": "question_coin_generator", "visual_metatile": "question", "collision": 1, "spawn_interval": 3, "spawn_limit": 20}},
+    "falling_ceiling": {"name": "Falling Ceiling", "class": "Falling Floor", "width": 48, "height": 16, "properties": {"subtype": "falling_on_pass_under", "visual_metatile": "inherit"}},
+    "conveyor_left": {"name": "Conveyor Left", "class": "Moving Platform", "width": 48, "height": 16, "properties": {"subtype": "platform_conveyor", "visual_metatile": "white_platform", "vx": -1}},
+    "conveyor_right": {"name": "Conveyor Right", "class": "Moving Platform", "width": 48, "height": 16, "properties": {"subtype": "platform_conveyor", "visual_metatile": "white_platform", "vx": 1}},
+    "bouncy_platform": {"name": "Bouncy Platform", "class": "Moving Platform", "width": 48, "height": 16, "properties": {"subtype": "platform_bounce", "visual_metatile": "white_platform"}},
+    "checkpoint": {"name": "Checkpoint", "class": "Checkpoint", "width": 16, "height": 16, "properties": {"subtype": "none"}},
+    "goal": {"name": "Goal", "class": "Goal", "width": 16, "height": 112, "properties": {"subtype": "none", "goal_walk_frames": 207}}
+  },
+  "classes": {
+    "Question Block": {
+      "kind": "question_block",
+      "subtypes": ["none", "question_enemy", "question_good_mushroom", "question_bad_mushroom", "question_star", "question_bad_flower", "question_poison_generator", "question_coin_generator", "question_hidden_poison"],
+      "properties": ["visual_metatile", "visual_palette", "collision", "hidden", "spent_metatile", "spawn_dir", "spawn_enemy_kind", "spawn_enemy_sprite", "spawn_enemy_palette", "spawn_enemy_param", "spawn_interval", "spawn_limit", "trigger_channel", "listen_channel", "trigger_delay"]
+    },
+    "Stage Spawner": {
+      "kind": "stage_spawner",
+      "subtypes": ["none", "stage_pipe_shot", "stage_flying_enemy", "stage_walker_swarm", "stage_upward_hazard", "stage_upward_hazard_toggle", "stage_upward_hazard_left", "stage_hint_message", "stage_pipe_hazard"],
+      "properties": ["spawn_enemy_kind", "spawn_enemy_sprite", "spawn_enemy_palette", "spawn_enemy_param", "spawn_enemy_count", "spawn_dir", "spawn_sound", "spawn_offset_x", "spawn_offset_y", "spawn_vx", "spawn_vy", "spawn_random_vx", "spawn_random_vy", "spawn_spacing_x", "spawn_spacing_y", "spawn_interval", "spawn_limit", "move_offset_x", "move_offset_y", "repeat_rearm_offset_x", "repeat_rearm_offset_y", "trigger_channel", "listen_channel", "channel_spawn_interval", "trigger_delay", "hint_text"]
+    },
+    "Enter Pipe": {
+      "kind": "enter_pipe", "subtypes": ["none", "pipe_fake_kill", "pipe_to_underground"],
+      "properties": ["stage_destination", "entry_id"]
+    },
+    "Side Pipe": {
+      "kind": "side_pipe", "subtypes": ["none", "pipe_fake_kill", "pipe_to_underground"],
+      "properties": ["stage_destination", "entry_id"]
+    },
+    "Falling Floor": {
+      "kind": "falling_floor", "subtypes": ["none", "falling_on_pass_under", "falling_when_approached"],
+      "properties": ["visual_metatile", "visual_palette", "gravity", "trigger_channel", "listen_channel", "trigger_delay"]
+    },
+    "Moving Platform": {
+      "kind": "moving_platform", "subtypes": ["none", "platform_conveyor", "platform_vertical_wrap", "platform_bounce"],
+      "properties": ["visual_metatile", "visual_palette", "vx", "vy"]
+    },
+    "Goal": {
+      "kind": "goal", "subtypes": ["none"],
+      "properties": ["goal_walk_frames", "trigger_channel", "listen_channel", "trigger_delay", "visual_metatile", "visual_palette", "collision"]
+    },
+    "Checkpoint": {
+      "kind": "checkpoint", "subtypes": ["none"],
+      "properties": ["trigger_channel", "listen_channel", "trigger_delay", "visual_metatile", "visual_palette", "collision"]
+    }
+  }
+}

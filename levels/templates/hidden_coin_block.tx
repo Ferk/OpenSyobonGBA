@@ -1,0 +1,41 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Hidden Coin Block",
+  "type": "Question Block",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "subtype",
+    "type": "string",
+    "propertytype": "Question Block Subtype",
+    "value": "none"
+   },
+   {
+    "name": "hidden",
+    "type": "bool",
+    "value": true
+   },
+   {
+    "name": "visual_metatile",
+    "type": "string",
+    "propertytype": "VisualMetatile",
+    "value": "empty"
+   },
+   {
+    "name": "collision",
+    "type": "int",
+    "propertytype": "LevelCollision",
+    "value": 0
+   },
+   {
+    "name": "spawn_limit",
+    "type": "int",
+    "value": 1
+   }
+  ]
+ }
+}

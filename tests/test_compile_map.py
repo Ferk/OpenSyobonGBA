@@ -115,9 +115,54 @@ class CompilerValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(compiler.MapValidationError, "exactly 1 cells"):
             self.compile()
         self.map["layers"][0]["data"] = [1]
-        self.map["tilesets"][0]["source"] = "shared.tsj"
-        with self.assertRaisesRegex(compiler.MapValidationError, "external tilesets"):
+        self.map["tilesets"][0]["source"] = "missing.tsj"
+        with self.assertRaisesRegex(compiler.MapValidationError, "external tileset.*missing.tsj"):
             self.compile()
+
+    def test_external_tileset_resolves_image_relative_to_tileset(self):
+        expected = self.compile()
+        tileset = copy.deepcopy(self.map["tilesets"][0])
+        del tileset["firstgid"]
+        tileset["image"] = "../tiles.png"
+        (self.root / "sets").mkdir()
+        (self.root / "sets/shared.tsj").write_text(json.dumps(tileset))
+        self.map["tilesets"] = [{"firstgid": 1, "source": "sets/shared.tsj"}]
+        self.assertEqual(self.compile(), expected)
+        deps = subprocess.check_output([sys.executable, str(ROOT / "tools/map_dependencies.py"),
+                                        str(self.root / "map.tmj")], text=True)
+        self.assertIn("sets/shared.tsj", deps)
+        self.assertIn("sets/../tiles.png", deps)
+
+    def test_focused_class_selects_kind_and_rejects_conflict(self):
+        self.obj["type"] = "Question Block"
+        self.obj["properties"] = [{"name": "subtype", "value": "question_star"}]
+        output = self.compile()
+        self.assertIn(".kind = TRAP_QUESTION_BLOCK", output)
+        self.assertIn(".subtype = 104", output)
+        self.set_property("trap_type", "goal")
+        with self.assertRaisesRegex(compiler.MapValidationError, "trap_type.*conflicts"):
+            self.compile()
+
+    def test_focused_class_subtypes_match_compiler(self):
+        for name, spec in compiler.BEHAVIOR_SCHEMA["classes"].items():
+            kind = compiler.TRAP_KIND_NAMES[spec["kind"]]
+            for subtype in spec["subtypes"]:
+                with self.subTest(name=name, subtype=subtype):
+                    self.assertIn(compiler.TRAP_SUBTYPE_NAMES[subtype],
+                                  compiler.TRAP_SUBTYPES.get(kind, {0}))
+                    if subtype != "none":
+                        self.assertIn(subtype, compiler.TRAP_SUBTYPE_NAMES_BY_KIND.get(kind, set()))
+
+    def test_tiled_focused_classes_follow_schema(self):
+        project = json.loads((ROOT / "OpenCorgiAction.tiled-project").read_text())
+        entries = project["propertyTypes"]
+        self.assertEqual(len(entries), len({entry["id"] for entry in entries}))
+        by_name = {entry["name"]: entry for entry in entries}
+        for name, spec in compiler.BEHAVIOR_SCHEMA["classes"].items():
+            with self.subTest(name=name):
+                self.assertEqual(by_name[name + " Subtype"]["values"], spec["subtypes"])
+                self.assertEqual([p["name"] for p in by_name[name]["members"]],
+                                 ["subtype"] + spec["properties"])
 
     def test_check_command_writes_no_generated_outputs(self):
         path = self.root / "map.tmj"
@@ -163,6 +208,130 @@ class CompilerValidationTests(unittest.TestCase):
     def test_runtime_only_question_subtype_is_not_authorable(self):
         self.set_property("subtype", "question_generator_active_internal")
         with self.assertRaisesRegex(compiler.MapValidationError, "subtype.*unknown"):
+            self.compile()
+
+    def test_template_inheritance_and_instance_overrides(self):
+        base = {"type": "template", "object": {"type": "Question Block",
+                "width": 16, "height": 16,
+                "properties": [{"name": "subtype", "value": "question_star"},
+                               {"name": "hidden", "value": True}]}}
+        (self.root / "star.tx").write_text(json.dumps(base))
+        self.obj.clear()
+        self.obj.update({"id": 1, "name": "instance", "template": "star.tx",
+                         "x": 7.5, "y": 80, "width": 32,
+                         "properties": [{"name": "hidden", "value": False}]})
+        output = self.compile()
+        self.assertIn(".kind = TRAP_QUESTION_BLOCK", output)
+        self.assertIn(".subtype = 104", output)
+        self.assertIn(".hidden = 0", output)
+        self.assertIn(".x = 491520, .y = 0, .w = 2097152, .h = 1048576", output)
+        deps = subprocess.check_output([sys.executable, str(ROOT / "tools/map_dependencies.py"),
+                                       str(self.root / "map.tmj")], text=True)
+        self.assertIn("star.tx", deps)
+
+    def test_template_errors_have_object_context(self):
+        self.obj["template"] = "missing.tx"
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*template.*missing.tx"):
+            self.compile()
+        (self.root / "loop.tx").write_text(json.dumps({"type": "template", "object": {"template": "loop.tx"}}))
+        self.obj["template"] = "loop.tx"
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*cyclic"):
+            self.compile()
+
+    def test_generated_presets_compile_and_match_schema(self):
+        for filename, preset in compiler.BEHAVIOR_SCHEMA["presets"].items():
+            with self.subTest(preset=filename):
+                template = ROOT / "levels/templates" / (filename + ".tx")
+                data = json.loads(template.read_text())
+                self.assertEqual(data["object"]["type"], preset["class"])
+                self.assertEqual({p["name"]: p["value"] for p in data["object"]["properties"]}, preset["properties"])
+                self.obj.clear()
+                self.obj.update({"id": 1, "template": str(template), "x": 0, "y": 80})
+                self.compile()
+
+    def preview_tileset(self, alignment="topleft"):
+        tileset = json.loads((ROOT / "levels/objects.tsj").read_text())
+        tileset["objectalignment"] = alignment
+        for tile in tileset["tiles"]:
+            tile["image"] = str(ROOT / "levels" / tile["image"])
+        (self.root / "objects.tsj").write_text(json.dumps(tileset))
+        self.map["tilesets"].append({"firstgid": 86, "source": "objects.tsj"})
+        return tileset
+
+    def test_named_metatiles_match_numeric_ids(self):
+        self.set_property("visual_metatile", 1)
+        self.set_property("spent_metatile", 3)
+        expected = self.compile()
+        self.set_property("visual_metatile", "brick")
+        self.set_property("spent_metatile", "solid")
+        self.assertEqual(self.compile(), expected)
+        self.set_property("visual_metatile", "inherit")
+        self.set_property("spent_metatile", "default_spent")
+        self.assertIn(".visual_metatile = 255", self.compile())
+        self.set_property("visual_metatile", "typo")
+        with self.assertRaisesRegex(compiler.MapValidationError, "visual_metatile.*typo"):
+            self.compile()
+        self.set_property("visual_metatile", 1.5)
+        with self.assertRaisesRegex(compiler.MapValidationError, "visual_metatile.*integer"):
+            self.compile()
+
+    def test_preview_body_and_bottom_anchor_are_independent_of_art(self):
+        self.preview_tileset("bottomleft")
+        self.obj.clear()
+        self.obj.update(id=1, gid=86, x=7.5, y=96, width=16, height=16,
+                        properties=[{"name": "body_width", "value": 21}])
+        expected = self.compile()
+        self.assertIn("{ ENEMY_WALKER, ENEMY_SPRITE_WALKER, -1, 21, 16, 0, 0, 126552, 491520, 0 }", expected)
+        self.preview_tileset_without_duplicate("topleft")
+        self.obj["y"] = 80
+        self.assertEqual(self.compile(), expected)
+        self.obj["width"] = 32
+        with self.assertRaisesRegex(compiler.MapValidationError, "body_width/body_height"):
+            self.compile()
+
+    def preview_tileset_without_duplicate(self, alignment):
+        self.map["tilesets"] = self.map["tilesets"][:1]
+        return self.preview_tileset(alignment)
+
+    def test_preview_tiles_cannot_be_painted_as_terrain(self):
+        self.preview_tileset()
+        self.map["layers"][0]["data"] = [86]
+        with self.assertRaisesRegex(compiler.MapValidationError, "object preview art on a tile layer"):
+            self.compile()
+
+    def test_preview_template_gid_remapping_and_dependencies(self):
+        template = ROOT / "levels/templates/enemies/defrag.tx"
+        self.obj.clear()
+        self.obj.update(id=1, template=str(template), x=0, y=80)
+        output = self.compile()
+        self.assertIn("{ ENEMY_DEFRAG, ENEMY_SPRITE_DEFRAG, -1, 16, 32, 0, 0, 126552, 0, 0 }", output)
+        # The same template must work when its tileset is already loaded at another GID.
+        self.map["tilesets"].append({"firstgid": 300, "source": str(ROOT / "levels/objects.tsj")})
+        self.assertEqual(self.compile(), output)
+        deps = subprocess.check_output([sys.executable, str(ROOT / "tools/map_dependencies.py"),
+                                       str(self.root / "map.tmj")], text=True)
+        self.assertIn("defrag.tx", deps)
+        self.assertIn("objects.tsj", deps)
+        self.assertIn("defrag.png", deps)
+
+    def test_every_preview_template_compiles(self):
+        for spec in compiler.BEHAVIOR_SCHEMA["previews"]:
+            with self.subTest(preview=spec["name"]):
+                group = "enemies" if spec["class"] == "Enemy" else "items"
+                self.obj.clear()
+                self.obj.update(id=1, template=str(ROOT / "levels/templates" / group / (spec["name"] + ".tx")), x=0, y=80)
+                self.compile()
+
+    def test_preview_tileset_validation(self):
+        self.preview_tileset()
+        self.map["tilesets"][1]["firstgid"] = 1
+        with self.assertRaisesRegex(compiler.MapValidationError, "GID ranges overlap"):
+            self.compile()
+        self.map["tilesets"][1]["firstgid"] = 86
+        tileset = json.loads((self.root / "objects.tsj").read_text())
+        tileset["tiles"][0]["imageheight"] = 32
+        (self.root / "objects.tsj").write_text(json.dumps(tileset))
+        with self.assertRaisesRegex(compiler.MapValidationError, "object tile 0 image dimensions"):
             self.compile()
 
 

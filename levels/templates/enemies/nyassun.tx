@@ -1,0 +1,16 @@
+{
+ "type": "template",
+ "tileset": {
+  "firstgid": 1,
+  "source": "../../objects.tsj"
+ },
+ "object": {
+  "name": "nyassun",
+  "type": "Enemy",
+  "gid": 6,
+  "width": 32,
+  "height": 32,
+  "rotation": 0,
+  "visible": true
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Goal",
+  "type": "Goal",
+  "width": 16,
+  "height": 112,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "subtype",
+    "type": "string",
+    "propertytype": "Goal Subtype",
+    "value": "none"
+   },
+   {
+    "name": "goal_walk_frames",
+    "type": "int",
+    "value": 207
+   }
+  ]
+ }
+}

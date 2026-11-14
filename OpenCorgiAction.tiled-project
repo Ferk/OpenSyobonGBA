@@ -354,13 +354,15 @@
     },
     {
      "name": "visual_metatile",
-     "type": "int",
-     "value": 255
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
     },
     {
      "name": "spent_metatile",
-     "type": "int",
-     "value": 255
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
     },
     {
      "name": "visual_palette",
@@ -454,11 +456,21 @@
      "name": "throw_vx",
      "type": "int",
      "value": 700
+    },
+    {
+     "name": "body_width",
+     "type": "int",
+     "value": 16
+    },
+    {
+     "name": "body_height",
+     "type": "int",
+     "value": 16
     }
    ]
   },
   {
-   "id": 10,
+   "id": 12,
    "name": "Player Start",
    "type": "class",
    "color": "#ff70c0ff",
@@ -475,7 +487,7 @@
    ]
   },
   {
-   "id": 11,
+   "id": 13,
    "name": "Goal Flag",
    "type": "class",
    "color": "#ff70ff70",
@@ -484,6 +496,807 @@
     "object"
    ],
    "members": []
+  },
+  {
+   "id": 14,
+   "name": "VisualMetatile",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "inherit",
+    "empty",
+    "brick",
+    "question",
+    "solid",
+    "ground_top",
+    "ground_dirt",
+    "white_platform",
+    "hint_block",
+    "hill_00",
+    "hill_01",
+    "hill_02",
+    "hill_03",
+    "hill_04",
+    "hill_10",
+    "hill_11",
+    "hill_12",
+    "hill_13",
+    "hill_14",
+    "hill_20",
+    "hill_21",
+    "hill_22",
+    "hill_23",
+    "hill_24",
+    "cloud_00",
+    "cloud_01",
+    "cloud_02",
+    "cloud_03",
+    "cloud_10",
+    "cloud_11",
+    "cloud_12",
+    "cloud_13",
+    "pipe_top_left",
+    "pipe_top_right",
+    "pipe_body_left",
+    "pipe_body_right",
+    "spikes",
+    "bg_spikes_00",
+    "bg_spikes_01",
+    "bg_spikes_02",
+    "bg_spikes_03",
+    "castle_00",
+    "castle_01",
+    "castle_02",
+    "castle_03",
+    "castle_04",
+    "castle_05",
+    "castle_10",
+    "castle_11",
+    "castle_12",
+    "castle_13",
+    "castle_14",
+    "castle_15",
+    "castle_20",
+    "castle_21",
+    "castle_22",
+    "castle_23",
+    "castle_24",
+    "castle_25",
+    "checkpoint_00",
+    "checkpoint_01",
+    "checkpoint_10",
+    "checkpoint_11",
+    "checkpoint_20",
+    "checkpoint_21",
+    "goal_00",
+    "goal_10",
+    "goal_20",
+    "goal_30",
+    "brown_background",
+    "green_solid",
+    "art_70",
+    "art_71",
+    "art_72",
+    "art_73",
+    "art_74",
+    "art_75",
+    "art_76",
+    "art_77",
+    "art_78",
+    "art_79",
+    "art_80",
+    "art_81",
+    "art_82",
+    "art_83",
+    "sky_stage_floor"
+   ]
+  },
+  {
+   "id": 15,
+   "name": "SpentMetatile",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "default_spent",
+    "empty",
+    "brick",
+    "question",
+    "solid",
+    "ground_top",
+    "ground_dirt",
+    "white_platform",
+    "hint_block",
+    "hill_00",
+    "hill_01",
+    "hill_02",
+    "hill_03",
+    "hill_04",
+    "hill_10",
+    "hill_11",
+    "hill_12",
+    "hill_13",
+    "hill_14",
+    "hill_20",
+    "hill_21",
+    "hill_22",
+    "hill_23",
+    "hill_24",
+    "cloud_00",
+    "cloud_01",
+    "cloud_02",
+    "cloud_03",
+    "cloud_10",
+    "cloud_11",
+    "cloud_12",
+    "cloud_13",
+    "pipe_top_left",
+    "pipe_top_right",
+    "pipe_body_left",
+    "pipe_body_right",
+    "spikes",
+    "bg_spikes_00",
+    "bg_spikes_01",
+    "bg_spikes_02",
+    "bg_spikes_03",
+    "castle_00",
+    "castle_01",
+    "castle_02",
+    "castle_03",
+    "castle_04",
+    "castle_05",
+    "castle_10",
+    "castle_11",
+    "castle_12",
+    "castle_13",
+    "castle_14",
+    "castle_15",
+    "castle_20",
+    "castle_21",
+    "castle_22",
+    "castle_23",
+    "castle_24",
+    "castle_25",
+    "checkpoint_00",
+    "checkpoint_01",
+    "checkpoint_10",
+    "checkpoint_11",
+    "checkpoint_20",
+    "checkpoint_21",
+    "goal_00",
+    "goal_10",
+    "goal_20",
+    "goal_30",
+    "brown_background",
+    "green_solid",
+    "art_70",
+    "art_71",
+    "art_72",
+    "art_73",
+    "art_74",
+    "art_75",
+    "art_76",
+    "art_77",
+    "art_78",
+    "art_79",
+    "art_80",
+    "art_81",
+    "art_82",
+    "art_83",
+    "sky_stage_floor"
+   ]
+  },
+  {
+   "id": 16,
+   "name": "Question Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "question_enemy",
+    "question_good_mushroom",
+    "question_bad_mushroom",
+    "question_star",
+    "question_bad_flower",
+    "question_poison_generator",
+    "question_coin_generator",
+    "question_hidden_poison"
+   ]
+  },
+  {
+   "id": 17,
+   "name": "Question Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Question Block Subtype",
+     "value": "none"
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "spawn_dir",
+     "type": "string",
+     "propertyType": "TrapSpawnDirection",
+     "value": "auto"
+    },
+    {
+     "name": "spawn_enemy_kind",
+     "type": "string",
+     "propertyType": "EnemyKind",
+     "value": "none"
+    },
+    {
+     "name": "spawn_enemy_sprite",
+     "type": "string",
+     "propertyType": "EnemySprite",
+     "value": "walker"
+    },
+    {
+     "name": "spawn_enemy_palette",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_param",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_interval",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_limit",
+     "type": "int",
+     "value": 1
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "name": "Stage Spawner Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "stage_pipe_shot",
+    "stage_flying_enemy",
+    "stage_walker_swarm",
+    "stage_upward_hazard",
+    "stage_upward_hazard_toggle",
+    "stage_upward_hazard_left",
+    "stage_hint_message",
+    "stage_pipe_hazard"
+   ]
+  },
+  {
+   "id": 19,
+   "name": "Stage Spawner",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Stage Spawner Subtype",
+     "value": "none"
+    },
+    {
+     "name": "spawn_enemy_kind",
+     "type": "string",
+     "propertyType": "EnemyKind",
+     "value": "none"
+    },
+    {
+     "name": "spawn_enemy_sprite",
+     "type": "string",
+     "propertyType": "EnemySprite",
+     "value": "walker"
+    },
+    {
+     "name": "spawn_enemy_palette",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_param",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_count",
+     "type": "int",
+     "value": 1
+    },
+    {
+     "name": "spawn_dir",
+     "type": "string",
+     "propertyType": "TrapSpawnDirection",
+     "value": "auto"
+    },
+    {
+     "name": "spawn_sound",
+     "type": "bool",
+     "value": true
+    },
+    {
+     "name": "spawn_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_vy",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_random_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_random_vy",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_spacing_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_spacing_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "spawn_interval",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_limit",
+     "type": "int",
+     "value": 1
+    },
+    {
+     "name": "move_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "move_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "repeat_rearm_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "repeat_rearm_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "channel_spawn_interval",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "hint_text",
+     "type": "string",
+     "value": ""
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "name": "Enter Pipe Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "pipe_fake_kill",
+    "pipe_to_underground"
+   ]
+  },
+  {
+   "id": 21,
+   "name": "Enter Pipe",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Enter Pipe Subtype",
+     "value": "none"
+    },
+    {
+     "name": "stage_destination",
+     "type": "string",
+     "propertyType": "StageDestination",
+     "value": "none"
+    },
+    {
+     "name": "entry_id",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "name": "Side Pipe Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "pipe_fake_kill",
+    "pipe_to_underground"
+   ]
+  },
+  {
+   "id": 23,
+   "name": "Side Pipe",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Side Pipe Subtype",
+     "value": "none"
+    },
+    {
+     "name": "stage_destination",
+     "type": "string",
+     "propertyType": "StageDestination",
+     "value": "none"
+    },
+    {
+     "name": "entry_id",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "name": "Falling Floor Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "falling_on_pass_under",
+    "falling_when_approached"
+   ]
+  },
+  {
+   "id": 25,
+   "name": "Falling Floor",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Falling Floor Subtype",
+     "value": "none"
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "gravity",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "name": "Moving Platform Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "platform_conveyor",
+    "platform_vertical_wrap",
+    "platform_bounce"
+   ]
+  },
+  {
+   "id": 27,
+   "name": "Moving Platform",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Moving Platform Subtype",
+     "value": "none"
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "vy",
+     "type": "float",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "name": "Goal Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 29,
+   "name": "Goal",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Goal Subtype",
+     "value": "none"
+    },
+    {
+     "name": "goal_walk_frames",
+     "type": "int",
+     "value": 207
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    }
+   ]
+  },
+  {
+   "id": 30,
+   "name": "Checkpoint Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 31,
+   "name": "Checkpoint",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Checkpoint Subtype",
+     "value": "none"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    }
+   ]
   }
  ],
  "propertyTypesFile": "",

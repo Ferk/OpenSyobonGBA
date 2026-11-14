@@ -6,6 +6,7 @@ import struct
 import tempfile
 from pathlib import Path
 
+BEHAVIOR_SCHEMA = json.loads((Path(__file__).with_name("behavior_schema.json")).read_text())
 
 TRAP_KIND_NAMES = {
     "falling_floor": "TRAP_FALLING_FLOOR",
@@ -374,6 +375,12 @@ def tile_properties(map_data):
             gid = firstgid + int(tile.get("id", 0))
             props[gid] = {p.get("name"): p.get("value")
                           for p in tile.get("properties", [])}
+            if layer_properties(tileset).get("object_tileset"):
+                props[gid].update(_object_tile=True,
+                                  _image_width=tile.get("imagewidth"),
+                                  _image_height=tile.get("imageheight"),
+                                  _alignment=tileset.get("objectalignment", "bottomleft"),
+                                  _class=tile.get("type") or tile.get("class"))
     return props
 
 
@@ -501,6 +508,13 @@ def object_name(obj):
     return obj.get("class") or obj.get("type") or obj.get("name") or ""
 
 
+def metatile_value(value, field):
+    sentinel = "inherit" if field == "visual_metatile" else "default_spent"
+    if isinstance(value, (int, float)):
+        return integer(value, field)
+    return enum_int(value, dict(BEHAVIOR_SCHEMA["metatiles"], **{sentinel: 255}), 255, field)
+
+
 def validate_map_format(map_data, width, height):
     if map_data.get("orientation") != "orthogonal":
         raise map_error("only orthogonal maps are supported", "orientation")
@@ -509,8 +523,9 @@ def validate_map_format(map_data, width, height):
     if map_data.get("infinite", False):
         raise map_error("infinite maps are not supported", "infinite")
     tilesets = map_data.get("tilesets", [])
-    if len(tilesets) != 1 or tilesets[0].get("firstgid", 1) != 1:
-        raise map_error("exactly one embedded tileset with firstgid 1 is supported", "tilesets")
+    terrain = [t for t in tilesets if not layer_properties(t).get("object_tileset")]
+    if len(terrain) != 1 or terrain[0].get("firstgid", 1) != 1:
+        raise map_error("one terrain tileset with firstgid 1 is required; additional tilesets must be object_tileset collections", "tilesets")
     for layer in map_data.get("layers", []):
         set_validation_context(layer=layer.get("name"), obj=None)
         kind = layer.get("type")
@@ -562,20 +577,37 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
             props = obj.get("properties", [])
             gid = decode_gid(obj.get("gid", 0))
             tile_prop = tile_props.get(gid, {})
-            name = object_name(obj)
-            trap = trap_kind(prop_value(props, "trap_type",
-                            tile_prop.get("trap_type")))
+            name = obj.get("class") or obj.get("type") or tile_prop.get("_class") or object_name(obj)
+            class_kind = BEHAVIOR_SCHEMA["classes"].get(name, {}).get("kind")
+            specified_kind = prop_value(props, "trap_type", tile_prop.get("trap_type"))
+            if class_kind and specified_kind and specified_kind != class_kind:
+                raise map_error(f"conflicts with object class {object_name(obj)!r} ({class_kind})", "trap_type")
+            trap = trap_kind(specified_kind or class_kind)
 
             try:
                 tiled_x = float(obj.get("x", 0))
                 tiled_y = float(obj.get("y", 0))
             except (TypeError, ValueError) as exc:
                 raise map_error("object x and y must be numeric pixel coordinates") from exc
+            body_width = obj.get("width", GBA_METATILE_SIZE)
+            body_height = obj.get("height", GBA_METATILE_SIZE)
+            if gid:
+                if not tile_prop.get("_object_tile"):
+                    raise map_error("tile objects must use an object_tileset preview tile", "gid")
+                image_width, image_height = tile_prop["_image_width"], tile_prop["_image_height"]
+                if obj.get("width", image_width) != image_width or obj.get("height", image_height) != image_height:
+                    raise map_error("resizing preview art is not supported; set body_width/body_height instead")
+                if tile_prop["_alignment"] in ("bottomleft", "unspecified"):
+                    tiled_y -= image_height
+                body_width = prop_value(props, "body_width", tile_prop.get("body_width", image_width))
+                body_height = prop_value(props, "body_height", tile_prop.get("body_height", image_height))
+                bounded(body_width, "body_width", 1, 255)
+                bounded(body_height, "body_height", 1, 255)
             world_y = tiled_y - WORLD_Y_OFFSET_PX
             x = fixed(tiled_x)
             y = fixed(world_y)
-            w = fixed(obj.get("width", GBA_METATILE_SIZE))
-            h = fixed(obj.get("height", GBA_METATILE_SIZE))
+            w = fixed(body_width)
+            h = fixed(body_height)
             subtype_value = prop_value(props, "subtype", tile_prop.get("subtype"))
             subtype = enum_int(subtype_value,
                                TRAP_SUBTYPE_NAMES, 0, "subtype")
@@ -701,8 +733,8 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "kind": enemy_kind,
                     "sprite": enemy_sprite,
                     "dir": bounded(prop_value(props, "dir", tile_prop.get("dir", -1)), "dir", -1, 1),
-                    "w": bounded(round(float(obj.get("width", 16))), "width", 1, 255),
-                    "h": bounded(round(float(obj.get("height", 16))), "height", 1, 255),
+                    "w": bounded(round(float(body_width)), "width", 1, 255),
+                    "h": bounded(round(float(body_height)), "height", 1, 255),
                     "palette": enemy_palette_value(prop_value(
                         props, "enemy_palette",
                         tile_prop.get("enemy_palette", 0)), "enemy_palette"),
@@ -751,8 +783,8 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     has_default_exit = any(integer(prop_value(o.get("properties", []), "entry_id", 0), "entry_id") == 0 for o in exits)
                     if not entry_id and not has_default_exit and not any(object_name(o) in ("Player Start", "PlayerStart", "player_start") for layer in target_map.get("layers", []) for o in layer.get("objects", [])):
                         raise map_error(f"destination {destination_path.name} has no default entry", "stage_destination")
-                visual_metatile = integer(prop_value(props, "visual_metatile", tile_prop.get("visual_metatile", 255)), "visual_metatile")
-                spent_metatile = integer(prop_value(props, "spent_metatile", tile_prop.get("spent_metatile", 255)), "spent_metatile")
+                visual_metatile = metatile_value(prop_value(props, "visual_metatile", tile_prop.get("visual_metatile", 255)), "visual_metatile")
+                spent_metatile = metatile_value(prop_value(props, "spent_metatile", tile_prop.get("spent_metatile", 255)), "spent_metatile")
                 for field, value in (("visual_metatile", visual_metatile), ("spent_metatile", spent_metatile)):
                     if value != 255:
                         bounded(value, field, 0, metatile_count - 1)
@@ -866,6 +898,77 @@ def format_u8_array(name, rows):
     return "\n".join(out)
 
 
+def load_tileset(entry, base):
+    if "source" not in entry:
+        return entry
+    source = entry["source"]
+    try:
+        path = (base / source).resolve()
+        tileset = json.loads(path.read_text())
+        if not isinstance(tileset, dict) or "source" in tileset:
+            raise ValueError("expected a JSON tileset object")
+        tileset.update(firstgid=entry.get("firstgid", 1), _source=str(path))
+        if tileset.get("image"):
+            tileset["image"] = str((path.parent / tileset["image"]).resolve())
+        for tile in tileset.get("tiles", []):
+            if tile.get("image"):
+                tile["image"] = str((path.parent / tile["image"]).resolve())
+        return tileset
+    except (OSError, TypeError, ValueError) as exc:
+        raise map_error(f"cannot load external tileset {source!r}: {exc}", "tilesets") from exc
+
+
+def png_size(path):
+    try:
+        with Path(path).open("rb") as png:
+            header = png.read(24)
+        if header[:8] != b"\x89PNG\r\n\x1a\n" or len(header) < 24:
+            raise ValueError("not a PNG image")
+        return struct.unpack(">II", header[16:24])
+    except (OSError, ValueError) as exc:
+        raise map_error(f"cannot read tileset image {str(path)!r}: {exc}") from exc
+
+
+def resolve_template(obj, base, stack=(), tilesets=None):
+    if "template" not in obj:
+        return obj
+    try:
+        path = (base / obj["template"]).resolve()
+        if path in stack or len(stack) >= 32:
+            raise ValueError("cyclic or excessively nested template reference")
+        data = json.loads(path.read_text())
+        if not isinstance(data, dict) or data.get("type") != "template" or not isinstance(data.get("object"), dict):
+            raise ValueError("expected a JSON object template")
+        inherited = resolve_template(data["object"], path.parent, stack + (path,), tilesets)
+        if "gid" in data["object"]:
+            if tilesets is None or "tileset" not in data:
+                raise ValueError("tile-object template must specify an external tileset")
+            source = load_tileset(data["tileset"], path.parent)
+            if not layer_properties(source).get("object_tileset"):
+                raise ValueError("tile-object templates must use an object_tileset preview collection")
+            target = next((t for t in tilesets if t.get("_source") == source.get("_source")), None)
+            if target is None:
+                source["firstgid"] = max(t["firstgid"] + t["tilecount"] for t in tilesets)
+                tilesets.append(source)
+                target = source
+            local = integer(inherited["gid"], "gid") - data["tileset"].get("firstgid", 1)
+            if not any(t["id"] == local for t in source.get("tiles", [])):
+                raise ValueError("template GID is outside its tileset")
+            inherited = dict(inherited, gid=target["firstgid"] + local)
+        properties = {p["name"]: p for p in inherited.get("properties", [])}
+        properties.update({p["name"]: p for p in obj.get("properties", [])})
+        merged = dict(inherited, **obj)
+        if "class" in obj:
+            merged.pop("type", None)
+        elif "type" in obj:
+            merged.pop("class", None)
+        merged.pop("template", None)
+        merged["properties"] = list(properties.values())
+        return merged
+    except (OSError, TypeError, KeyError, ValueError) as exc:
+        raise map_error(f"cannot load template {obj.get('template')!r}: {exc}", "template") from exc
+
+
 def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
     set_validation_context(map_path=tmj_path, layer=None, obj=None)
     try:
@@ -878,6 +981,12 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
 
     if not isinstance(map_data, dict):
         raise map_error("map root must be a JSON object")
+    map_data["tilesets"] = [load_tileset(entry, tmj_path.parent) for entry in map_data.get("tilesets", [])]
+    for layer in map_data.get("layers", []):
+        for index, obj in enumerate(layer.get("objects", [])):
+            set_validation_context(layer=layer.get("name"), obj=obj)
+            layer["objects"][index] = resolve_template(obj, tmj_path.parent, tilesets=map_data["tilesets"])
+    set_validation_context(layer=None, obj=None)
     try:
         width = int(map_data["width"])
         height = int(map_data["height"])
@@ -904,25 +1013,34 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
     camera_margin_bottom = bounded(map_props.get("camera_margin_bottom", 0), "camera_margin_bottom", 0, 65535)
     tileset_ranges = []
     for tileset in map_data.get("tilesets", []):
-        if tileset.get("source"):
-            raise map_error("external tilesets are not supported; embed the tileset in the map")
+        firstgid = integer(tileset.get("firstgid", 1), "firstgid")
+        if layer_properties(tileset).get("object_tileset"):
+            if tileset.get("objectalignment", "bottomleft") not in ("topleft", "bottomleft", "unspecified"):
+                raise map_error("object tileset alignment must be topleft or bottomleft")
+            if tileset.get("tileoffset", {}).get("x", 0) or tileset.get("tileoffset", {}).get("y", 0):
+                raise map_error("object tileset drawing offsets are not supported")
+            tiles = tileset.get("tiles", [])
+            if not tiles or sorted(t["id"] for t in tiles) != list(range(len(tiles))) or tileset.get("tilecount") != len(tiles):
+                raise map_error("object tileset must have contiguous tile IDs and a matching tilecount")
+            for tile in tiles:
+                size = png_size(tmj_path.parent / tile.get("image", ""))
+                if size != (tile.get("imagewidth"), tile.get("imageheight")):
+                    raise map_error(f"object tile {tile['id']} image dimensions do not match metadata")
+            tileset_ranges.append((firstgid, firstgid + len(tiles)))
+            continue
         image = tileset.get("image")
         if not image:
             raise map_error("tileset must specify an image")
         image_path = tmj_path.parent / image
-        try:
-            with image_path.open("rb") as png:
-                header = png.read(24)
-            if header[:8] != b"\x89PNG\r\n\x1a\n" or len(header) < 24:
-                raise ValueError("not a PNG image")
-            image_width, image_height = struct.unpack(">II", header[16:24])
-        except (OSError, ValueError) as exc:
-            raise map_error(f"cannot read tileset image {image!r}: {exc}") from exc
+        image_width, image_height = png_size(image_path)
         count = (image_width // 16) * (image_height // 16)
         if (tileset.get("imagewidth"), tileset.get("imageheight"), tileset.get("tilecount")) != (image_width, image_height, count):
             raise map_error(f"tileset {tileset.get('name')!r} metadata does not match image {image_width}x{image_height}, {count} tiles")
         firstgid = int(tileset.get("firstgid", 1))
         tileset_ranges.append((firstgid, firstgid + count))
+    ordered_ranges = sorted(tileset_ranges)
+    if any(start < 1 for start, end in ordered_ranges) or any(right[0] < left[1] for left, right in zip(ordered_ranges, ordered_ranges[1:])):
+        raise map_error("tileset GID ranges overlap or start below 1", "tilesets")
     props = tile_properties(map_data)
 
     metatiles = [[0 for _ in range(width)] for _ in range(height)]
@@ -947,6 +1065,8 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
                 continue
             if not any(first <= gid < end for first, end in tileset_ranges):
                 raise map_error(f"tile ({x}, {y}) uses unknown GID {gid}")
+            if props.get(gid, {}).get("_object_tile"):
+                raise map_error(f"tile ({x}, {y}) uses object preview art on a tile layer; place it as an object instead")
             if is_switch_layer:
                 switch_cells[y][x] = 1
             elif is_source_layer:
@@ -957,7 +1077,7 @@ def write_outputs(tmj_path, header_path, source_path, symbol_prefix=None):
                 palettes[y][x] = bounded(palette_from_gid(gid, props, layer_palette), "palette", 0, 3)
 
     if not tileset_ranges:
-        raise map_error("map must contain an embedded tileset")
+        raise map_error("map must contain a tileset")
     objects, enemy_spawns, traps = parse_object_layers(map_data, props, count, tmj_path)
     prefix = symbol_prefix or c_ident(tmj_path.name)
     guard = f"GENERATED_{prefix.upper()}_DATA_H"

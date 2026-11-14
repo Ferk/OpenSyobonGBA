@@ -1,0 +1,16 @@
+{
+ "type": "template",
+ "tileset": {
+  "firstgid": 1,
+  "source": "../../objects.tsj"
+ },
+ "object": {
+  "name": "defrag",
+  "type": "Enemy",
+  "gid": 11,
+  "width": 16,
+  "height": 32,
+  "rotation": 0,
+  "visible": true
+ }
+}

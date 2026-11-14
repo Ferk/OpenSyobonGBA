@@ -330,19 +330,13 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 176,
@@ -367,19 +361,13 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 256,
@@ -404,29 +392,25 @@
       },
       {
        "name": "spent_metatile",
-       "type": "int",
-       "value": 3
+       "type": "string",
+       "value": "solid",
+       "propertytype": "SpentMetatile"
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "question_hidden_poison"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 0
+       "type": "string",
+       "value": "empty",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 208,
@@ -468,8 +452,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 7
+       "type": "string",
+       "value": "hint_block",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -492,15 +477,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Enter Pipe Subtype",
        "type": "string",
        "value": "pipe_to_underground"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "enter_pipe"
       },
       {
        "name": "stage_destination",
@@ -510,7 +489,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Enter Pipe",
      "visible": true,
      "width": 32,
      "x": 224,
@@ -529,19 +508,13 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Side Pipe Subtype",
        "type": "string",
        "value": "pipe_fake_kill"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "side_pipe"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Side Pipe",
      "visible": true,
      "width": 32,
      "x": 192,
@@ -603,19 +576,13 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Stage Spawner Subtype",
        "type": "string",
        "value": "stage_pipe_shot"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "stage_spawner"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 32,
      "x": 224,
@@ -649,17 +616,8 @@
  "tileheight": 16,
  "tilesets": [
   {
-   "columns": 1,
    "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1360,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 85,
-   "tileheight": 16,
-   "tilewidth": 16
+   "source": "tiles_16.tsj"
   }
  ],
  "tilewidth": 16,

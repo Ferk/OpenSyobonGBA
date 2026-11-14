@@ -2633,6 +2633,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "shell_walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2640,7 +2650,8 @@
      "visible": true,
      "width": 16,
      "x": 464,
-     "y": 160
+     "y": 160,
+     "gid": 87
     },
     {
      "height": 16,
@@ -2672,6 +2683,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2679,7 +2700,8 @@
      "visible": true,
      "width": 16,
      "x": 160,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -2711,6 +2733,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2718,7 +2750,8 @@
      "visible": true,
      "width": 16,
      "x": 192,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -2750,6 +2783,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2757,7 +2800,8 @@
      "visible": true,
      "width": 16,
      "x": 352,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -2789,6 +2833,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2796,7 +2850,8 @@
      "visible": true,
      "width": 16,
      "x": 576,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -2828,6 +2883,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2835,7 +2900,8 @@
      "visible": true,
      "width": 16,
      "x": 592,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -2867,6 +2933,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2874,7 +2950,8 @@
      "visible": true,
      "width": 16,
      "x": 608,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 32,
@@ -2945,6 +3022,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2952,7 +3039,8 @@
      "visible": true,
      "width": 16,
      "x": 1343.66666666667,
-     "y": 110.666666666667
+     "y": 110.666666666667,
+     "gid": 94
     }
    ],
    "opacity": 1,
@@ -2985,15 +3073,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3003,7 +3085,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 416,
@@ -3028,15 +3110,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3046,7 +3122,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 304,
@@ -3071,15 +3147,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3089,7 +3159,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1968,
@@ -3114,15 +3184,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3132,7 +3196,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1984,
@@ -3157,15 +3221,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3175,7 +3233,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 2000,
@@ -3200,15 +3258,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3218,7 +3270,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 2016,
@@ -3243,15 +3295,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3261,7 +3307,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 2032,
@@ -3286,15 +3332,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3304,7 +3344,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 336,
@@ -3329,15 +3369,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3347,7 +3381,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 352,
@@ -3372,15 +3406,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3390,7 +3418,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 368,
@@ -3415,15 +3443,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3433,7 +3455,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 384,
@@ -3458,15 +3480,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3476,7 +3492,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1152,
@@ -3501,15 +3517,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3519,7 +3529,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 32,
@@ -3544,15 +3554,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
       },
       {
        "name": "visual_palette",
@@ -3562,7 +3566,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 624,
@@ -3587,20 +3591,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3610,7 +3609,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1264,
@@ -3635,20 +3634,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3658,7 +3652,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 128,
@@ -3683,20 +3677,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3706,7 +3695,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 144,
@@ -3731,20 +3720,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3754,7 +3738,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 16,
      "x": 32,
@@ -3779,20 +3763,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3802,7 +3781,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 16,
      "x": 384,
@@ -3850,14 +3829,10 @@
        "value": "question_star"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3866,7 +3841,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1280,
@@ -3919,14 +3894,10 @@
        "value": "question_good_mushroom"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -3935,7 +3906,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1248,
@@ -3988,14 +3959,10 @@
        "value": "question_good_mushroom"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4004,7 +3971,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 112,
@@ -4052,14 +4019,10 @@
        "value": "question_enemy"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4068,7 +4031,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 160,
@@ -4116,14 +4079,10 @@
        "value": "question_hidden_poison"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4132,7 +4091,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 784.181818181818,
@@ -4233,14 +4192,10 @@
        "value": "stage_pipe_hazard"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "stage_spawner"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4249,7 +4204,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 16,
      "x": 1640,
@@ -4303,8 +4258,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4358,20 +4314,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Checkpoint Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "checkpoint"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4381,7 +4332,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Checkpoint",
      "visible": true,
      "width": 16,
      "x": 976,
@@ -4464,20 +4415,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Stage Spawner Subtype",
        "type": "string",
        "value": "stage_upward_hazard"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "stage_spawner"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4487,7 +4433,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 16,
      "x": 690.758620689655,
@@ -4585,20 +4531,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Stage Spawner Subtype",
        "type": "string",
        "value": "stage_upward_hazard_toggle"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "stage_spawner"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4608,7 +4549,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 16,
      "x": 850.758620689655,
@@ -4654,20 +4595,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Stage Spawner Subtype",
        "type": "string",
        "value": "stage_hint_message"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "stage_spawner"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4677,7 +4613,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 49.6551724137931,
      "x": 2464,
@@ -4723,20 +4659,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "falling_when_approached"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4746,7 +4677,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 82.7531034482759,
      "x": 1968,
@@ -4791,20 +4722,15 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Side Pipe Subtype",
        "type": "string",
        "value": "pipe_to_underground"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "side_pipe"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4820,7 +4746,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Side Pipe",
      "visible": true,
      "width": 64,
      "x": 2064,
@@ -4865,15 +4791,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "falling_on_pass_under"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
       },
       {
        "name": "trigger_channel",
@@ -4882,8 +4802,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 1
+       "type": "string",
+       "value": "brick",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4893,7 +4814,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 96,
      "x": 1104,
@@ -4918,15 +4839,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "default"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
       },
       {
        "name": "trigger_channel",
@@ -4940,8 +4855,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -4951,7 +4867,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 48,
      "x": 1056,
@@ -4976,15 +4892,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "default"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
       },
       {
        "name": "trigger_delay",
@@ -4993,8 +4903,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "visual_palette",
@@ -5004,7 +4915,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 144,
      "x": 1056,
@@ -5023,24 +4934,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Moving Platform Subtype",
        "type": "string",
        "value": "platform_vertical_wrap"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1776,
@@ -5059,24 +4965,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Moving Platform Subtype",
        "type": "string",
        "value": "platform_vertical_wrap"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1776,
@@ -5095,24 +4996,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Moving Platform Subtype",
        "type": "string",
        "value": "platform_vertical_wrap"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1856,
@@ -5131,24 +5027,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Moving Platform Subtype",
        "type": "string",
        "value": "platform_vertical_wrap"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1856,
@@ -5175,6 +5066,16 @@
        "name": "trigger_channel",
        "type": "int",
        "value": 26
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -5182,7 +5083,8 @@
      "visible": true,
      "width": 16,
      "x": 1536,
-     "y": 160
+     "y": 160,
+     "gid": 100
     }
    ],
    "opacity": 1,
@@ -5212,17 +5114,12 @@
  "tileheight": 16,
  "tilesets": [
   {
-   "columns": 1,
    "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1360,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 85,
-   "tileheight": 16,
-   "tilewidth": 16
+   "source": "tiles_16.tsj"
+  },
+  {
+   "firstgid": 86,
+   "source": "objects.tsj"
   }
  ],
  "tilewidth": 16,

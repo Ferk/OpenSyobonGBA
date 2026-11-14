@@ -306,6 +306,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -313,7 +323,8 @@
      "visible": true,
      "width": 16,
      "x": 16,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -340,6 +351,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -347,7 +368,8 @@
      "visible": true,
      "width": 16,
      "x": 48,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -374,6 +396,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -381,7 +413,8 @@
      "visible": true,
      "width": 16,
      "x": 80,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -408,6 +441,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -415,7 +458,8 @@
      "visible": true,
      "width": 16,
      "x": 112,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -442,6 +486,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -449,7 +503,8 @@
      "visible": true,
      "width": 16,
      "x": 144,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -476,6 +531,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -483,7 +548,8 @@
      "visible": true,
      "width": 16,
      "x": 176,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -510,6 +576,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -517,7 +593,8 @@
      "visible": true,
      "width": 16,
      "x": 208,
-     "y": 176
+     "y": 176,
+     "gid": 94
     },
     {
      "height": 16,
@@ -544,6 +621,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -551,7 +638,8 @@
      "visible": true,
      "width": 16,
      "x": 240,
-     "y": 176
+     "y": 176,
+     "gid": 94
     }
    ],
    "opacity": 1,
@@ -581,17 +669,12 @@
  "tileheight": 16,
  "tilesets": [
   {
-   "columns": 1,
    "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1360,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 85,
-   "tileheight": 16,
-   "tilewidth": 16
+   "source": "tiles_16.tsj"
+  },
+  {
+   "firstgid": 86,
+   "source": "objects.tsj"
   }
  ],
  "tilewidth": 16,

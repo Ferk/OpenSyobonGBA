@@ -1,0 +1,19 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Checkpoint",
+  "type": "Checkpoint",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "subtype",
+    "type": "string",
+    "propertytype": "Checkpoint Subtype",
+    "value": "none"
+   }
+  ]
+ }
+}

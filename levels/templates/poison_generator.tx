@@ -1,0 +1,41 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Poison Generator",
+  "type": "Question Block",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "subtype",
+    "type": "string",
+    "propertytype": "Question Block Subtype",
+    "value": "question_poison_generator"
+   },
+   {
+    "name": "visual_metatile",
+    "type": "string",
+    "propertytype": "VisualMetatile",
+    "value": "question"
+   },
+   {
+    "name": "collision",
+    "type": "int",
+    "propertytype": "LevelCollision",
+    "value": 1
+   },
+   {
+    "name": "spawn_interval",
+    "type": "int",
+    "value": 16
+   },
+   {
+    "name": "spawn_limit",
+    "type": "int",
+    "value": 0
+   }
+  ]
+ }
+}

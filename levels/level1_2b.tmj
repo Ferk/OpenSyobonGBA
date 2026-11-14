@@ -1030,15 +1030,10 @@
        "name": "subtype",
        "type": "string",
        "value": "pipe_fake_kill"
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "enter_pipe"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Enter Pipe",
      "visible": true,
      "width": 32,
      "x": 704,
@@ -1073,15 +1068,10 @@
        "name": "goal_walk_frames",
        "type": "int",
        "value": 207
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "goal"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Goal",
      "visible": true,
      "width": 16,
      "x": 416,
@@ -1091,7 +1081,7 @@
      "id": 6,
      "name": "ref 1-2B upward kuma hazard stype102 sx8 5,-2",
      "type": "",
-     "class": "Trap",
+     "class": "Stage Spawner",
      "x": 82.75862068965517,
      "y": -26.48275862068965,
      "width": 16.551724137931036,
@@ -1099,11 +1089,6 @@
      "rotation": 0,
      "visible": true,
      "properties": [
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "stage_spawner"
-      },
       {
        "name": "spawn_enemy_kind",
        "type": "string",
@@ -1179,17 +1164,8 @@
  "tileheight": 16,
  "tilesets": [
   {
-   "columns": 1,
    "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1360,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 85,
-   "tileheight": 16,
-   "tilewidth": 16
+   "source": "tiles_16.tsj"
   }
  ],
  "tilewidth": 16,

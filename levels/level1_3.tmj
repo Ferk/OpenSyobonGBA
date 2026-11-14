@@ -2755,24 +2755,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Question Block Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 0
+       "type": "string",
+       "value": "empty",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 288,
@@ -2834,14 +2829,25 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 18
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
      "type": "Enemy",
      "visible": true,
-     "width": 18,
+     "width": 16,
      "x": 1616,
-     "y": 80
+     "y": 80,
+     "gid": 94
     },
     {
      "height": 32,
@@ -2873,6 +2879,16 @@
        "name": "throw_vx",
        "type": "int",
        "value": 1400
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 32
       }
      ],
      "rotation": 0,
@@ -2880,7 +2896,8 @@
      "visible": true,
      "width": 16,
      "x": 2336,
-     "y": 160
+     "y": 160,
+     "gid": 96
     },
     {
      "height": 32,
@@ -2902,6 +2919,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "defrag"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 32
       }
      ],
      "rotation": 0,
@@ -2909,7 +2936,8 @@
      "visible": true,
      "width": 16,
      "x": 1344,
-     "y": 128
+     "y": 128,
+     "gid": 96
     },
     {
      "height": 16,
@@ -2936,6 +2964,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "jien_cannon"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2943,7 +2981,8 @@
      "visible": true,
      "width": 16,
      "x": 1536,
-     "y": 16
+     "y": 16,
+     "gid": 98
     },
     {
      "height": 16,
@@ -2970,6 +3009,16 @@
        "name": "enemy_sprite",
        "type": "string",
        "value": "jien_cannon"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -2977,7 +3026,8 @@
      "visible": true,
      "width": 16,
      "x": 1536,
-     "y": 80
+     "y": 80,
+     "gid": 98
     },
     {
      "height": 32,
@@ -3001,6 +3051,16 @@
        "propertytype": "EnemySprite",
        "type": "string",
        "value": "super_boon"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 32
       }
      ],
      "rotation": 0,
@@ -3008,7 +3068,8 @@
      "visible": true,
      "width": 16,
      "x": 1952,
-     "y": 80
+     "y": 80,
+     "gid": 99
     },
     {
      "height": 16,
@@ -3033,14 +3094,25 @@
        "propertytype": "EnemySprite",
        "type": "string",
        "value": "superjien"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 18
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
      "type": "Enemy",
      "visible": true,
-     "width": 18,
+     "width": 16,
      "x": 416,
-     "y": 32
+     "y": 32,
+     "gid": 94
     },
     {
      "height": 16,
@@ -3065,14 +3137,25 @@
        "propertytype": "EnemySprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 17
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
      "type": "Enemy",
      "visible": true,
-     "width": 17,
+     "width": 16,
      "x": 1088,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -3097,14 +3180,25 @@
        "propertytype": "EnemySprite",
        "type": "string",
        "value": "walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 17
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
      "type": "Enemy",
      "visible": true,
-     "width": 17,
+     "width": 16,
      "x": 1120,
-     "y": 192
+     "y": 192,
+     "gid": 86
     },
     {
      "height": 16,
@@ -3129,14 +3223,25 @@
        "propertytype": "EnemySprite",
        "type": "string",
        "value": "shell_walker"
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 17
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
      "type": "Enemy",
      "visible": true,
-     "width": 17,
+     "width": 16,
      "x": 2048,
-     "y": 32
+     "y": 32,
+     "gid": 87
     },
     {
      "height": 32,
@@ -3212,8 +3317,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3261,8 +3367,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 1
+       "type": "string",
+       "value": "brick",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3300,8 +3407,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3341,8 +3449,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3382,8 +3491,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3423,8 +3533,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3476,18 +3587,14 @@
        "value": "question_enemy"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 976,
@@ -3515,18 +3622,14 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 0
+       "type": "string",
+       "value": "empty",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 1184,
@@ -3565,8 +3668,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 7
+       "type": "string",
+       "value": "hint_block",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3603,18 +3707,14 @@
        "value": "question_bad_flower"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "question_block"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 2
+       "type": "string",
+       "value": "question",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Question Block",
      "visible": true,
      "width": 16,
      "x": 112,
@@ -3653,8 +3753,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 7
+       "type": "string",
+       "value": "hint_block",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3692,8 +3793,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 1
+       "type": "string",
+       "value": "brick",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3731,8 +3833,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 1
+       "type": "string",
+       "value": "brick",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3770,8 +3873,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 1
+       "type": "string",
+       "value": "brick",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3810,8 +3914,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 7
+       "type": "string",
+       "value": "hint_block",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3850,8 +3955,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 0
+       "type": "string",
+       "value": "empty",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
@@ -3886,6 +3992,16 @@
        "name": "trigger_channel",
        "type": "int",
        "value": 1
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 16
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
       }
      ],
      "rotation": 0,
@@ -3893,7 +4009,8 @@
      "visible": true,
      "width": 16,
      "x": 160,
-     "y": 176
+     "y": 176,
+     "gid": 100
     },
     {
      "height": 32,
@@ -3912,18 +4029,14 @@
        "value": "falling_when_approached"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "falling_floor"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 48,
      "x": 144,
@@ -3941,11 +4054,6 @@
        "value": "pipe_to_underground"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "enter_pipe"
-      },
-      {
        "name": "stage_destination",
        "type": "string",
        "propertytype": "StageDestination",
@@ -3953,7 +4061,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Enter Pipe",
      "visible": true,
      "width": 32,
      "x": 1040,
@@ -4009,15 +4117,10 @@
        "name": "subtype",
        "type": "string",
        "value": "stage_upward_hazard_left"
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "stage_spawner"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 32,
      "x": 1184,
@@ -4083,15 +4186,10 @@
        "name": "subtype",
        "type": "string",
        "value": "stage_upward_hazard_toggle"
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "stage_spawner"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 49.6551724137931,
      "x": 1519.44827586207,
@@ -4137,15 +4235,10 @@
        "name": "subtype",
        "type": "string",
        "value": "stage_upward_hazard"
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "stage_spawner"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Stage Spawner",
      "visible": true,
      "width": 82.7586206896552,
      "x": 2087.72413793103,
@@ -4161,15 +4254,10 @@
        "name": "goal_walk_frames",
        "type": "int",
        "value": 207
-      },
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "goal"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Goal",
      "visible": true,
      "width": 16,
      "x": 2208,
@@ -4198,8 +4286,9 @@
       },
       {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "vy",
@@ -4233,24 +4322,19 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Falling Floor Subtype",
        "type": "string",
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "falling_floor"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Falling Floor",
      "visible": true,
      "width": 48,
      "x": 612.965517241379,
@@ -4268,14 +4352,10 @@
        "value": "platform_conveyor"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "vx",
@@ -4284,7 +4364,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 728.275862068965,
@@ -4298,23 +4378,19 @@
      "properties": [
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Moving Platform Subtype",
        "type": "string",
        "value": "platform_bounce"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1664,
@@ -4332,14 +4408,10 @@
        "value": "platform_vertical_wrap"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "moving_platform"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 6
+       "type": "string",
+       "value": "white_platform",
+       "propertytype": "VisualMetatile"
       },
       {
        "name": "vy",
@@ -4348,7 +4420,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Platform",
      "visible": true,
      "width": 48,
      "x": 1872,
@@ -4376,18 +4448,14 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "checkpoint"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Checkpoint",
      "visible": true,
      "width": 16,
      "x": 976,
@@ -4415,18 +4483,14 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "checkpoint"
-      },
-      {
        "name": "visual_metatile",
-       "type": "int",
-       "value": 255
+       "type": "string",
+       "value": "inherit",
+       "propertytype": "VisualMetatile"
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Checkpoint",
      "visible": true,
      "width": 16,
      "x": 1760,
@@ -7222,17 +7286,12 @@
  "tileheight": 16,
  "tilesets": [
   {
-   "columns": 1,
    "firstgid": 1,
-   "image": "../gfx/tiles_16.png",
-   "imageheight": 1360,
-   "imagewidth": 16,
-   "margin": 0,
-   "name": "tiles_16",
-   "spacing": 0,
-   "tilecount": 85,
-   "tileheight": 16,
-   "tilewidth": 16
+   "source": "tiles_16.tsj"
+  },
+  {
+   "firstgid": 86,
+   "source": "objects.tsj"
   }
  ],
  "tilewidth": 16,
