@@ -4185,9 +4185,9 @@
        "value": -4.413793103448
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 172.137931034483
+       "value": 39.13792419433594
       },
       {
        "name": "spawn_dir",
@@ -4420,9 +4420,9 @@
        "value": -5.51724137931
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 249.379310344828
+       "value": 202.48275756835938
       },
       {
        "name": "spawn_dir",
@@ -4536,9 +4536,9 @@
        "value": -4.413793103448
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 140.137931034483
+       "value": 93.24137878417969
       },
       {
        "name": "spawn_dir",

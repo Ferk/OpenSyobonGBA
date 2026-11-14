@@ -569,9 +569,9 @@
        "value": -2.206896551724
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 183.172413793103
+       "value": 183.1724090576172
       },
       {
        "name": "spawn_dir",

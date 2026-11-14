@@ -3826,9 +3826,9 @@
        "value": 5.51724137931
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 183.172413793103
+       "value": 209.65516662597656
       },
       {
        "name": "spawn_vy",
@@ -3895,9 +3895,9 @@
        "value": 33.103448275862
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": -15.448275862069
+       "value": 11.03448486328125
       },
       {
        "name": "spawn_vy",
@@ -3959,9 +3959,9 @@
        "propertytype": "TrapSpawnDirection"
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": -9.931034482759
+       "value": 16.733551025390625
       },
       {
        "name": "spawn_spacing_x",
@@ -4028,9 +4028,9 @@
        "value": 33.103448275862
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": -15.448275862069
+       "value": 11.03448486328125
       },
       {
        "name": "spawn_vy",

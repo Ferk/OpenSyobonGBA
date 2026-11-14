@@ -64,7 +64,6 @@
     "question_poison_generator",
     "question_coin_generator",
     "question_hidden_poison",
-    "question_generator_active_internal",
     "evasive_vertical",
     "evasive_horizontal",
     "pipe_fake_kill",
@@ -282,16 +281,6 @@
      "name": "spawn_sound",
      "type": "bool",
      "value": true
-    },
-    {
-     "name": "spawn_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_y",
-     "type": "float",
-     "value": 0
     },
     {
      "name": "spawn_offset_x",

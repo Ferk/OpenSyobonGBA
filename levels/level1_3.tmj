@@ -4001,9 +4001,9 @@
        "value": 4.413793103448
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 130.758620689655
+       "value": 2.7586212158203125
       },
       {
        "name": "subtype",
@@ -4070,14 +4070,14 @@
        "value": 0
       },
       {
-       "name": "spawn_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 1469.79310344828
+       "value": -49.65516662597656
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": -15.448275862069
+       "value": 11.03448486328125
       },
       {
        "name": "subtype",

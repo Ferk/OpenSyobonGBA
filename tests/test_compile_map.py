@@ -128,6 +128,43 @@ class CompilerValidationTests(unittest.TestCase):
         self.assertFalse((self.root / "map.c").exists())
         self.assertFalse((self.root / "map.h").exists())
 
+    def test_spawns_use_offsets_and_reject_absolute_coordinates(self):
+        self.set_property("trap_type", "stage_spawner")
+        self.set_property("spawn_offset_x", 7.5)
+        self.set_property("spawn_offset_y", -12.25)
+        self.obj["x"] = 20
+        self.assertIn(".spawn_offset_x = 491520, .spawn_offset_y = -802816", self.compile())
+        self.obj["x"] = 40
+        self.assertIn(".spawn_offset_x = 491520, .spawn_offset_y = -802816", self.compile())
+        self.set_property("spawn_x", 100)
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*spawn_x.*spawn_offset_x"):
+            self.compile()
+
+    def test_channel_listener_kind_and_cycles(self):
+        self.set_property("trap_type", "spike_block")
+        self.set_property("listen_channel", 1)
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*listen_channel.*cannot"):
+            self.compile()
+        self.set_property("trap_type", "falling_floor")
+        self.set_property("trigger_channel", 2)
+        other = copy.deepcopy(self.obj)
+        other["id"] = 2
+        other["name"] = "other"
+        other["properties"] = [{"name": "trap_type", "value": "falling_floor"},
+                               {"name": "listen_channel", "value": 2},
+                               {"name": "trigger_channel", "value": 3}]
+        self.map["layers"][1]["objects"].append(other)
+        self.map["nextobjectid"] = 3
+        self.compile()
+        other["properties"][-1]["value"] = 1
+        with self.assertRaisesRegex(compiler.MapValidationError, "other.*trigger_channel.*cycle"):
+            self.compile()
+
+    def test_runtime_only_question_subtype_is_not_authorable(self):
+        self.set_property("subtype", "question_generator_active_internal")
+        with self.assertRaisesRegex(compiler.MapValidationError, "subtype.*unknown"):
+            self.compile()
+
 
 if __name__ == "__main__":
     unittest.main()

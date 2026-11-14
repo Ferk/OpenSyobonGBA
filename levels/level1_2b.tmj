@@ -1130,14 +1130,14 @@
        "value": true
       },
       {
-       "name": "spawn_x",
+       "name": "spawn_offset_x",
        "type": "float",
-       "value": 38.620689655172
+       "value": -44.13792419433594
       },
       {
-       "name": "spawn_y",
+       "name": "spawn_offset_y",
        "type": "float",
-       "value": 150.068965517241
+       "value": 176.55172729492188
       },
       {
        "name": "spawn_vx",

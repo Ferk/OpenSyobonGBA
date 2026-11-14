@@ -56,8 +56,6 @@ TRAP_SUBTYPE_NAMES = {
     "question_poison_generator": 110,
     "question_coin_generator": 112,
     "question_hidden_poison": 114,
-    "question_generator_active": 200,
-    "question_generator_active_internal": 200,
     "evasive_vertical": 0,
     "evasive_horizontal": 1,
     "pipe_fake_kill": 0,
@@ -204,6 +202,12 @@ TRAP_SUBTYPE_NAMES_BY_KIND = {
     "TRAP_HINT_BLOCK": {"hint_stage_1"},
     "TRAP_MOVING_PLATFORM": {"platform_conveyor", "platform_vertical_wrap", "platform_bounce"},
     "TRAP_JUMP_PAD": {"warp_pad", "fatal_launch"},
+}
+
+CHANNEL_LISTENER_KINDS = {
+    "TRAP_FALLING_FLOOR", "TRAP_BUMP_SHOOTER", "TRAP_QUESTION_BLOCK",
+    "TRAP_STAGE_SPAWNER", "TRAP_CHECKPOINT", "TRAP_GOAL", "TRAP_FAKE_GOAL",
+    "TRAP_HINT_BLOCK", "TRAP_PICKUP_ITEM", "TRAP_MOVING_BLOCK",
 }
 
 
@@ -545,6 +549,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
     objects = []
     enemy_spawns = []
     traps = []
+    trap_origins = []
     dynamic_colliders = 0
 
     for layer in map_data.get("layers", []):
@@ -672,12 +677,10 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                 props, "repeat_rearm_offset_y",
                 tile_prop.get("repeat_rearm_offset_y", 0)) or 0)
 
-            spawn_x_prop = prop_value(props, "spawn_x", tile_prop.get("spawn_x"))
-            spawn_y_prop = prop_value(props, "spawn_y", tile_prop.get("spawn_y"))
-            if spawn_x_prop is not None:
-                spawn_offset_x = fixed(spawn_x_prop) - x
-            if spawn_y_prop is not None:
-                spawn_offset_y = fixed(float(spawn_y_prop) - WORLD_Y_OFFSET_PX) - y
+            for axis in ("x", "y"):
+                field = "spawn_" + axis
+                if prop_value(props, field, tile_prop.get(field)) is not None:
+                    raise map_error(f"absolute spawn positions are not supported; use spawn_offset_{axis} relative to the object", field)
 
             if layer_name.lower().startswith("enem") or name.lower() == "enemy":
                 if len(enemy_spawns) >= MAX_ENEMY_SPAWNS:
@@ -756,6 +759,9 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                 collision = integer(prop_value(props, "collision", tile_prop.get("collision", 255)), "collision")
                 if collision not in (0, 1, 2, 3, 255):
                     raise map_error(f"invalid collision {collision}", "collision")
+                if listen_channel and trap not in CHANNEL_LISTENER_KINDS:
+                    raise map_error(f"{trap} cannot be activated by a channel", "listen_channel")
+                trap_origins.append((layer_name, obj))
                 traps.append({
                     "kind": trap or "TRAP_QUESTION_BLOCK",
                     "subtype": subtype,
@@ -827,6 +833,28 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "h": h,
                 })
 
+    edges = {}
+    for trap, origin in zip(traps, trap_origins):
+        if trap["listen_channel"] and trap["trigger_channel"]:
+            edges.setdefault(trap["listen_channel"], []).append((trap["trigger_channel"], origin))
+    visiting = set()
+    visited = set()
+
+    def check_channel(channel):
+        visiting.add(channel)
+        for target, (layer_name, obj) in edges.get(channel, []):
+            if target in visiting:
+                set_validation_context(layer=layer_name, obj=obj)
+                raise map_error(f"channel link {channel} -> {target} creates a cycle", "trigger_channel")
+            if target not in visited:
+                check_channel(target)
+        visiting.remove(channel)
+        visited.add(channel)
+
+    for channel in edges:
+        if channel not in visited:
+            check_channel(channel)
+    set_validation_context(layer=None, obj=None)
     return objects, enemy_spawns, traps
 
 
