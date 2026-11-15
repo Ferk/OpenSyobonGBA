@@ -73,6 +73,34 @@ class CompilerValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(compiler.MapValidationError, "spawn_interval.*255"):
             self.compile()
 
+    def test_enemy_recipe_must_fit_the_runtime_pool(self):
+        self.obj["type"] = "Stage Spawner"
+        self.set_property("spawn_enemy_count", 33)
+        with self.assertRaisesRegex(compiler.MapValidationError, "spawn_enemy_count.*32"):
+            self.compile()
+
+    def test_level1_missing_encounters_are_authored(self):
+        path = ROOT / "levels/level1.tmj"
+        data = json.loads(path.read_text())
+        data["tilesets"] = [compiler.load_tileset(t, path.parent) for t in data["tilesets"]]
+        _, enemies, traps = compiler.parse_object_layers(
+            data, compiler.tile_properties(data), map_path=path)
+        walker = next(e for e in enemies if e["x"] == 432 * compiler.FIX_SCALE
+                      and e["y"] == 64 * compiler.FIX_SCALE)
+        self.assertEqual(walker["kind"], "ENEMY_WALKER")
+        self.assertEqual((walker["w"], walker["h"], walker["dir"]), (17, 16, -1))
+        laser = next(t for t in traps if t["spawn_enemy_kind"] == "ENEMY_LASER")
+        self.assertEqual(laser["x"], round((1872 + 2 * 16 / 29) * compiler.FIX_SCALE))
+        self.assertEqual(laser["y"], round((43 * 16 / 29 - 80) * compiler.FIX_SCALE))
+        self.assertEqual(laser["w"], round(146 * 16 / 29 * compiler.FIX_SCALE))
+        self.assertEqual(laser["h"], round(32 * 16 / 29 * compiler.FIX_SCALE))
+        self.assertEqual(laser["spawn_offset_x"], round(88 * 16 / 29 * compiler.FIX_SCALE))
+        self.assertEqual(laser["spawn_offset_y"], round(20 * 16 / 29 * compiler.FIX_SCALE))
+        self.assertEqual(laser["spawn_enemy_sprite"], "ENEMY_SPRITE_LASER")
+        self.assertEqual((laser["spawn_enemy_count"], laser["spawn_limit"]), (1, 1))
+        self.assertEqual((laser["spawn_dir"], laser["spawn_vx"], laser["spawn_vy"]), (0, 0, 0))
+        self.assertIn("WAVE-MOTION CANNON!!", laser["hint_text"])
+
     def test_unset_destination_and_valid_first_stage_are_distinct(self):
         self.obj["type"] = "Transition Zone"
         self.set_property("stage_destination", "none")

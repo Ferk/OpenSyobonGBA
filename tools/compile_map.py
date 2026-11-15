@@ -183,6 +183,7 @@ MAX_MAP_WIDTH = 160
 MAX_MAP_HEIGHT = 17
 MAX_TRAPS = 48
 MAX_ENEMY_SPAWNS = 64
+MAX_ACTIVE_ENEMIES = 32
 MAX_DYNAMIC_COLLIDERS = 16
 STAGE_MAPS = ("level1.tmj", "level1_2.tmj", "level1_2u.tmj",
               "level1_2b.tmj", "level1_3.tmj", "level1_3u.tmj", "level1_3s.tmj")
@@ -812,7 +813,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "spawn_enemy_sprite": spawn_enemy_sprite,
                     "spawn_enemy_palette": enemy_palette_value(spawn_enemy_palette, "spawn_enemy_palette"),
                     "spawn_enemy_param": bounded(spawn_enemy_param, "spawn_enemy_param", 0, 255),
-                    "spawn_enemy_count": bounded(spawn_enemy_count, "spawn_enemy_count", 0, 255),
+                    "spawn_enemy_count": bounded(spawn_enemy_count, "spawn_enemy_count", 0, MAX_ACTIVE_ENEMIES),
                     "spawn_sound": bounded(spawn_sound, "spawn_sound", 0, 1),
                     "trigger_channel": bounded(trigger_channel, "trigger_channel", 0, 255),
                     "listen_channel": bounded(listen_channel, "listen_channel", 0, 255),

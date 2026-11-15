@@ -3015,6 +3015,47 @@
      "width": 64,
      "x": 1648,
      "y": 80
+    },
+    {
+     "id": 43,
+     "name": "ref 1-1 explicit walker 27,9",
+     "type": "Enemy",
+     "gid": 86,
+     "x": 432,
+     "y": 144,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "enemy_kind",
+       "type": "string",
+       "propertytype": "EnemyKind",
+       "value": "walker"
+      },
+      {
+       "name": "enemy_sprite",
+       "type": "string",
+       "propertytype": "EnemySprite",
+       "value": "walker"
+      },
+      {
+       "name": "dir",
+       "type": "int",
+       "value": -1
+      },
+      {
+       "name": "body_width",
+       "type": "int",
+       "value": 17
+      },
+      {
+       "name": "body_height",
+       "type": "int",
+       "value": 16
+      }
+     ]
     }
    ],
    "opacity": 1,
@@ -4250,6 +4291,67 @@
      "width": 16,
      "x": 1616,
      "y": 144
+    },
+    {
+     "id": 44,
+     "name": "ref 1-1 laser trigger stype103 sx0 117,2",
+     "type": "Stage Spawner",
+     "x": 1873.103448275862,
+     "y": 23.724137931034484,
+     "width": 80.55172413793103,
+     "height": 17.655172413793103,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "spawn_enemy_kind",
+       "type": "string",
+       "propertytype": "EnemyKind",
+       "value": "laser"
+      },
+      {
+       "name": "spawn_enemy_sprite",
+       "type": "string",
+       "propertytype": "EnemySprite",
+       "value": "laser"
+      },
+      {
+       "name": "spawn_dir",
+       "type": "string",
+       "propertytype": "TrapSpawnDirection",
+       "value": "auto"
+      },
+      {
+       "name": "spawn_offset_x",
+       "type": "float",
+       "value": 48.55172413793103
+      },
+      {
+       "name": "spawn_offset_y",
+       "type": "float",
+       "value": 11.03448275862069
+      },
+      {
+       "name": "spawn_enemy_count",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_limit",
+       "type": "int",
+       "value": 1
+      },
+      {
+       "name": "spawn_sound",
+       "type": "bool",
+       "value": false
+      },
+      {
+       "name": "hint_text",
+       "type": "string",
+       "value": "WAVE-MOTION CANNON!!"
+      }
+     ]
     }
    ],
    "opacity": 1,
@@ -4260,7 +4362,7 @@
   }
  ],
  "nextlayerid": 6,
- "nextobjectid": 43,
+ "nextobjectid": 45,
  "orientation": "orthogonal",
  "properties": [
   {

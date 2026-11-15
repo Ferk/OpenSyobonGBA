@@ -116,18 +116,20 @@ void enemies_load_1_2b(EnemyManager *manager, const Level *level);
 void enemies_load_1_3(EnemyManager *manager, const Level *level);
 void enemies_load_1_3_underground(EnemyManager *manager, const Level *level);
 void enemies_load_1_3_sky(EnemyManager *manager, const Level *level);
-void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
+uint8_t enemies_available_slots(const EnemyManager *manager);
+/* Spawn functions return zero without changing the pool when no slot is free. */
+uint8_t enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
                           fix16_t y, uint8_t sprite, int8_t dir);
-void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
+uint8_t enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
                                    fix16_t x, fix16_t y,
                                    fix16_t vx, fix16_t vy,
                                    uint8_t sprite, int8_t dir);
-void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
+uint8_t enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
                                  fix16_t x, fix16_t y,
                                  fix16_t vx, fix16_t vy,
                                  uint8_t sprite, uint8_t palette,
                                  uint8_t param, int8_t dir);
-void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
+uint8_t enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir);
 uint8_t enemies_transform_near_good_mushroom(EnemyManager *manager,
                                              fix16_t x, fix16_t y);

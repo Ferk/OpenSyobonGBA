@@ -1247,6 +1247,11 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         return;
     }
 
+    if (trap->subtype == QUESTION_ENEMY &&
+        enemies_available_slots(&enemy_current) == 0) {
+        return;
+    }
+
     audio_play_block_hit();
     trap->trigger_pending = 0;
     trap->hidden = 0;
@@ -1408,10 +1413,15 @@ static fix16_t random_fixed_centered(fix16_t range)
     return random_fixed_positive(range) - range / 2;
 }
 
-static void spawn_trap_enemy_recipe(Trap *trap, const Player *player)
+static uint8_t spawn_trap_enemy_recipe(Trap *trap, const Player *player)
 {
     if (trap->spawn_enemy_kind == ENEMY_NONE || trap->spawn_enemy_count == 0) {
-        return;
+        return 1;
+    }
+
+    /* Check the whole recipe before allocating to avoid partial swarms. */
+    if (enemies_available_slots(&enemy_current) < trap->spawn_enemy_count) {
+        return 0;
     }
 
     for (uint8_t i = 0; i < trap->spawn_enemy_count; ++i) {
@@ -1446,6 +1456,7 @@ static void spawn_trap_enemy_recipe(Trap *trap, const Player *player)
             vx, vy, trap->spawn_enemy_sprite, trap->spawn_enemy_palette,
             trap->spawn_enemy_param, spawn_dir);
     }
+    return 1;
 }
 
 static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level,
@@ -1469,23 +1480,29 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
         return;
     }
 
-    trap->state = TRAP_SPENT;
-    trap->trigger_pending = 0;
-
     if (trap->spawn_enemy_kind != ENEMY_NONE) {
+        if (!spawn_trap_enemy_recipe(trap, player)) {
+            trap->trigger_pending = 1;
+            trap->timer = 0;
+            return;
+        }
         if (trap->spawn_sound) {
             audio_play_trap_trigger();
         }
-        spawn_trap_enemy_recipe(trap, player);
         mark_trap_spawned(trap);
-        if (has_rearm_offset) {
-            trap->state = TRAP_ACTIVE;
+        if (trap->hint_text && trap->spawn_enemy_count > 0) {
+            messages_show_text(trap->hint_text,
+                               trap->x + trap->spawn_offset_x,
+                               trap->y + trap->spawn_offset_y, 20);
         }
     } else if (trap->subtype == STAGE_HINT_MESSAGE) {
         messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
                                  trap->x, trap->y);
     }
 
+    trap->state = has_rearm_offset && trap->spawn_enemy_kind != ENEMY_NONE
+                      ? TRAP_ACTIVE : TRAP_SPENT;
+    trap->trigger_pending = 0;
     emit_trap_channel(manager, level, player, trap->trigger_channel);
 }
 
@@ -1500,7 +1517,9 @@ static void update_stage_pipe_hazard(Trap *trap, const Player *player)
         return;
     }
 
-    trap->timer++;
+    if (trap->timer < interval) {
+        trap->timer++;
+    }
     if (trap->timer < interval) {
         return;
     }
@@ -1509,8 +1528,10 @@ static void update_stage_pipe_hazard(Trap *trap, const Player *player)
         return;
     }
 
+    if (!spawn_trap_enemy_recipe(trap, player)) {
+        return;
+    }
     trap->timer = 0;
-    spawn_trap_enemy_recipe(trap, player);
     mark_trap_spawned(trap);
 }
 

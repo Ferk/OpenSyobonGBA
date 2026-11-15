@@ -180,14 +180,35 @@ static uint8_t enemy_lands_on_platform(const Level *level, const Enemy *enemy,
     return 0;
 }
 
+uint8_t enemies_available_slots(const EnemyManager *manager)
+{
+    uint8_t available = ENEMY_MAX_ACTIVE - manager->count;
+
+    for (uint8_t i = 0; i < manager->count; ++i) {
+        if (manager->enemies[i].state == ENEMY_STATE_EMPTY) {
+            available++;
+        }
+    }
+    return available;
+}
+
 static Enemy *add_enemy(EnemyManager *manager, EnemyKind kind,
                         uint16_t source_x, uint16_t source_y, int8_t dir)
 {
-    if (manager->count >= ENEMY_MAX_ACTIVE) {
-        return 0;
-    }
+    Enemy *enemy = 0;
 
-    Enemy *enemy = &manager->enemies[manager->count++];
+    for (uint8_t i = 0; i < manager->count; ++i) {
+        if (manager->enemies[i].state == ENEMY_STATE_EMPTY) {
+            enemy = &manager->enemies[i];
+            break;
+        }
+    }
+    if (!enemy) {
+        if (manager->count >= ENEMY_MAX_ACTIVE) {
+            return 0;
+        }
+        enemy = &manager->enemies[manager->count++];
+    }
 
     enemy->kind = kind;
     enemy->state = (kind == ENEMY_CEILING_FALLER) ? ENEMY_STATE_WAITING : ENEMY_STATE_ACTIVE;
@@ -273,13 +294,13 @@ static void spawn_enemy_record(EnemyManager *manager, EnemySpawn *spawn)
     spawn->spawned = 1;
 }
 
-void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
+uint8_t enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
                           fix16_t y, uint8_t sprite, int8_t dir)
 {
     Enemy *enemy = add_enemy(manager, kind, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
 
     if (!enemy) {
-        return;
+        return 0;
     }
 
     enemy->state = ENEMY_STATE_ACTIVE;
@@ -292,17 +313,18 @@ void enemies_spawn_direct(EnemyManager *manager, EnemyKind kind, fix16_t x,
     enemy->sprite = sprite;
     enemy->param = 0;
     enemy->emerge_timer = 0;
+    return 1;
 }
 
-void enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
+uint8_t enemies_spawn_direct_velocity(EnemyManager *manager, EnemyKind kind,
                                    fix16_t x, fix16_t y,
                                    fix16_t vx, fix16_t vy,
                                    uint8_t sprite, int8_t dir)
 {
-    enemies_spawn_direct_config(manager, kind, x, y, vx, vy, sprite, 0, 0, dir);
+    return enemies_spawn_direct_config(manager, kind, x, y, vx, vy, sprite, 0, 0, dir);
 }
 
-void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
+uint8_t enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
                                  fix16_t x, fix16_t y,
                                  fix16_t vx, fix16_t vy,
                                  uint8_t sprite, uint8_t palette,
@@ -311,7 +333,7 @@ void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
     Enemy *enemy = add_enemy(manager, kind, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
 
     if (!enemy) {
-        return;
+        return 0;
     }
 
     enemy->state = ENEMY_STATE_ACTIVE;
@@ -323,6 +345,7 @@ void enemies_spawn_direct_config(EnemyManager *manager, EnemyKind kind,
     enemy->palette = palette;
     enemy->param = param;
     enemy->emerge_timer = 0;
+    return 1;
 }
 
 static void update_spawns(EnemyManager *manager, const Player *player)
@@ -1091,13 +1114,13 @@ void enemies_load_1_3_sky(EnemyManager *manager, const Level *level)
                           level1_3s_enemy_spawn_count);
 }
 
-void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
+uint8_t enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
                               uint8_t sprite, int8_t dir)
 {
     Enemy *enemy = add_enemy(manager, ENEMY_WALKER, 0, LEVEL_VIEW_SOURCE_ROW_OFFSET, dir);
 
     if (!enemy) {
-        return;
+        return 0;
     }
 
     enemy->x = x;
@@ -1107,6 +1130,7 @@ void enemies_spawn_from_block(EnemyManager *manager, fix16_t x, fix16_t y,
     enemy->sprite = sprite;
     enemy->param = 0;
     enemy->emerge_timer = 16;
+    return 1;
 }
 
 void enemies_update(EnemyManager *manager, Level *level, Player *player,

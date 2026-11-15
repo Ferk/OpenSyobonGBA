@@ -472,7 +472,7 @@ A rectangular trigger with a data-driven enemy recipe, hint message, or recurrin
 |`spawn_enemy_sprite` |`EnemySprite` |Graphic of the spawned enemy.
 |`spawn_enemy_palette` |int |OBJ palette bank for the spawned enemy.
 |`spawn_enemy_param` |int |Behavior parameter passed to the spawned enemy.
-|`spawn_enemy_count` |int |Enemies produced on each activation.
+|`spawn_enemy_count` |int |Enemies produced on each activation. A group waits until enough enemy slots are free; it is never partially spawned. The runtime pool holds 32 enemies.
 |`spawn_dir` |`TrapSpawnDirection` |`auto`, `left`, or `right` initial direction.
 |`spawn_sound` |bool |Plays the trap sound at activation.
 |`spawn_offset_x`, `spawn_offset_y` |number |Pixel offset from the trigger object's position. Moving the object moves the spawn point with it. Defaults to zero.
@@ -487,7 +487,7 @@ A rectangular trigger with a data-driven enemy recipe, hint message, or recurrin
 |`listen_channel` |int |Channel that activates this spawner.
 |`channel_spawn_interval` |int |Spawn interval override after a linked activation.
 |`trigger_delay` |int |Frames to wait after linked activation.
-|`hint_text` |string |Modal text for `stage_hint_message`; supports `\n`.
+|`hint_text` |string |Modal text for `stage_hint_message`; supports `\n`. With an enemy recipe, optional non-modal activation text shown for 20 frames at the spawn position, only after a successful spawn.
 |===
 
 === `enter_pipe`
