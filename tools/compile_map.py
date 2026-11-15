@@ -6,7 +6,10 @@ import struct
 import tempfile
 from pathlib import Path
 
+from authoring_schema import authoring_classes
+
 BEHAVIOR_SCHEMA = json.loads((Path(__file__).with_name("behavior_schema.json")).read_text())
+AUTHORING_CLASSES = authoring_classes(BEHAVIOR_SCHEMA)
 
 TRAP_KIND_NAMES = {
     "falling_floor": "TRAP_FALLING_FLOOR",
@@ -443,17 +446,6 @@ def source_from_gid(gid, props):
     return int(props.get(gid, {}).get("source", 0))
 
 
-def trap_kind(value):
-    if value is None:
-        return None
-    text = str(value)
-    if text in TRAP_KIND_NAMES.values():
-        return text
-    if text.lower() not in TRAP_KIND_NAMES:
-        raise map_error(f"unknown value {text!r}; expected one of {', '.join(sorted(TRAP_KIND_NAMES))}", "trap_type")
-    return TRAP_KIND_NAMES[text.lower()]
-
-
 def enum_name(value, names, default, field=None):
     if value is None:
         return default
@@ -578,11 +570,20 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
             gid = decode_gid(obj.get("gid", 0))
             tile_prop = tile_props.get(gid, {})
             name = obj.get("class") or obj.get("type") or tile_prop.get("_class") or object_name(obj)
-            class_kind = BEHAVIOR_SCHEMA["classes"].get(name, {}).get("kind")
-            specified_kind = prop_value(props, "trap_type", tile_prop.get("trap_type"))
-            if class_kind and specified_kind and specified_kind != class_kind:
-                raise map_error(f"conflicts with object class {object_name(obj)!r} ({class_kind})", "trap_type")
-            trap = trap_kind(specified_kind or class_kind)
+            if name == "Trap":
+                raise map_error("generic Trap class is no longer supported; select a focused class such as 'Question Block' or 'Falling Floor'", "class")
+            if any(p.get("name") == "trap_type" for p in props) or "trap_type" in tile_prop:
+                raise map_error("trap_type is no longer supported; select the behavior using the object's focused class", "trap_type")
+            class_spec = AUTHORING_CLASSES.get(name, {})
+            class_kind = class_spec.get("kind")
+            # Recipe defaults must work even when Tiled has not serialized them.
+            tile_prop = dict(class_spec.get("defaults", {}), **tile_prop)
+            if "family" in class_spec:
+                subtype_override = prop_value(props, "subtype", tile_prop.get("subtype"))
+                expected = TRAP_SUBTYPE_NAMES[class_spec["subtype"]]
+                if enum_int(subtype_override, TRAP_SUBTYPE_NAMES, expected, "subtype") != expected:
+                    raise map_error(f"class {name!r} fixes subtype to {class_spec['subtype']!r}; change its class to {class_spec['family']!r} to select another behavior", "subtype")
+            trap = TRAP_KIND_NAMES.get(class_kind)
 
             try:
                 tiled_x = float(obj.get("x", 0))
@@ -750,7 +751,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
 
             if trap or layer_name.lower().startswith("trap"):
                 if trap is None:
-                    raise map_error("trap objects require a trap_type", "trap_type")
+                    raise map_error(f"unknown trap class {name!r}; select one of {', '.join(sorted(AUTHORING_CLASSES))}", "class")
                 if len(traps) >= MAX_TRAPS:
                     raise map_error(f"exceeds the limit of {MAX_TRAPS} traps")
                 if (trap in {"TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE", "TRAP_EVASIVE_BLOCK", "TRAP_MOVING_PLATFORM", "TRAP_BREAKING_PLATFORM", "TRAP_MOVING_BLOCK"} or
@@ -795,7 +796,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     raise map_error(f"{trap} cannot be activated by a channel", "listen_channel")
                 trap_origins.append((layer_name, obj))
                 traps.append({
-                    "kind": trap or "TRAP_QUESTION_BLOCK",
+                    "kind": trap,
                     "subtype": subtype,
                     "destination": destination,
                     "entry_id": entry_id,

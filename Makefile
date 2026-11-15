@@ -146,7 +146,7 @@ $(BUILD)/level.o $(BUILD)/player.o $(BUILD)/traps.o $(BUILD)/enemy.o: $(GFX_HEAD
 $(ROOT_OFILES): $(MAP_H)
 $(BUILD)/audio.o: $(SOUND_HEADERS)
 
-$(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py tools/map_dependencies.py tools/behavior_schema.json $(MAP_SOURCES) $(MAP_TILESETS) | dirs
+$(SOURCES)/generated/%_data.c $(INCLUDES)/generated/%_data.h &: $(LEVELS)/%.tmj tools/compile_map.py tools/authoring_schema.py tools/map_dependencies.py tools/behavior_schema.json $(MAP_SOURCES) $(MAP_TILESETS) | dirs
 	python3 tools/compile_map.py $< --source $(SOURCES)/generated/$*_data.c --header $(INCLUDES)/generated/$*_data.h --symbol-prefix $*
 
 $(BUILD)/%.o: $(SOURCES)/%.s | dirs

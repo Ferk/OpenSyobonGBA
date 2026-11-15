@@ -6,7 +6,7 @@
  },
  "object": {
   "name": "coin",
-  "type": "Trap",
+  "type": "Coin",
   "gid": 16,
   "width": 16,
   "height": 16,

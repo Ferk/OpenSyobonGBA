@@ -1,0 +1,12 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Fatal Launch Pad",
+  "type": "Fatal Launch Pad",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": []
+ }
+}

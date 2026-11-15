@@ -6,7 +6,7 @@
  },
  "object": {
   "name": "question_ball",
-  "type": "Trap",
+  "type": "Pickup Item",
   "gid": 15,
   "width": 16,
   "height": 16,

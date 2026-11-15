@@ -440,15 +440,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Hint Block Subtype",
        "type": "string",
        "value": "hint_stage_1"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "hint_block"
       },
       {
        "name": "visual_metatile",
@@ -458,7 +452,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Hint Block",
      "visible": true,
      "width": 16,
      "x": 112,

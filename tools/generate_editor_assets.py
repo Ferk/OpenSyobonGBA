@@ -30,7 +30,7 @@ def main():
         properties = [{"name": "preview_name", "type": "string", "value": spec["name"]}]
         for name, value in spec["properties"].items():
             prop = {"name": name, "type": "int" if isinstance(value, int) else "string", "value": value}
-            enum = {"enemy_kind": "EnemyKind", "enemy_sprite": "EnemySprite", "trap_type": "TrapKind"}.get(name)
+            enum = {"enemy_kind": "EnemyKind", "enemy_sprite": "EnemySprite"}.get(name)
             if enum:
                 prop["propertytype"] = enum
             properties.append(prop)

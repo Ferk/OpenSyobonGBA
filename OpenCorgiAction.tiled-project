@@ -8,75 +8,6 @@
  "objectTypesFile": "",
  "propertyTypes": [
   {
-   "id": 1,
-   "name": "TrapKind",
-   "type": "enum",
-   "storageType": "string",
-   "valuesAsFlags": false,
-   "values": [
-    "falling_floor",
-    "bump_shooter",
-    "question_block",
-    "evasive_block",
-    "stage_spawner",
-    "enter_pipe",
-    "side_pipe",
-    "checkpoint",
-    "goal",
-    "hint_block",
-    "spike_block",
-    "moving_platform",
-    "pickup_item",
-    "fake_goal",
-    "moving_block",
-    "breaking_platform",
-    "transition_zone",
-    "coin",
-    "jump_pad",
-    "breakable_block",
-    "kill_zone",
-    "p_switch_block"
-   ]
-  },
-  {
-   "id": 2,
-   "name": "TrapSubtype",
-   "type": "enum",
-   "storageType": "string",
-   "valuesAsFlags": false,
-   "values": [
-    "none",
-    "falling_on_pass_under",
-    "falling_when_approached",
-    "stage_pipe_shot",
-    "stage_flying_enemy",
-    "stage_walker_swarm",
-    "stage_upward_hazard",
-    "stage_upward_hazard_toggle",
-    "stage_upward_hazard_left",
-    "stage_hint_message",
-    "stage_pipe_hazard",
-    "question_enemy",
-    "question_good_mushroom",
-    "question_bad_mushroom",
-    "question_star",
-    "question_bad_flower",
-    "question_poison_generator",
-    "question_coin_generator",
-    "question_hidden_poison",
-    "evasive_vertical",
-    "evasive_horizontal",
-    "pipe_fake_kill",
-    "pipe_to_underground",
-    "hint_stage_1",
-    "platform_conveyor",
-    "platform_vertical_wrap",
-    "platform_bounce",
-    "warp_pad",
-    "fatal_launch"
-   ]
-  },
-  {
    "id": 11,
    "name": "StageDestination",
    "type": "enum",
@@ -194,208 +125,6 @@
     "solid",
     "pass_through",
     "death"
-   ]
-  },
-  {
-   "id": 8,
-   "name": "Trap",
-   "type": "class",
-   "color": "#ffff7070",
-   "drawFill": true,
-   "useAs": [
-    "object"
-   ],
-   "members": [
-    {
-     "name": "trap_type",
-     "type": "string",
-     "propertyType": "TrapKind",
-     "value": "question_block"
-    },
-    {
-     "name": "subtype",
-     "type": "string",
-     "propertyType": "TrapSubtype",
-     "value": "none"
-    },
-    {
-     "name": "spawn_dir",
-     "type": "string",
-     "propertyType": "TrapSpawnDirection",
-     "value": "auto"
-    },
-    {
-     "name": "stage_destination",
-     "type": "string",
-     "propertyType": "StageDestination",
-     "value": "none"
-    },
-    {
-     "name": "entry_id",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "spawn_interval",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "spawn_limit",
-     "type": "int",
-     "value": 1
-    },
-    {
-     "name": "item_variant",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "spawn_enemy_kind",
-     "type": "string",
-     "propertyType": "EnemyKind",
-     "value": "none"
-    },
-    {
-     "name": "spawn_enemy_sprite",
-     "type": "string",
-     "propertyType": "EnemySprite",
-     "value": "walker"
-    },
-    {
-     "name": "spawn_enemy_palette",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "spawn_enemy_param",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "spawn_enemy_count",
-     "type": "int",
-     "value": 1
-    },
-    {
-     "name": "spawn_sound",
-     "type": "bool",
-     "value": true
-    },
-    {
-     "name": "spawn_offset_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_offset_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_vx",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_vy",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_spacing_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "spawn_spacing_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "repeat_rearm_offset_x",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "repeat_rearm_offset_y",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "trigger_channel",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "listen_channel",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "channel_spawn_interval",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "trigger_delay",
-     "type": "int",
-     "value": 0
-    },
-    {
-     "name": "goal_walk_frames",
-     "type": "int",
-     "value": 207
-    },
-    {
-     "name": "hint_text",
-     "type": "string",
-     "value": ""
-    },
-    {
-     "name": "visual_metatile",
-     "type": "string",
-     "value": "inherit",
-     "propertyType": "VisualMetatile"
-    },
-    {
-     "name": "spent_metatile",
-     "type": "string",
-     "value": "default_spent",
-     "propertyType": "SpentMetatile"
-    },
-    {
-     "name": "visual_palette",
-     "type": "string",
-     "propertyType": "BgPalette",
-     "value": "normal"
-    },
-    {
-     "name": "collision",
-     "type": "int",
-     "propertyType": "LevelCollision",
-     "value": 255
-    },
-    {
-     "name": "hidden",
-     "type": "bool",
-     "value": false
-    },
-    {
-     "name": "vx",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "vy",
-     "type": "float",
-     "value": 0
-    },
-    {
-     "name": "gravity",
-     "type": "float",
-     "value": 0
-    }
    ]
   },
   {
@@ -1192,12 +921,6 @@
    ],
    "members": [
     {
-     "name": "subtype",
-     "type": "string",
-     "propertyType": "Goal Subtype",
-     "value": "none"
-    },
-    {
      "name": "goal_walk_frames",
      "type": "int",
      "value": 207
@@ -1258,12 +981,6 @@
    ],
    "members": [
     {
-     "name": "subtype",
-     "type": "string",
-     "propertyType": "Checkpoint Subtype",
-     "value": "none"
-    },
-    {
      "name": "trigger_channel",
      "type": "int",
      "value": 0
@@ -1295,6 +1012,1214 @@
      "type": "int",
      "propertyType": "LevelCollision",
      "value": 255
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "name": "Bump Shooter Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 33,
+   "name": "Bump Shooter",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 34,
+   "name": "Evasive Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "evasive_vertical",
+    "evasive_horizontal"
+   ]
+  },
+  {
+   "id": 35,
+   "name": "Evasive Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Evasive Block Subtype",
+     "value": "none"
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    }
+   ]
+  },
+  {
+   "id": 36,
+   "name": "Hint Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "hint_stage_1"
+   ]
+  },
+  {
+   "id": 37,
+   "name": "Hint Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Hint Block Subtype",
+     "value": "none"
+    },
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hint_text",
+     "type": "string",
+     "value": ""
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 38,
+   "name": "Spike Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 39,
+   "name": "Spike Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    }
+   ]
+  },
+  {
+   "id": 40,
+   "name": "Pickup Item Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 41,
+   "name": "Pickup Item",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "item_variant",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 42,
+   "name": "Fake Goal Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 43,
+   "name": "Fake Goal",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 44,
+   "name": "Moving Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 45,
+   "name": "Moving Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "move_offset_x",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "move_offset_y",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 46,
+   "name": "Breaking Platform Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 47,
+   "name": "Breaking Platform",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 48,
+   "name": "Transition Zone Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 49,
+   "name": "Transition Zone",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "stage_destination",
+     "type": "string",
+     "propertyType": "StageDestination",
+     "value": "none"
+    },
+    {
+     "name": "entry_id",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 50,
+   "name": "Coin Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 51,
+   "name": "Coin",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 52,
+   "name": "Jump Pad Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none",
+    "warp_pad",
+    "fatal_launch"
+   ]
+  },
+  {
+   "id": 53,
+   "name": "Jump Pad",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "subtype",
+     "type": "string",
+     "propertyType": "Jump Pad Subtype",
+     "value": "none"
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    }
+   ]
+  },
+  {
+   "id": 54,
+   "name": "Breakable Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 55,
+   "name": "Breakable Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    }
+   ]
+  },
+  {
+   "id": 56,
+   "name": "Kill Zone Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 57,
+   "name": "Kill Zone",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": []
+  },
+  {
+   "id": 58,
+   "name": "P-Switch Block Subtype",
+   "type": "enum",
+   "storageType": "string",
+   "valuesAsFlags": false,
+   "values": [
+    "none"
+   ]
+  },
+  {
+   "id": 59,
+   "name": "P-Switch Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    }
+   ]
+  },
+  {
+   "id": 60,
+   "name": "Star Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 61,
+   "name": "Mushroom Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 62,
+   "name": "Poison Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "name": "Bad Flower Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "name": "Enemy Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_dir",
+     "type": "string",
+     "propertyType": "TrapSpawnDirection",
+     "value": "auto"
+    },
+    {
+     "name": "spawn_enemy_kind",
+     "type": "string",
+     "propertyType": "EnemyKind",
+     "value": "none"
+    },
+    {
+     "name": "spawn_enemy_sprite",
+     "type": "string",
+     "propertyType": "EnemySprite",
+     "value": "walker"
+    },
+    {
+     "name": "spawn_enemy_palette",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_enemy_param",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 65,
+   "name": "Coin Generator",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_interval",
+     "type": "int",
+     "value": 3
+    },
+    {
+     "name": "spawn_limit",
+     "type": "int",
+     "value": 20
+    }
+   ]
+  },
+  {
+   "id": 66,
+   "name": "Poison Generator",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "spawn_interval",
+     "type": "int",
+     "value": 16
+    },
+    {
+     "name": "spawn_limit",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "name": "Falling Ceiling",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "gravity",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 68,
+   "name": "Conveyor",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "vx",
+     "type": "float",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 69,
+   "name": "Bouncy Platform",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    }
+   ]
+  },
+  {
+   "id": 70,
+   "name": "Wrapping Platform",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "vy",
+     "type": "float",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "name": "Warp Pad",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    }
+   ]
+  },
+  {
+   "id": 72,
+   "name": "Fatal Launch Pad",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
     }
    ]
   }

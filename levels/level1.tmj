@@ -3496,15 +3496,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Evasive Block Subtype",
        "type": "string",
        "value": "evasive_vertical"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "evasive_block"
       },
       {
        "name": "visual_metatile",
@@ -3514,7 +3508,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Evasive Block",
      "visible": true,
      "width": 16,
      "x": 128,

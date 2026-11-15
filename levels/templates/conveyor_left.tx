@@ -2,18 +2,12 @@
  "type": "template",
  "object": {
   "name": "Conveyor Left",
-  "type": "Moving Platform",
+  "type": "Conveyor",
   "width": 48,
   "height": 16,
   "rotation": 0,
   "visible": true,
   "properties": [
-   {
-    "name": "subtype",
-    "type": "string",
-    "propertytype": "Moving Platform Subtype",
-    "value": "platform_conveyor"
-   },
    {
     "name": "visual_metatile",
     "type": "string",

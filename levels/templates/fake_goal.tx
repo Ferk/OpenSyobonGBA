@@ -1,0 +1,12 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Fake Goal",
+  "type": "Fake Goal",
+  "width": 16,
+  "height": 112,
+  "rotation": 0,
+  "visible": true,
+  "properties": []
+ }
+}

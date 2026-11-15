@@ -1,0 +1,30 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Hint Block",
+  "type": "Hint Block",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "visual_metatile",
+    "type": "string",
+    "propertytype": "VisualMetatile",
+    "value": "hint_block"
+   },
+   {
+    "name": "collision",
+    "type": "int",
+    "propertytype": "LevelCollision",
+    "value": 1
+   },
+   {
+    "name": "hint_text",
+    "type": "string",
+    "value": "Your message here."
+   }
+  ]
+ }
+}

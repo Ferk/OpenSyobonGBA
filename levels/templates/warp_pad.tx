@@ -1,0 +1,18 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Warp Pad",
+  "type": "Warp Pad",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "hidden",
+    "type": "bool",
+    "value": true
+   }
+  ]
+ }
+}

@@ -3305,15 +3305,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Spike Block Subtype",
        "type": "string",
        "value": "none"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "spike_block"
       },
       {
        "name": "visual_metatile",
@@ -3323,7 +3317,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Spike Block",
      "visible": true,
      "width": 16,
      "x": 688,
@@ -3361,11 +3355,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "moving_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "brick",
@@ -3373,7 +3362,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Moving Block",
      "visible": true,
      "width": 16,
      "x": 352,
@@ -3401,11 +3390,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "p_switch_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "question",
@@ -3413,7 +3397,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "P-Switch Block",
      "visible": true,
      "width": 16,
      "x": 864,
@@ -3437,15 +3421,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Jump Pad Subtype",
        "type": "string",
        "value": "warp_pad"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3455,7 +3433,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Jump Pad",
      "visible": true,
      "width": 16,
      "x": 288,
@@ -3479,15 +3457,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Jump Pad Subtype",
        "type": "string",
        "value": "warp_pad"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3497,7 +3469,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Jump Pad",
      "visible": true,
      "width": 16,
      "x": 304,
@@ -3521,15 +3493,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Jump Pad Subtype",
        "type": "string",
        "value": "warp_pad"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "jump_pad"
       },
       {
        "name": "visual_metatile",
@@ -3539,7 +3505,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Jump Pad",
      "visible": true,
      "width": 16,
      "x": 320,
@@ -3662,11 +3628,6 @@
        "value": "hint_stage_1"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "hint_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "hint_block",
@@ -3674,7 +3635,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Hint Block",
      "visible": true,
      "width": 16,
      "x": 448,
@@ -3747,11 +3708,6 @@
        "value": "hint_stage_1"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "hint_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "hint_block",
@@ -3759,7 +3715,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Hint Block",
      "visible": true,
      "width": 16,
      "x": 1120,
@@ -3787,11 +3743,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "breaking_platform"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "brick",
@@ -3799,7 +3750,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Breaking Platform",
      "visible": true,
      "width": 16,
      "x": 928,
@@ -3827,11 +3778,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "breaking_platform"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "brick",
@@ -3839,7 +3785,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Breaking Platform",
      "visible": true,
      "width": 16,
      "x": 944,
@@ -3867,11 +3813,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "breaking_platform"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "brick",
@@ -3879,7 +3820,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Breaking Platform",
      "visible": true,
      "width": 16,
      "x": 960,
@@ -3907,12 +3848,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "breakable_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "hint_block",
@@ -3920,7 +3855,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Breakable Block",
      "visible": true,
      "width": 16,
      "x": 1776,
@@ -3948,12 +3883,6 @@
        "value": "fatal_launch"
       },
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "jump_pad"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "empty",
@@ -3961,7 +3890,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Jump Pad",
      "visible": true,
      "width": 16,
      "x": 1824,
@@ -3984,11 +3913,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "pickup_item"
-      },
-      {
        "name": "trigger_channel",
        "type": "int",
        "value": 1
@@ -4005,7 +3929,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Pickup Item",
      "visible": true,
      "width": 16,
      "x": 160,
@@ -4275,11 +4199,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "breaking_platform"
-      },
-      {
        "name": "trigger_delay",
        "type": "int",
        "value": 8
@@ -4297,7 +4216,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Breaking Platform",
      "visible": true,
      "width": 48,
      "x": 528,
@@ -4503,12 +4422,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "transition_zone"
-      },
-      {
        "name": "stage_destination",
        "type": "string",
        "propertytype": "StageDestination",
@@ -4516,7 +4429,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Transition Zone",
      "visible": true,
      "width": 481,
      "x": -1,
@@ -4527,16 +4440,9 @@
      "id": 1000,
      "name": "1-3 type120 upper kill zone",
      "opacity": 1,
-     "properties": [
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "kill_zone"
-      }
-     ],
+     "properties": [],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Kill Zone",
      "visible": true,
      "width": 292,
      "x": 1668,
@@ -4548,8 +4454,7 @@
    "visible": true,
    "x": 0,
    "y": 0
-  }
-,
+  },
   {
    "data": [
     0,
@@ -7265,7 +7170,8 @@
    "width": 159,
    "x": 0,
    "y": 0
-  } ],
+  }
+ ],
  "nextlayerid": 6,
  "nextobjectid": 1001,
  "orientation": "orthogonal",

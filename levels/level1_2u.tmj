@@ -4252,11 +4252,6 @@
        "value": "none"
       },
       {
-       "name": "trap_type",
-       "type": "string",
-       "value": "spike_block"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "inherit",
@@ -4269,7 +4264,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Spike Block",
      "visible": true,
      "width": 16,
      "x": 288,
@@ -5055,12 +5050,6 @@
        "name": "item_variant",
        "type": "int",
        "value": 0
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "pickup_item"
       },
       {
        "name": "trigger_channel",

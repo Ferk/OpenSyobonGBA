@@ -1,0 +1,849 @@
+:toc:
+
+= Level Authoring With Tiled
+
+Levels are authored as Tiled JSON maps (`.tmj`) in the `levels/` directory. Open `OpenCorgiAction.tiled-project` in Tiled so custom classes and enum dropdowns are available.
+
+Always open the project file before opening a map. This is what loads the `StageDestination` dropdown; a pipe or transition `stage_destination` must be chosen from it, never assigned as an object/class reference. The map compiler rejects malformed required destinations instead of silently defaulting them to `1-1`.
+
+
+== Map Setup
+
+Use these map settings:
+
+* Orientation: orthogonal.
+* Tile size: 16x16.
+* Infinite map: disabled.
+* Width: 1-160 tiles.
+* Height: 1-17 tiles.
+* Tileset: `levels/tiles_16.tsj` (uses `../gfx/tiles_16.png`).
+
+The visible GBA viewport is 15x10 metatiles, but the map may be wider and taller.
+
+== Layers
+
+Recommended layer layout:
+
+[cols="1,3",options="header"]
+|===
+|Layer |Purpose
+
+|`Background`
+|Visible 16x16 metatile layout. Decorative tiles, terrain, pipes, clouds, castle pieces, spikes, and blocks that exist from level start go here.
+
+|`Objects`
+|Entry points such as `Player Start` and `Pipe Exit`. A focused trap can also be placed here.
+
+|`Enemies`
+|Enemy spawn objects. Put all enemy objects here, including hidden face hazards.
+
+|`Traps`
+|Trap trigger rectangles and trap-backed level objects.
+|===
+
+These are conventions, with one important compiler rule: objects on a layer whose
+name starts with `enem` (case-insensitive) are compiled as enemies, even if their class says
+otherwise. Keep traps on `Traps` or another non-enemy object layer. For example,
+1-3 has a `Question Block` on `Objects`. The `P-Switch Blocks` tile layer is a
+separate conversion mask; it may be hidden in Tiled and is still exported.
+
+Use object properties for behavior, and use the visible background tile layer for purely decorative tiles.
+
+Use `Player Start` for normal stage entry and debug stage select. Use `Pipe Exit` for the landing point after a pipe transition into that map. Match a pipe's `entry_id` with a `Pipe Exit` `entry_id`; route `0` is the default. When no matching exit exists, the map's normal `Player Start` is used.
+
+=== `Player Start`
+
+`Player Start` has a `checkpoint` boolean, enabled by default. When enabled, entering the map through that start records it as the respawn state. When disabled, it is an entry-only start: death returns to the last checkpoint flag or checkpoint-enabled Player Start instead. Checkpoint flags retain their consumed state when the saved map is rebuilt after death.
+
+== Coordinates
+
+Object coordinates are pixel coordinates in Tiled. The converter stores them as 16.16 fixed-point values.
+
+The engine subtracts the source row offset from object Y positions. This means objects placed near the top of the Tiled map may have negative world Y values at runtime, which is expected for sky objects and ceiling hazards.
+
+When in doubt:
+
+* Align terrain and static block-like traps to the 16px grid.
+* Use object rectangles for trigger zones.
+* Keep trigger rectangles in world positions, not camera-relative positions.
+
+== Background Tiles And Palettes
+
+Set the `Background` layer property `palette`:
+
+* `normal` for overworld/default colors.
+* `underground` for underground recolors.
+* `palette2` or `palette3` for the other currently supported banks.
+
+Tile graphics come from `gfx/tiles_16.png`. The converter writes a metatile array and a parallel palette array. At runtime BG0 uses both arrays while streaming.
+
+Clouds and other decorative background art should have empty collision. Collision
+for ordinary background metatiles is currently selected by the runtime from the
+metatile ID, not from Tiled tile collision properties. Check that mapping if a
+decorative tile unexpectedly behaves as solid.
+
+=== Named Metatile Choices
+
+`visual_metatile` uses the `VisualMetatile` dropdown, with names such as `brick`,
+`question`, `white_platform`, `hint_block`, and `ground_top`. Select `inherit`
+instead of the old value `255`: it leaves the visual choice to the trap's normal
+behavior. Falling floors and moving platforms sample their backing cells in this
+mode; other trap kinds use their existing default behavior.
+
+`spent_metatile` uses `SpentMetatile`. Select `default_spent` for the ordinary
+solid spent block, or an explicit named tile to override it. Existing numeric
+IDs are still accepted by the compiler, but authored maps and presets now use
+names. The compiled ROM continues to store the same compact byte IDs.
+
+Select a tile in the shared `tiles_16.tsj` to see its `metatile_name` alongside
+the actual thumbnail. The dropdown itself is text-only. Extra art without a
+runtime semantic name retains a stable `art_N` label. Names describe graphics,
+not solidity or behavior. The catalog is maintained in
+`tools/behavior_schema.json` under `metatiles`.
+
+== Sprite Previews
+
+The `levels/objects.tsj` image-collection tileset provides port-graphic previews
+for common enemies, the question-ball pickup, and coins. Either add this tileset
+and insert a tile object on the appropriate object layer, or drag a template
+from `levels/templates/enemies/` or `levels/templates/items/` into the map.
+Enemy tiles supply an editable behavior/sprite recipe; pickup tiles supply their
+trap kind. Do not paint these previews onto a background tile layer: the compiler
+rejects that rather than turning an enemy picture into terrain.
+
+The generated tileset uses top-left alignment, matching rectangle objects. The
+compiler also supports bottom-left alignment for object collections, subtracting
+the artwork height to recover the body's top-left position. Do not move an
+object up again to compensate for that conversion.
+
+[cols="1,3",options="header"]
+|===
+|Setting |Meaning
+|Object width/height |Preview image dimensions. Keep these unchanged; scaled preview art is rejected.
+|`body_width`, `body_height` |Gameplay body dimensions in pixels, independently editable from the artwork.
+|`enemy_kind`, `enemy_sprite` |Runtime recipe for an enemy; explicit instance properties override the tile's defaults.
+|`dir` |Runtime direction; use this rather than flipping the editor tile. Flip/rotation flags are not supported.
+|===
+
+The selected tile determines the editor picture. Changing `enemy_sprite` alone
+does not change that picture; replace the tile in Tiled when changing artwork.
+Replacing a tile also changes any recipe defaults that were not explicitly
+overridden on the instance. Set behavior properties explicitly when reusing art
+with a different behavior.
+
+Each preview tile includes a `Gameplay Body` rectangle in Tiled's tile collision
+editor showing its default body. That outline is an editor aid, not collision
+data consumed by the port. If an instance overrides its body dimensions, inspect
+its `body_width` and `body_height` properties for the actual runtime size. Trigger
+areas such as spawner zones remain independent rectangular trap objects.
+
+Existing ordinary enemies and pickup items use previews while retaining their
+previous bodies and positions. The larger hidden-cloud hazards retain their
+authored rectangles. The hidden-face library preview shows the face as an editor
+aid even though it remains hidden initially at runtime. Previews show the normal
+palette and initial art, not runtime animations or recolors.
+
+Run `make editor-assets` after editing graphics or authoring metadata. This
+regenerates the Tiled classes, named choices, presets, object tileset and preview
+PNGs from the port's current files in `gfx/`; it requires Python and Pillow but
+not the GBA toolchain. Files in `levels/editor/`, `objects.tsj` and the generated
+templates should not be edited directly.
+
+== Enemy Objects
+
+Create a preview tile object or a rectangle with class `Enemy` on the `Enemies`
+layer. `enemy_kind` selects behavior and `enemy_sprite` selects the graphic;
+they are separate properties, not separate object classes. A rectangle's geometry
+defines its body; a preview object's `body_width` and `body_height` do so instead.
+
+Properties:
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`enemy_kind`
+|`EnemyKind`
+|Behavior state machine. The `EnemyKind` dropdown includes `none`, `walker`, `shell_walker`, `shell`, `static_hazard`, `ceiling_faller`, `pipe_shot`, `firebar`, `superjien`, `jien_cannon`, `kuma`, `giant`, `defrag`, `aramaki`, `laser`, and `super_boon`.
+
+|`enemy_sprite`
+|`EnemySprite`
+|Graphic/visibility mode. The `EnemySprite` dropdown includes `walker`, `shell_walker`, `shell`, `hazard`, `atype3`, `face_hidden`, `face_grin`, `nyassun`, `nyassun_alert`, `kuma`, `cuckoo32`, `fire_projectile`, `superjien`, `jien_cannon`, `giant`, `defrag`, `defrag_stomped`, `laser`, and `super_boon`.
+
+|`dir`
+|int
+|Initial direction. Use `-1` for left and `1` for right.
+
+|`enemy_palette`
+|int
+|OBJ palette bank. Default is `0`. Use `4` for the darker underground face hazard.
+
+|`enemy_param`
+|int
+|Extra behavior parameter. For `enemy_kind = firebar`, this is the number of outer firebar segments, matching the original `bxtype % 100`.
+
+|`throw_vx`
+|signed int
+|Defrag-san's release momentum in original reference velocity units. `700` is the default and throws right; a negative value throws left.
+|===
+
+Body width and height become the enemy collision and culling size. A reusable
+hidden grin hazard should have a 32x32 body, `enemy_kind = static_hazard`, and
+`enemy_sprite = face_hidden`.
+
+The hidden face hazard is invisible until touched. On player contact it switches to `face_grin`, displays the face sprite, shows the death message, and kills the player.
+
+Use `enemy_kind = ceiling_faller` with `enemy_sprite = nyassun` for the original Nyassun dropper hazards. They remain idle until the player passes beneath their horizontal range, then switch to the alert sprite and drop.
+
+=== Enemy Kinds
+
+The `enemy_kind` determines behavior; `enemy_sprite` only selects art. Use the matching sprite named below unless intentionally reusing a behavior with different art.
+
+==== `walker`
+
+The standard 17px-wide ground walker. It patrols, turns at solid walls, falls from unsupported terrain, and can be stomped. Use `enemy_sprite = walker`.
+
+==== `shell_walker` and `shell`
+
+`shell_walker` is the walking shell enemy. Stomping it changes it into `shell`; a moving shell slides quickly and can defeat other enemies. Use `shell_walker` and `shell` sprites respectively.
+
+==== `static_hazard`
+
+A non-moving lethal overlap hazard. `face_hidden` begins invisible and changes to `face_grin` on contact. Size it to the intended danger area; the reusable face hazard is 32x32.
+
+==== `ceiling_faller`
+
+Waits until the player moves underneath, then falls. Use `nyassun` or `nyassun_alert` for the original Nyassun presentation. The object rectangle defines both its initial body and horizontal activation range.
+
+==== `pipe_shot`
+
+A projectile with initial velocity from the spawning trap recipe. It normally follows projectile gravity. Use `fire_projectile` for the standard pipe hazard.
+
+==== `firebar`
+
+A rotating firebar. Use `enemy_sprite = fire_projectile`. `enemy_param` sets the number of outer segments; use `0` for the default bar.
+
+==== `super_boon`
+
+The original type-8 Super Boon. It hovers vertically with the original acceleration and speed limits and ignores terrain gravity. Stomping it changes it into a stationary normal Boon that can be bounced on again; side contact remains lethal. Use a 16x32 object with `enemy_sprite = super_boon`.
+
+==== `superjien`
+
+The spiky soldier. It is an 18px-wide ground enemy and uses `superjien` art. Set `enemy_param = 1` for the original hopping variant.
+
+==== `jien_cannon`
+
+The original type-7 Jien Cannon. Use `enemy_sprite = jien_cannon`. `enemy_param` selects the original `axtype`: `0` uses `dir`, `1` reverses `dir`, `2` moves up, and `3` moves down. It moves at the reference speed of `400` and ignores terrain.
+
+==== `kuma`
+
+The 16x32 Kuma enemy. It uses `kuma` art and is commonly created by a stage-spawner recipe with explicit launch velocity.
+
+==== `giant`
+
+The large transformed enemy. It walks through and breaks breakable terrain beneath or overlapping its body. Set the object rectangle to its authored size and use `giant` art.
+
+==== `defrag`
+
+Defrag-san is a 16x32 enemy using `defrag` art. On player contact it holds the player briefly, then launches them upward and horizontally. `throw_vx` controls that horizontal momentum: positive is right, negative is left, and omitted is the original `700`. It also catches moving item entities, holds each for 20 frames, then throws it up and right at the original velocity. Set `enemy_param = 1` for the original pole-capable variant: when it reaches an unspent goal pole it removes the pole and interrupts that goal sequence. Capturing the player first clears this variant flag, matching the original.
+
+==== `aramaki`
+
+The original `atype 3` vertical enemy. It uses a small oscillating descent rather than normal gravity. Use `enemy_sprite = atype3`; set `spawn_enemy_param = 1` for the original `axtype 1` variant, which drops an additional step while above the player. The original 1-3 `sxtype 10` trigger uses that variant with `spawn_vy = 0`.
+
+==== `laser`
+
+A horizontal 64px beam. Use `enemy_sprite = laser` and set `dir` to choose its travel direction. It does not use gravity and is lethal on contact.
+
+== Trap Objects
+
+Create a rectangular object on the `Traps` layer and select its behavior class.
+Every trap kind now has a focused class, including hint/spike/breakable blocks,
+jump pads, pickups, coins, breaking platforms, kill zones and transition zones.
+Each exposes relevant settings only. All existing generic trap objects have
+been migrated without changing their positions or compiled behavior. The giant
+shared `Trap` class and global trap-kind/subtype dropdowns have been removed.
+The compiler rejects the generic class and obsolete `trap_type` properties;
+select a focused family or recipe class instead.
+
+To create a focused trap, select its class in Tiled and then select its `subtype`
+and other relevant properties. Do not add `trap_type`: the class determines the
+behavior, and any explicit `trap_type` is rejected. For example, choose class
+`Question Block`, then subtype `question_star`. A family with only one behavior
+does not show a redundant subtype selector.
+
+For a shorter property list, choose a recipe class such as `Star Block`,
+`Enemy Block`, `Coin Generator`, `Falling Ceiling`, `Conveyor`, `Bouncy Platform`,
+`Warp Pad` or `Fatal Launch Pad`. These are independent Tiled classes generated
+from their family definitions, not native Tiled subclasses. Their subtype is
+fixed: a `Conveyor` exposes signed `vx` but no ignored `vy`, and a `Bouncy
+Platform` exposes no movement velocities. The compiler rejects a conflicting
+explicit subtype. Switch back to the family class to change behavior; remove
+any obsolete custom overrides left by Tiled when changing classes.
+
+Recipe defaults are shared with the compiler, even if Tiled has not saved them
+as explicit properties. For example, `Poison Generator` defaults to unlimited
+spawns 16 frames apart and `Coin Generator` to 20 spawns 3 frames apart.
+Explicit zero and false values still override defaults. Classes select behavior,
+not artwork: use named visual settings, sprite tiles or a configured template
+for the intended appearance.
+
+The class lists and subtype choices are maintained in
+`tools/behavior_schema.json`. After changing them, run
+`python3 tools/generate_tiled_classes.py` and reopen the Tiled project. This is
+not yet a complete behavior schema: runtime enums and family-specific runtime
+defaults remain separate. Property types, editor defaults, recipe defaults,
+field lists, units and the class catalog below are generated from the schema.
+
+=== Named Presets
+
+Reusable rectangle templates are in `levels/templates/`. Open that directory in
+Tiled's Project view and drag a `.tx` file onto a non-enemy object layer, or use
+the Insert Template tool. These are configured instances of the focused
+classes or recipe classes, not additional runtime kinds. Recipe templates fix
+their subtype through their class; family templates can still select a subtype.
+
+[cols="1,2,3",options="header"]
+|===
+|Template |Class |Initial Settings
+|`hidden_coin_block.tx` |`Question Block` |Hidden single-coin block; empty backing cell until revealed.
+|`star_block.tx` |`Star Block` |Visible question block producing one star.
+|`poison_generator.tx` |`Poison Generator` |Unlimited poisonous mushrooms, 16 frames between spawns.
+|`coin_generator.tx` |`Coin Generator` |20 coin spawns, 3 frames apart.
+|`falling_ceiling.tx` |`Falling Ceiling` |48x16 ceiling group triggered by passing underneath; inherits backing art.
+|`conveyor_left.tx` |`Conveyor` |48x16 conveyor carrying the player left at 1 pixel/frame.
+|`conveyor_right.tx` |`Conveyor` |48x16 conveyor carrying the player right at 1 pixel/frame.
+|`bouncy_platform.tx` |`Bouncy Platform` |48x16 platform that launches the player on landing.
+|`checkpoint.tx` |`Checkpoint` |16x16 checkpoint pickup area.
+|`goal.tx` |`Goal` |16x112 goal area with a 207-frame completion walk.
+|`warp_pad.tx` |`Warp Pad` |Hidden note pad. Add a separate transition zone above it.
+|`fatal_launch_pad.tx` |`Fatal Launch Pad` |Strong upward launcher. Add a separate kill zone for a lethal ceiling.
+|`spike_block.tx` |`Spike Block` |Solid-looking block whose spikes activate on landing or blocked-side movement.
+|`breaking_platform.tx` |`Breaking Platform` |White 48x16 platform with a configurable 12-frame grace period.
+|`hint_block.tx` |`Hint Block` |Hint graphic and editable modal message.
+|`fake_goal.tx` |`Fake Goal` |16x112 deceptive goal pole.
+|===
+
+Position and resize an instance to fit the map. Paint terrain beneath a falling
+ceiling group so it has backing cells to remove and sample; do not paint a moving
+platform onto the background. Instance properties override template values,
+including explicit zero and false values. Unmodified settings continue to follow
+the template. Detach an instance in Tiled if it should stop following it.
+
+The compiler resolves JSON rectangle and preview tile-object templates directly,
+so detaching before export is unnecessary. Missing templates and cyclic
+references produce errors. The build tracks referenced `.tx` files, their
+tilesets and their images. The rectangle presets above remain rectangles;
+sprite-backed templates are in the separate `enemies/` and `items/` subfolders.
+
+Preset definitions live under `presets` in `tools/behavior_schema.json`.
+Regenerate them with `python3 tools/generate_tiled_classes.py`; direct changes to
+the generated `.tx` files will be overwritten on regeneration. Normal templates
+saved independently in Tiled can also be used. Existing placed map objects are
+not automatically converted to template instances.
+
+=== Trap Kind Reference
+
+Its rectangle is its trigger or collision area unless noted otherwise. Only
+properties listed for a trap type affect that type; the converter accepts other
+properties for a shared data format, but the runtime ignores them.
+
+The sections below use internal kind names; the generated catalog at the end of
+this reference lists their Tiled classes and settings. Each rectangle is the
+trigger or body described in its section.
+
+=== `falling_floor`
+
+Tiled class: `Falling Floor`.
+
+Removes its backing cells and creates falling sprite tiles. Its rectangle defines the full tile group.
+
+* Subtypes:
+** `none`: Falls when the player stands on it.
+** `falling_on_pass_under`: A ceiling group that falls when the player passes underneath and can crush them.
+** `falling_when_approached`: Falls when the player approaches its horizontal trigger range.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Optional falling art override. `inherit` copies the backing background tile.
+|`visual_palette` |`BgPalette` |Palette for an overridden falling visual.
+|`gravity` |number |Falling acceleration in GBA pixels per frame squared. `0` uses the standard falling-floor gravity. The original 1-3 slow-drop platform uses `0.082759`.
+|`trigger_channel` |int |Channel emitted when the group begins falling.
+|`listen_channel` |int |Channel that triggers the fall externally.
+|`trigger_delay` |int |Frames to wait after a linked channel event.
+|===
+
+=== `bump_shooter`
+
+A block trigger that fires one upward projectile when hit from below.
+
+* Subtypes:
+** `none`: Fires the standard upward projectile.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Backing block art when a custom tile is needed.
+|`visual_palette` |`BgPalette` |Backing block palette.
+|`collision` |`LevelCollision` |Backing cell collision override.
+|`trigger_channel` |int |Channel emitted after firing.
+|===
+
+=== `question_block`
+
+Tiled class: `Question Block`.
+
+A block hit from below that pays out an item, enemy, or repeated generator.
+
+* Subtypes:
+** `none`: Produces one coin popup.
+** `question_enemy`: Produces a walker by default, or the configured enemy recipe.
+** `question_good_mushroom`: Produces the beneficial mushroom.
+** `question_bad_mushroom`: Produces the poisonous mushroom.
+** `question_bad_flower`: Produces the fire-flower trap, which kills the player on pickup.
+** `question_star`: Produces a bouncing star.
+** `question_poison_generator`: Repeatedly produces poisonous mushrooms.
+** `question_coin_generator`: Repeatedly produces coins.
+** `question_hidden_poison`: Produces a fast poisonous mushroom.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Initial block metatile.
+|`visual_palette` |`BgPalette` |Initial block palette.
+|`collision` |`LevelCollision` |Initial block collision. Use `empty` with `hidden = true` for a hidden block.
+|`hidden` |bool |Hides the initial backing cell without disabling its bump trigger. A hidden single-coin block uses `subtype = none`, `visual_metatile = empty`, and `collision = empty`.
+|`spent_metatile` |`SpentMetatile` |Tile after use. `default_spent` selects the normal solid spent block.
+|`spawn_dir` |`TrapSpawnDirection` |Direction for `question_enemy`: `auto`, `left`, or `right`.
+|`spawn_enemy_kind` |`EnemyKind` |Optional behavior override for `question_enemy`; omitting it keeps the walker.
+|`spawn_enemy_sprite` |`EnemySprite` |Graphic for the configured question-block enemy.
+|`spawn_enemy_palette` |int |OBJ palette bank for the configured enemy.
+|`spawn_enemy_param` |int |Behavior parameter for the configured enemy.
+|`spawn_interval` |int |Frames between generator spawns. The first spawn is immediate.
+|`spawn_limit` |int |Generator maximum; `0` means unlimited.
+|`trigger_channel` |int |Channel emitted after the block is hit.
+|`listen_channel` |int |Channel that activates the block.
+|`trigger_delay` |int |Frames to wait after a linked channel event.
+|===
+
+=== `evasive_block`
+
+A solid visible block that moves away when approached or bumped. Its rectangle defines the moving collision body.
+
+* Subtypes:
+** `evasive_vertical`: Moves vertically away from the player.
+** `evasive_horizontal`: Moves horizontally away from the player.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Backing block art.
+|`visual_palette` |`BgPalette` |Backing block palette.
+|`collision` |`LevelCollision` |Backing cell collision.
+|===
+
+=== `stage_spawner`
+
+Tiled class: `Stage Spawner`.
+
+A rectangular trigger with a data-driven enemy recipe, hint message, or recurring pipe hazard. Subtypes never select an enemy in C; use the spawn recipe properties.
+
+* Subtypes:
+** `stage_pipe_shot`: One-shot pipe-style projectile trigger.
+** `stage_flying_enemy`: One-shot flying enemy trigger.
+** `stage_walker_swarm`: One-shot multi-walker trigger.
+** `stage_upward_hazard`: Upward launch trigger.
+** `stage_upward_hazard_toggle`: Two-threshold upward hazard. The first overlap relocates its trigger by `move_offset_x`/`move_offset_y`; a later overlap at that shifted position spawns the configured enemy.
+** `stage_upward_hazard_left`: Leftward upward-launch variant.
+** `stage_hint_message`: Displays `hint_text` instead of spawning an enemy.
+** `stage_pipe_hazard`: Repeating, proximity-driven pipe hazard.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Activation area; `stage_upward_hazard_toggle` moves this area by `move_offset_x`/`move_offset_y` before its second activation.
+|`spawn_enemy_kind` |`EnemyKind` |Behavior of the spawned enemy. `none` is valid for messages.
+|`spawn_enemy_sprite` |`EnemySprite` |Graphic of the spawned enemy.
+|`spawn_enemy_palette` |int |OBJ palette bank for the spawned enemy.
+|`spawn_enemy_param` |int |Behavior parameter passed to the spawned enemy.
+|`spawn_enemy_count` |int |Enemies produced on each activation.
+|`spawn_dir` |`TrapSpawnDirection` |`auto`, `left`, or `right` initial direction.
+|`spawn_sound` |bool |Plays the trap sound at activation.
+|`spawn_offset_x`, `spawn_offset_y` |number |Pixel offset from the trigger object's position. Moving the object moves the spawn point with it. Defaults to zero.
+|`spawn_vx`, `spawn_vy` |number |Initial map-pixel velocity per frame.
+|`spawn_random_vx`, `spawn_random_vy` |number |Map-pixel randomized velocity range around the initial velocity.
+|`spawn_spacing_x`, `spawn_spacing_y` |number |Per-enemy map-pixel offset for multi-spawns.
+|`spawn_interval` |int |Frames between `stage_pipe_hazard` spawns.
+|`spawn_limit` |int |Maximum spawns; `0` means unlimited.
+|`move_offset_x`, `move_offset_y` |number |Map-pixel relocation applied by `stage_upward_hazard_toggle` before its subsequent activation.
+|`repeat_rearm_offset_x`, `repeat_rearm_offset_y` |number |Map-pixel shifted rectangle that re-arms a trigger.
+|`trigger_channel` |int |Channel emitted after activation.
+|`listen_channel` |int |Channel that activates this spawner.
+|`channel_spawn_interval` |int |Spawn interval override after a linked activation.
+|`trigger_delay` |int |Frames to wait after linked activation.
+|`hint_text` |string |Modal text for `stage_hint_message`; supports `\n`.
+|===
+
+=== `enter_pipe`
+
+Tiled class: `Enter Pipe`.
+
+A vertical pipe entered by holding Down. Pipe art remains on `Background`.
+
+* Subtypes:
+** `pipe_fake_kill`: Sinks the player, then performs the fake-pipe kill sequence.
+** `pipe_to_underground`: Sinks the player, then loads the selected destination map.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Defines the pipe mouth.
+
+|`stage_destination` |`StageDestination` |Map loaded after a successful pipe transition. Select the destination explicitly, for example `1-3u`.
+|`entry_id` |int |Destination entry route. Match this to a `Pipe Exit` in the destination map; defaults to `0`.
+|===
+
+=== `side_pipe`
+
+Tiled class: `Side Pipe`.
+
+A horizontal pipe entered while standing at its opening and holding Right. The destination map may define a `Pipe Exit` object to override its normal player start.
+
+* Subtypes:
+** `pipe_fake_kill`: Pulls the player in, blasts them out, and kills them.
+** `pipe_to_underground`: Pulls the player in and loads the selected destination map.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Defines the side-pipe opening.
+
+|`stage_destination` |`StageDestination` |Map loaded after a successful pipe transition. Select the destination explicitly.
+|`entry_id` |int |Destination entry route. Match this to a `Pipe Exit` in the destination map; defaults to `0`.
+|===
+
+=== `breakable_block`
+
+A solid block which retains the selected backing art until it is hit from below, then uses the normal brick-break sound and four debris pieces before disappearing. Use it for the original type-301 hint-break block with `visual_metatile = hint_block`.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Initial block art. Use `hint_block` for the original hint-break appearance.
+|`visual_palette` |`BgPalette` |Palette for the initial block art.
+|`collision` |`LevelCollision` |Initial backing-cell collision; normally `solid`.
+|===
+
+=== `p_switch_block`
+
+The original type-116 P-switch block. Hitting it from below spends the block and
+spawns a P-switch one tile above it. Landing on the switch stops the music and
+converts visible block traps and cells marked on the `P-Switch Blocks` tile
+layer into collectible coins for the current attempt. Paint the eligible cells
+on that layer; its visibility in Tiled does not affect the generated mask.
+Hidden blocks remain hidden until revealed. Level reload restores the map.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Initial block art; use `question` for the original item-block appearance.
+|`spent_metatile` |`SpentMetatile` |Art after being hit; defaults to the ordinary solid/spent block.
+|`visual_palette` |`BgPalette` |Palette used for both initial and spent block art.
+|`collision` |`LevelCollision` |Initial backing-cell collision; normally `solid`.
+|===
+
+=== `jump_pad`
+
+The shared launch-pad family. Its object rectangle is the landing/contact area. The subtype selects the original behavior; any resulting death or level transition belongs in a separate off-screen `kill_zone` or `transition_zone`.
+
+* Subtypes:
+** `none`: Standard solid bounce pad. It rebounds the player once when they land on top.
+** `warp_pad`: Original type-117 note pad. It is non-solid, ignores terrain collision while it carries the player upward, and pairs with a `transition_zone` above the map when it leads elsewhere.
+** `fatal_launch`: Original type-120 jump platform. It is non-solid and continuously forces a stronger upward launch. Pair it with an off-screen `kill_zone` when the original launch is fatal.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Landing/contact area. The default subtype is solid; `warp_pad` and `fatal_launch` are non-solid.
+|`subtype` |`Jump Pad Subtype` |Selects `none`, `warp_pad`, or `fatal_launch`. Recipe classes fix this selection and hide the field.
+|`hidden` |bool |Suppresses the pad sprite until its first activation. The pad remains functional while hidden; use this for the original hidden type-117 note pads.
+|===
+
+=== `kill_zone`
+
+A non-rendered lethal rectangle. Use it for authored hazards beyond the visible map, such as the ceiling reached by the original type-120 launch.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Any player overlap calls the normal death sequence.
+|===
+
+=== `transition_zone`
+
+A non-solid map-transition rectangle. It requests its selected `stage_destination` on player overlap; use it for a note-pad launch handoff or other map exits.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Transition area.
+|`stage_destination` |`StageDestination` |Map to load when entered.
+|===
+
+=== `checkpoint`
+
+Tiled class: `Checkpoint`.
+
+An overlap trigger that records the player respawn location.
+
+* Subtypes:
+** `none`: Standard checkpoint flag.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Pickup area and respawn anchor.
+|`trigger_channel` |int |Channel emitted after pickup.
+|`listen_channel` |int |Channel that activates the checkpoint.
+|`trigger_delay` |int |Frames to wait after a linked channel event.
+|`visual_metatile`, `visual_palette`, `collision` |tile settings |Optional backing-cell integration.
+|===
+
+=== `goal`
+
+Tiled class: `Goal`.
+
+The real goal pole. It starts the pole slide, then the rightward completion walk after the player reaches the base.
+
+* Subtypes:
+** `none`: Standard level-completion pole.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Pole trigger area.
+|`goal_walk_frames` |int |Frames from beginning the rightward walk until requesting completion.
+|`trigger_channel` |int |Channel emitted when the pole is reached.
+|`listen_channel` |int |Channel that activates the goal.
+|`trigger_delay` |int |Frames to wait after a linked channel event.
+|`visual_metatile`, `visual_palette`, `collision` |tile settings |Optional backing-cell integration.
+|===
+
+=== `fake_goal`
+
+A deceptive pole that moves when approached, bounces a player who lands on it, and kills on body contact.
+
+* Subtypes:
+** `none`: Standard fake-pole behavior.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object rectangle |geometry |Fake pole body and approach range.
+|`trigger_channel` |int |Channel emitted when the fake pole kills the player.
+|`visual_metatile`, `visual_palette`, `collision` |tile settings |Optional backing-cell integration.
+|===
+
+=== `hint_block`
+
+An interaction trigger that pauses gameplay and shows a dismissible text modal.
+
+* Subtypes:
+** `none`: Standard hint block.
+** `hint_stage_1`: Reference label for the original stage-one hint.
+
+Both subtypes use `hint_text` when it is non-empty; otherwise the built-in stage-one text is used.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`hint_text` |string |Text shown by the modal. Use `\n` for line breaks.
+|`trigger_channel` |int |Channel emitted when activated.
+|`visual_metatile`, `visual_palette`, `collision` |tile settings |Optional backing-cell integration.
+|===
+
+=== `spike_block`
+
+A normal-looking block that exposes lethal top and side spikes after the player lands on it or pushes a blocked side face.
+
+* Subtypes:
+** `none`: Standard hidden-spike behavior.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Background block art.
+|`visual_palette` |`BgPalette` |Background block palette.
+|`collision` |`LevelCollision` |Background block collision.
+|===
+
+=== `moving_platform`
+
+Tiled class: `Moving Platform`.
+
+A sprite-rendered solid platform that moves continuously and carries the player. Do not paint the platform itself on `Background`.
+
+* Subtypes:
+** `none`: Moves continuously without wrapping.
+** `platform_conveyor`: Static conveyor. Its signed `vx` carries the player: negative is left and positive is right. It is fatal after 100 uninterrupted ride frames.
+** `platform_vertical_wrap`: Wraps between vertical camera bounds.
+** `platform_bounce`: Static platform that launches the player upward on landing.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object width, height |geometry |Platform collision and sprite extent.
+|`visual_metatile` |`VisualMetatile` |OBJ metatile graphic. `inherit` samples the backing map cell at the object position, including its palette; use an explicit metatile to override it.
+|`visual_palette` |`BgPalette` |Palette for an explicit `visual_metatile`; ignored when `visual_metatile` is `inherit`.
+|`vx`, `vy` |number |Constant horizontal and vertical speed in GBA pixels per frame. For `platform_conveyor`, `vx` is the player-carry speed and the platform itself remains still; `vy` is ignored. Both are ignored by `platform_bounce`.
+|===
+
+=== `pickup_item`
+
+A gravity-driven collectible, such as the green question ball.
+
+* Subtypes:
+** `none`: Standard falling pickup.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object width, height |geometry |Pickup collision size.
+|`item_variant` |int |`0` picks up and emits its channel. `1` also releases the star burst.
+|`trigger_channel` |int |Channel emitted on pickup.
+|===
+
+=== `coin`
+
+A stationary collectable coin. It is rendered from the item sheet and disappears when the player touches it.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object width, height |geometry |Coin collision and display size. Use `16 x 16` for reference coins.
+|`trigger_channel` |int |Optional channel emitted when collected.
+|===
+
+=== `moving_block`
+
+A trap-backed block that removes its original cell, moves by an offset, then remains as a dynamic collider. It is normally activated by a channel.
+
+* Subtypes:
+** `none`: Standard one-time offset movement.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|`visual_metatile` |`VisualMetatile` |Block art after moving.
+|`visual_palette` |`BgPalette` |Block palette.
+|`collision` |`LevelCollision` |Collision of the original backing cell.
+|`move_offset_x`, `move_offset_y` |number |Map-pixel movement offset.
+|`listen_channel` |int |Channel that activates movement.
+|`trigger_delay` |int |Frames to wait after activation.
+|`trigger_channel` |int |Channel emitted after movement starts.
+|===
+
+=== `breaking_platform`
+
+A pass-through platform that remains solid for a configurable period after first landing, then disappears into fragments using its own art.
+
+* Subtypes:
+** `none`: Standard break-on-landing behavior.
+
+[cols="1,1,3",options="header"]
+|===
+|Property |Type |Meaning
+
+|Object width, height |geometry |Full platform extent.
+|`visual_metatile` |`VisualMetatile` |Platform fragment art.
+|`visual_palette` |`BgPalette` |Platform fragment palette.
+|`trigger_delay` |int |Solid grace period after first landing. `0` breaks immediately.
+|===
+
+include::generated/tiled_classes.adoc[]
+
+== Camera Bounds
+
+Set these as map properties on the TMJ itself:
+
+|===
+|Property |Meaning
+
+|`camera_margin_top`
+|Pixels hidden from the top of the map when clamping vertical camera scroll. `0` lets the camera reach the map top.
+
+|`camera_margin_bottom`
+|Pixels hidden from the bottom of the map when clamping vertical camera scroll. `32` keeps the bottom two 16 px rows offscreen.
+|===
+
+== Build And Validation
+
+After editing a level:
+
+----
+make check-maps
+----
+
+This checks every map without a GBA toolchain or generated files. To check just
+one map, run `python3 tools/compile_map.py levels/level1_3.tmj --check`. Errors
+identify the map and, where applicable, the layer, object and property.
+
+The compiler accepts finite orthogonal maps with 16x16 tiles and one terrain
+tileset, plus optional object-preview collection tilesets marked
+`object_tileset = true`. External image paths are relative to the tileset file.
+Group layers, nonzero layer offsets, opacity or parallax,
+flipped or rotated tiles, rotated or non-rectangular objects, and encoded or
+chunked tile data are not supported and produce an error. Invisible ordinary
+tile layers are not exported; object-layer and object visibility does not
+disable gameplay. The `P-Switch Blocks` mask is exported even when hidden.
+
+Spawn positions are relative to the spawner object, using `spawn_offset_x` and
+`spawn_offset_y`; absolute `spawn_x` and `spawn_y` properties are rejected.
+Nonzero `listen_channel` values are accepted only on traps that support linked
+activation. Channel links must not form cycles, including links with delays.
+
+To build the ROM:
+
+----
+DEVKITPRO=/opt/devkitpro DEVKITARM=/opt/devkitpro/devkitARM make OpenCorgiAction.gba
+----
+
+The Makefile regenerates level C/H files when a map, its referenced tileset or
+tileset image, or the compiler's behavior metadata changes.
+
+Useful checks:
+
+----
+rg -n "level1_2u_enemy_spawns|level1_2u_traps" src/generated/level1_2u_data.c
+----
+
+For stage-select testing, rebuild with:
+
+----
+DEVKITPRO=/opt/devkitpro DEVKITARM=/opt/devkitpro/devkitARM DEBUG_STAGE_SELECT=1 make clean
+DEVKITPRO=/opt/devkitpro DEVKITARM=/opt/devkitpro/devkitARM DEBUG_STAGE_SELECT=1 make OpenCorgiAction.gba
+----
+
+Use `make clean` when changing compile-time flags.

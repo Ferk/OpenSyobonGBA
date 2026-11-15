@@ -2,18 +2,12 @@
  "type": "template",
  "object": {
   "name": "Poison Generator",
-  "type": "Question Block",
+  "type": "Poison Generator",
   "width": 16,
   "height": 16,
   "rotation": 0,
   "visible": true,
   "properties": [
-   {
-    "name": "subtype",
-    "type": "string",
-    "propertytype": "Question Block Subtype",
-    "value": "question_poison_generator"
-   },
    {
     "name": "visual_metatile",
     "type": "string",

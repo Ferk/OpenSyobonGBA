@@ -302,12 +302,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -319,7 +313,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 32,
@@ -333,12 +327,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -350,7 +338,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 64,
@@ -364,12 +352,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -381,7 +363,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 96,
@@ -395,12 +377,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -412,7 +388,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 128,
@@ -426,12 +402,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -443,7 +413,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 160,
@@ -457,12 +427,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -474,7 +438,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 48,
@@ -488,12 +452,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -505,7 +463,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 80,
@@ -519,12 +477,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -536,7 +488,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 112,
@@ -550,12 +502,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -567,7 +513,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 144,
@@ -581,12 +527,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -598,7 +538,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 32,
@@ -612,12 +552,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -629,7 +563,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 64,
@@ -643,12 +577,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -660,7 +588,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 96,
@@ -674,12 +602,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -691,7 +613,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 128,
@@ -705,12 +627,6 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "coin"
-      },
-      {
        "name": "body_width",
        "type": "int",
        "value": 16
@@ -722,7 +638,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Coin",
      "visible": true,
      "width": 16,
      "x": 160,
@@ -780,15 +696,9 @@
       },
       {
        "name": "subtype",
-       "propertytype": "TrapSubtype",
+       "propertytype": "Hint Block Subtype",
        "type": "string",
        "value": "hint_stage_1"
-      },
-      {
-       "name": "trap_type",
-       "propertytype": "TrapKind",
-       "type": "string",
-       "value": "hint_block"
       },
       {
        "name": "visual_metatile",
@@ -798,7 +708,7 @@
       }
      ],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Hint Block",
      "visible": true,
      "width": 16,
      "x": 192,

@@ -1044,15 +1044,9 @@
      "id": 4,
      "name": "ref 1-2B fake goal pole btype85 19,2",
      "opacity": 1,
-     "properties": [
-      {
-       "name": "trap_type",
-       "type": "string",
-       "value": "fake_goal"
-      }
-     ],
+     "properties": [],
      "rotation": 0,
-     "type": "Trap",
+     "type": "Fake Goal",
      "visible": true,
      "width": 16,
      "x": 304,

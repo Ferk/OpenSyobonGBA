@@ -1,0 +1,24 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Breaking Platform",
+  "type": "Breaking Platform",
+  "width": 48,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "visual_metatile",
+    "type": "string",
+    "propertytype": "VisualMetatile",
+    "value": "white_platform"
+   },
+   {
+    "name": "trigger_delay",
+    "type": "int",
+    "value": 12
+   }
+  ]
+ }
+}

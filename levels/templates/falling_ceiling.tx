@@ -2,18 +2,12 @@
  "type": "template",
  "object": {
   "name": "Falling Ceiling",
-  "type": "Falling Floor",
+  "type": "Falling Ceiling",
   "width": 48,
   "height": 16,
   "rotation": 0,
   "visible": true,
   "properties": [
-   {
-    "name": "subtype",
-    "type": "string",
-    "propertytype": "Falling Floor Subtype",
-    "value": "falling_on_pass_under"
-   },
    {
     "name": "visual_metatile",
     "type": "string",

@@ -1,0 +1,25 @@
+{
+ "type": "template",
+ "object": {
+  "name": "Spike Block",
+  "type": "Spike Block",
+  "width": 16,
+  "height": 16,
+  "rotation": 0,
+  "visible": true,
+  "properties": [
+   {
+    "name": "visual_metatile",
+    "type": "string",
+    "propertytype": "VisualMetatile",
+    "value": "solid"
+   },
+   {
+    "name": "collision",
+    "type": "int",
+    "propertytype": "LevelCollision",
+    "value": 1
+   }
+  ]
+ }
+}

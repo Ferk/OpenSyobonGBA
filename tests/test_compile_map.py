@@ -1,15 +1,18 @@
 import copy
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
 spec = importlib.util.spec_from_file_location("compile_map", ROOT / "tools/compile_map.py")
 compiler = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(compiler)
@@ -20,9 +23,9 @@ class CompilerValidationTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
         shutil.copy(ROOT / "gfx/tiles_16.png", self.root / "tiles.png")
-        self.obj = {"id": 1, "type": "Trap", "name": "example", "x": 0,
+        self.obj = {"id": 1, "type": "Question Block", "name": "example", "x": 0,
                     "y": 0, "width": 16, "height": 16,
-                    "properties": [{"name": "trap_type", "value": "question_block"}]}
+                    "properties": []}
         self.map = {"width": 1, "height": 1, "nextobjectid": 2,
                     "orientation": "orthogonal", "tilewidth": 16, "tileheight": 16,
                     "tilesets": [{"firstgid": 1, "image": "tiles.png", "imagewidth": 16,
@@ -45,9 +48,21 @@ class CompilerValidationTests(unittest.TestCase):
         props.append({"name": name, "value": value})
 
     def test_unknown_trap_has_object_and_field(self):
-        self.set_property("trap_type", "typo")
-        with self.assertRaisesRegex(compiler.MapValidationError, "example.*trap_type.*unknown"):
+        self.obj["type"] = "Question Blcok"
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*class.*unknown trap class"):
             self.compile()
+
+    def test_generic_trap_and_obsolete_kind_property_are_rejected(self):
+        for layer_name in ("Traps", "Objects"):
+            self.map["layers"][1]["name"] = layer_name
+            self.obj["type"] = "Trap"
+            with self.assertRaisesRegex(compiler.MapValidationError, "example.*class.*generic Trap"):
+                self.compile()
+        self.obj["type"] = "Question Block"
+        for value in ("question_block", "goal", None):
+            self.set_property("trap_type", value)
+            with self.assertRaisesRegex(compiler.MapValidationError, "example.*trap_type.*no longer supported"):
+                self.compile()
 
     def test_wrong_kind_subtype_and_out_of_range_interval(self):
         self.set_property("subtype", "platform_bounce")
@@ -59,7 +74,7 @@ class CompilerValidationTests(unittest.TestCase):
             self.compile()
 
     def test_unset_destination_and_valid_first_stage_are_distinct(self):
-        self.set_property("trap_type", "transition_zone")
+        self.obj["type"] = "Transition Zone"
         self.set_property("stage_destination", "none")
         with self.assertRaisesRegex(compiler.MapValidationError, "stage_destination"):
             self.compile()
@@ -133,14 +148,14 @@ class CompilerValidationTests(unittest.TestCase):
         self.assertIn("sets/shared.tsj", deps)
         self.assertIn("sets/../tiles.png", deps)
 
-    def test_focused_class_selects_kind_and_rejects_conflict(self):
+    def test_focused_class_selects_kind_and_rejects_obsolete_property(self):
         self.obj["type"] = "Question Block"
         self.obj["properties"] = [{"name": "subtype", "value": "question_star"}]
         output = self.compile()
         self.assertIn(".kind = TRAP_QUESTION_BLOCK", output)
         self.assertIn(".subtype = 104", output)
         self.set_property("trap_type", "goal")
-        with self.assertRaisesRegex(compiler.MapValidationError, "trap_type.*conflicts"):
+        with self.assertRaisesRegex(compiler.MapValidationError, "trap_type.*no longer supported"):
             self.compile()
 
     def test_focused_class_subtypes_match_compiler(self):
@@ -161,8 +176,106 @@ class CompilerValidationTests(unittest.TestCase):
         for name, spec in compiler.BEHAVIOR_SCHEMA["classes"].items():
             with self.subTest(name=name):
                 self.assertEqual(by_name[name + " Subtype"]["values"], spec["subtypes"])
+                subtype_fields = ["subtype"] if len(spec["subtypes"]) > 1 else []
                 self.assertEqual([p["name"] for p in by_name[name]["members"]],
-                                 ["subtype"] + spec["properties"])
+                                 subtype_fields + spec["properties"])
+
+    def test_all_trap_kinds_have_focused_classes(self):
+        self.assertEqual(set(compiler.TRAP_KIND_NAMES),
+                         {s["kind"] for s in compiler.BEHAVIOR_SCHEMA["classes"].values()})
+        project = json.loads((ROOT / "OpenCorgiAction.tiled-project").read_text())
+        names = {t["name"] for t in project["propertyTypes"]}
+        self.assertFalse({"Trap", "TrapKind", "TrapSubtype"} & names)
+
+    def test_recipe_defaults_equal_explicit_family_settings(self):
+        for name, recipe in compiler.BEHAVIOR_SCHEMA["recipes"].items():
+            with self.subTest(recipe=name):
+                self.obj["type"] = name
+                self.obj["properties"] = []
+                expected = self.compile()
+                self.obj["type"] = recipe["family"]
+                self.obj["properties"] = [
+                    {"name": field, "value": value} for field, value in
+                    dict(recipe["defaults"], subtype=recipe["subtype"]).items()]
+                self.assertEqual(self.compile(), expected)
+
+    def test_recipe_rejects_conflicting_subtype_but_allows_setting_overrides(self):
+        self.obj["type"] = "Poison Generator"
+        self.obj["properties"] = []
+        output = self.compile()
+        self.assertIn(".spawn_interval = 16", output)
+        self.assertIn(".spawn_limit = 0", output)
+        self.set_property("spawn_interval", 0)
+        self.set_property("spawn_limit", 1)
+        output = self.compile()
+        self.assertIn(".spawn_interval = 0", output)
+        self.assertIn(".spawn_limit = 1", output)
+        self.set_property("subtype", "question_star")
+        with self.assertRaisesRegex(compiler.MapValidationError, "example.*subtype.*class.*fixes subtype"):
+            self.compile()
+
+    def test_recipe_templates_keep_zero_false_and_signed_overrides(self):
+        self.obj.clear()
+        self.obj.update(id=1, template=str(ROOT / "levels/templates/warp_pad.tx"),
+                        x=0, y=80, properties=[{"name": "hidden", "value": False}])
+        self.assertIn(".hidden = 0", self.compile())
+        self.obj.update(template=str(ROOT / "levels/templates/conveyor_left.tx"),
+                        properties=[{"name": "vx", "value": 2.5}])
+        self.assertIn(".vx = 163840", self.compile())
+
+    def test_recipe_editor_fields_and_documentation_follow_schema(self):
+        from generate_tiled_classes import class_reference
+        schema = compiler.BEHAVIOR_SCHEMA
+        project = json.loads((ROOT / "OpenCorgiAction.tiled-project").read_text())
+        types = {t["name"]: t for t in project["propertyTypes"]}
+        for name, recipe in schema["recipes"].items():
+            fields = types[name]["members"]
+            self.assertEqual([p["name"] for p in fields], recipe["properties"])
+            for prop in fields:
+                default = recipe["defaults"].get(prop["name"], schema["properties"][prop["name"]]["value"])
+                self.assertEqual(prop["value"], default)
+        self.assertEqual((ROOT / "docs/generated/tiled_classes.adoc").read_text(),
+                         class_reference(schema, compiler.AUTHORING_CLASSES))
+
+    def test_class_generator_is_repeatable_without_legacy_trap_class(self):
+        import generate_tiled_classes as generator
+        project = self.root / "project.tiled-project"
+        shutil.copy(ROOT / "OpenCorgiAction.tiled-project", project)
+        with mock.patch.multiple(generator, ROOT=self.root, PROJECT=project,
+                                 TEMPLATES=self.root / "templates"):
+            generator.main()
+            first = project.read_bytes()
+            generator.main()
+            self.assertEqual(first, project.read_bytes())
+
+    def test_invalid_recipe_schema_is_rejected(self):
+        from authoring_schema import authoring_classes
+        schema = copy.deepcopy(compiler.BEHAVIOR_SCHEMA)
+        schema["recipes"]["Conveyor"]["properties"].append("hint_text")
+        with self.assertRaisesRegex(ValueError, "Conveyor.*unsupported family properties"):
+            authoring_classes(schema)
+
+    @unittest.skipUnless(shutil.which("tiled"), "Tiled is not installed")
+    def test_recipe_survives_tiled_export_with_template_overrides(self):
+        self.map.update(type="map", version="1.10", tiledversion="1.10.2", nextlayerid=3)
+        self.map["tilesets"][0].update(name="Terrain", tilewidth=16, tileheight=16, columns=1)
+        self.map["layers"][0].update(id=1, width=1, height=1)
+        self.map["layers"][1].update(id=2, draworder="topdown")
+        for layer in self.map["layers"]:
+            layer.update(opacity=1, visible=True, x=0, y=0)
+        self.obj.clear()
+        self.obj.update(id=1, template=str(ROOT / "levels/templates/conveyor_left.tx"),
+                        x=0, y=80, properties=[{"name": "vx", "type": "float", "value": 2.5}])
+        expected = self.compile()
+        exported = self.root / "exported.tmj"
+        result = subprocess.run([shutil.which("tiled"), "--export-map",
+                                 str(self.root / "map.tmj"), str(exported)],
+                                env=dict(os.environ, QT_QPA_PLATFORM="offscreen"),
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        compiler.write_outputs(exported, self.root / "exported.h",
+                               self.root / "exported.c", "map")
+        self.assertEqual((self.root / "exported.c").read_text(), expected)
 
     def test_check_command_writes_no_generated_outputs(self):
         path = self.root / "map.tmj"
@@ -174,7 +287,7 @@ class CompilerValidationTests(unittest.TestCase):
         self.assertFalse((self.root / "map.h").exists())
 
     def test_spawns_use_offsets_and_reject_absolute_coordinates(self):
-        self.set_property("trap_type", "stage_spawner")
+        self.obj["type"] = "Stage Spawner"
         self.set_property("spawn_offset_x", 7.5)
         self.set_property("spawn_offset_y", -12.25)
         self.obj["x"] = 20
@@ -186,17 +299,16 @@ class CompilerValidationTests(unittest.TestCase):
             self.compile()
 
     def test_channel_listener_kind_and_cycles(self):
-        self.set_property("trap_type", "spike_block")
+        self.obj["type"] = "Spike Block"
         self.set_property("listen_channel", 1)
         with self.assertRaisesRegex(compiler.MapValidationError, "example.*listen_channel.*cannot"):
             self.compile()
-        self.set_property("trap_type", "falling_floor")
+        self.obj["type"] = "Falling Floor"
         self.set_property("trigger_channel", 2)
         other = copy.deepcopy(self.obj)
         other["id"] = 2
         other["name"] = "other"
-        other["properties"] = [{"name": "trap_type", "value": "falling_floor"},
-                               {"name": "listen_channel", "value": 2},
+        other["properties"] = [{"name": "listen_channel", "value": 2},
                                {"name": "trigger_channel", "value": 3}]
         self.map["layers"][1]["objects"].append(other)
         self.map["nextobjectid"] = 3
