@@ -81,6 +81,9 @@ typedef struct Trap {
     uint8_t spent_metatile;
     uint8_t spawn_interval;
     uint8_t spawn_limit;
+    uint8_t activation_limit;
+    uint8_t disable_channel;
+    uint8_t draw_pipe;
     uint8_t item_variant;
     uint8_t spawn_enemy_kind;
     uint8_t spawn_enemy_sprite;
@@ -104,6 +107,8 @@ typedef struct Trap {
     fix16_t repeat_rearm_offset_y;
     fix16_t move_offset_x;
     fix16_t move_offset_y;
+    fix16_t channel_vx;
+    fix16_t channel_vy;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t spawn_count;
@@ -137,6 +142,9 @@ typedef struct TrapTrigger {
     uint8_t visual_palette;
     uint8_t spawn_interval;
     uint8_t spawn_limit;
+    uint8_t activation_limit;
+    uint8_t disable_channel;
+    uint8_t draw_pipe;
     uint8_t item_variant;
     uint8_t spawn_enemy_kind;
     uint8_t spawn_enemy_sprite;
@@ -160,6 +168,8 @@ typedef struct TrapTrigger {
     fix16_t repeat_rearm_offset_y;
     fix16_t move_offset_x;
     fix16_t move_offset_y;
+    fix16_t channel_vx;
+    fix16_t channel_vy;
     uint16_t goal_walk_frames;
     const char *hint_text;
     uint8_t visual_metatile;

@@ -11,6 +11,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(shutil.which("cc"), "host C compiler is not installed")
 class RuntimeSpawningTests(unittest.TestCase):
+    def test_persistent_banner(self):
+        with tempfile.TemporaryDirectory() as directory:
+            executable = Path(directory) / "messages"
+            result = subprocess.run([
+                shutil.which("cc"), "-std=c99", "-O1",
+                "-I" + str(ROOT / "tests/stubs"), "-I" + str(ROOT / "include"),
+                str(ROOT / "tests/runtime_messages.c"), str(ROOT / "src/font4x6.c"),
+                "-o", str(executable),
+            ], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            result = subprocess.run([str(executable)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_enemy_pool_and_trap_retry(self):
         with tempfile.TemporaryDirectory() as directory:
             executable = Path(directory) / "spawning"
@@ -29,11 +42,13 @@ class RuntimeSpawningTests(unittest.TestCase):
                     f"static const unsigned short {asset}Pal[256] = {{0}};\n"
                     f"#define {asset}TilesLen sizeof({asset}Tiles)\n"
                     f"#define {asset}PalLen sizeof({asset}Pal)\n")
-            subprocess.run([
+            result = subprocess.run([
                 shutil.which("cc"), "-std=c99", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-I" + str(ROOT / "tests/stubs"), "-I" + str(ROOT / "include"),
                 "-I" + str(fixtures), str(ROOT / "tests/runtime_spawning.c"),
                 str(ROOT / "src/enemy.c"), "-o", str(executable),
-            ], check=True, capture_output=True, text=True)
-            subprocess.run([str(executable)], check=True, capture_output=True, text=True)
+            ], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            result = subprocess.run([str(executable)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

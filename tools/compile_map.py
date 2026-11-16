@@ -60,10 +60,14 @@ TRAP_SUBTYPE_NAMES = {
     "question_poison_generator": 110,
     "question_coin_generator": 112,
     "question_hidden_poison": 114,
+    "question_fragile_coin": 115,
     "evasive_vertical": 0,
     "evasive_horizontal": 1,
     "pipe_fake_kill": 0,
     "pipe_to_underground": 1,
+    "pipe_fireworks": 2,
+    "pipe_owata": 5,
+    "stage_banner": 189,
     "hint_stage_1": 1,
     "platform_conveyor": 2,
     "platform_vertical_wrap": 5,
@@ -190,19 +194,19 @@ STAGE_MAPS = ("level1.tmj", "level1_2.tmj", "level1_2u.tmj",
 
 TRAP_SUBTYPES = {
     "TRAP_FALLING_FLOOR": {0, 51, 52},
-    "TRAP_QUESTION_BLOCK": {0, 101, 102, 103, 104, 105, 110, 112, 114},
+    "TRAP_QUESTION_BLOCK": {0, 101, 102, 103, 104, 105, 110, 112, 114, 115},
     "TRAP_EVASIVE_BLOCK": {0, 1},
-    "TRAP_STAGE_SPAWNER": {0, 100, 101, 102, 180, 181, 182, 187, 188},
-    "TRAP_ENTER_PIPE": {0, 1}, "TRAP_SIDE_PIPE": {0, 1},
+    "TRAP_STAGE_SPAWNER": {0, 100, 101, 102, 180, 181, 182, 187, 188, 189},
+    "TRAP_ENTER_PIPE": {0, 1, 2, 5}, "TRAP_SIDE_PIPE": {0, 1},
     "TRAP_HINT_BLOCK": {0, 1}, "TRAP_MOVING_PLATFORM": {0, 2, 5, 12},
     "TRAP_JUMP_PAD": {0, 1, 2},
 }
 TRAP_SUBTYPE_NAMES_BY_KIND = {
     "TRAP_FALLING_FLOOR": {"falling_on_pass_under", "falling_when_below", "falling_brick_group", "falling_when_approached"},
-    "TRAP_QUESTION_BLOCK": {"question_enemy", "question_good_mushroom", "question_bad_mushroom", "question_star", "question_bad_flower", "question_poison_generator", "question_coin_generator", "question_hidden_poison"},
+    "TRAP_QUESTION_BLOCK": {"question_enemy", "question_good_mushroom", "question_bad_mushroom", "question_star", "question_bad_flower", "question_poison_generator", "question_coin_generator", "question_hidden_poison", "question_fragile_coin"},
     "TRAP_EVASIVE_BLOCK": {"evasive_vertical", "evasive_horizontal"},
-    "TRAP_STAGE_SPAWNER": {"stage_pipe_shot", "stage_flying_enemy", "stage_walker_swarm", "stage_ghost_swarm", "stage_upward_hazard", "stage_upward_hazard_toggle", "stage_upward_hazard_left", "stage_hint_message", "stage_pipe_hazard"},
-    "TRAP_ENTER_PIPE": {"pipe_fake_kill", "pipe_to_underground"},
+    "TRAP_STAGE_SPAWNER": {"stage_pipe_shot", "stage_flying_enemy", "stage_walker_swarm", "stage_ghost_swarm", "stage_upward_hazard", "stage_upward_hazard_toggle", "stage_upward_hazard_left", "stage_hint_message", "stage_pipe_hazard", "stage_banner"},
+    "TRAP_ENTER_PIPE": {"pipe_fake_kill", "pipe_to_underground", "pipe_fireworks", "pipe_owata"},
     "TRAP_SIDE_PIPE": {"pipe_fake_kill", "pipe_to_underground"},
     "TRAP_HINT_BLOCK": {"hint_stage_1"},
     "TRAP_MOVING_PLATFORM": {"platform_conveyor", "platform_vertical_wrap", "platform_bounce"},
@@ -212,7 +216,7 @@ TRAP_SUBTYPE_NAMES_BY_KIND = {
 CHANNEL_LISTENER_KINDS = {
     "TRAP_FALLING_FLOOR", "TRAP_BUMP_SHOOTER", "TRAP_QUESTION_BLOCK",
     "TRAP_STAGE_SPAWNER", "TRAP_CHECKPOINT", "TRAP_GOAL", "TRAP_FAKE_GOAL",
-    "TRAP_HINT_BLOCK", "TRAP_PICKUP_ITEM", "TRAP_MOVING_BLOCK",
+    "TRAP_HINT_BLOCK", "TRAP_PICKUP_ITEM", "TRAP_MOVING_BLOCK", "TRAP_MOVING_PLATFORM",
 }
 
 
@@ -756,6 +760,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                 if len(traps) >= MAX_TRAPS:
                     raise map_error(f"exceeds the limit of {MAX_TRAPS} traps")
                 if (trap in {"TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE", "TRAP_EVASIVE_BLOCK", "TRAP_MOVING_PLATFORM", "TRAP_BREAKING_PLATFORM", "TRAP_MOVING_BLOCK"} or
+                    (trap == "TRAP_QUESTION_BLOCK" and subtype == 115) or
                     (trap == "TRAP_JUMP_PAD" and subtype == 0)):
                     dynamic_colliders += 1
                     if dynamic_colliders > MAX_DYNAMIC_COLLIDERS:
@@ -808,6 +813,9 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                                                "visual_palette"),
                     "spawn_interval": bounded(spawn_interval, "spawn_interval", 0, 255),
                     "spawn_limit": bounded(spawn_limit, "spawn_limit", 0, 255),
+                    "activation_limit": bounded(prop_value(props, "activation_limit", tile_prop.get("activation_limit", 0)), "activation_limit", 0, 255),
+                    "disable_channel": bounded(prop_value(props, "disable_channel", tile_prop.get("disable_channel", 0)), "disable_channel", 0, 255),
+                    "draw_pipe": bounded(prop_value(props, "draw_pipe", tile_prop.get("draw_pipe", 1)), "draw_pipe", 0, 1),
                     "item_variant": bounded(item_variant, "item_variant", 0, 255),
                     "spawn_enemy_kind": spawn_enemy_kind,
                     "spawn_enemy_sprite": spawn_enemy_sprite,
@@ -831,6 +839,8 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "repeat_rearm_offset_y": repeat_rearm_offset_y,
                     "move_offset_x": move_offset_x,
                     "move_offset_y": move_offset_y,
+                    "channel_vx": fixed(prop_value(props, "channel_vx", tile_prop.get("channel_vx", 0)), "channel_vx"),
+                    "channel_vy": fixed(prop_value(props, "channel_vy", tile_prop.get("channel_vy", 0)), "channel_vy"),
                     "goal_walk_frames": bounded(goal_walk_frames, "goal_walk_frames", 0, 65535),
                     "hint_text": c_string_literal(hint_text),
                     "visual_metatile": visual_metatile,
@@ -869,7 +879,8 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
 
     edges = {}
     for trap, origin in zip(traps, trap_origins):
-        if trap["listen_channel"] and trap["trigger_channel"]:
+        # Platform channel actions change velocity; only landing emits a channel.
+        if trap["kind"] != "TRAP_MOVING_PLATFORM" and trap["listen_channel"] and trap["trigger_channel"]:
             edges.setdefault(trap["listen_channel"], []).append((trap["trigger_channel"], origin))
     visiting = set()
     visited = set()
@@ -1198,6 +1209,7 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .destination = {trap['destination']}, .entry_id = {trap['entry_id']}, .spawn_dir = {trap['spawn_dir']},",
                 f"        .visual_palette = {trap['visual_palette']}, .spawn_interval = {trap['spawn_interval']},",
                 f"        .spawn_limit = {trap['spawn_limit']}, .item_variant = {trap['item_variant']},",
+                f"        .activation_limit = {trap['activation_limit']}, .disable_channel = {trap['disable_channel']}, .draw_pipe = {trap['draw_pipe']},",
                 f"        .spawn_enemy_kind = {trap['spawn_enemy_kind']}, .spawn_enemy_sprite = {trap['spawn_enemy_sprite']},",
                 f"        .spawn_enemy_palette = {trap['spawn_enemy_palette']}, .spawn_enemy_param = {trap['spawn_enemy_param']},",
                 f"        .spawn_enemy_count = {trap['spawn_enemy_count']}, .spawn_sound = {trap['spawn_sound']},",
@@ -1215,6 +1227,7 @@ extern const uint16_t {prefix}_trap_count;
                 f"        .spawn_spacing_x = {trap['spawn_spacing_x']}, .spawn_spacing_y = {trap['spawn_spacing_y']},",
                 f"        .repeat_rearm_offset_x = {trap['repeat_rearm_offset_x']}, .repeat_rearm_offset_y = {trap['repeat_rearm_offset_y']},",
                 f"        .move_offset_x = {trap['move_offset_x']}, .move_offset_y = {trap['move_offset_y']},",
+                f"        .channel_vx = {trap['channel_vx']}, .channel_vy = {trap['channel_vy']},",
                 "    },",
             ])
     else:

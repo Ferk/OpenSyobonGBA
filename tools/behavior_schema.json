@@ -497,6 +497,18 @@
       "width": 16,
       "height": 112,
       "properties": {}
+    },
+    "fragile_coin_block": {
+      "name": "Hidden Fragile Coin Block",
+      "class": "Fragile Coin Block",
+      "width": 16,
+      "height": 16,
+      "properties": {
+        "hidden": true,
+        "collision": 0,
+        "visual_metatile": "empty",
+        "spent_metatile": "solid"
+      }
     }
   },
   "classes": {
@@ -511,7 +523,8 @@
         "question_bad_flower",
         "question_poison_generator",
         "question_coin_generator",
-        "question_hidden_poison"
+        "question_hidden_poison",
+        "question_fragile_coin"
       ],
       "properties": [
         "visual_metatile",
@@ -542,7 +555,8 @@
         "stage_upward_hazard_toggle",
         "stage_upward_hazard_left",
         "stage_hint_message",
-        "stage_pipe_hazard"
+        "stage_pipe_hazard",
+        "stage_banner"
       ],
       "properties": [
         "spawn_enemy_kind",
@@ -570,7 +584,10 @@
         "listen_channel",
         "channel_spawn_interval",
         "trigger_delay",
-        "hint_text"
+        "hint_text",
+        "activation_limit",
+        "disable_channel",
+        "draw_pipe"
       ]
     },
     "Enter Pipe": {
@@ -578,11 +595,14 @@
       "subtypes": [
         "none",
         "pipe_fake_kill",
-        "pipe_to_underground"
+        "pipe_to_underground",
+        "pipe_fireworks",
+        "pipe_owata"
       ],
       "properties": [
         "stage_destination",
-        "entry_id"
+        "entry_id",
+        "draw_pipe"
       ]
     },
     "Side Pipe": {
@@ -625,7 +645,12 @@
         "visual_metatile",
         "visual_palette",
         "vx",
-        "vy"
+        "vy",
+        "trigger_channel",
+        "listen_channel",
+        "trigger_delay",
+        "channel_vx",
+        "channel_vy"
       ]
     },
     "Goal": {
@@ -1002,6 +1027,30 @@
       "type": "float",
       "value": 0,
       "units": "pixels relative to object"
+    },
+    "activation_limit": {
+      "type": "int",
+      "value": 0,
+      "units": "successful activations; 0 is unlimited"
+    },
+    "disable_channel": {
+      "type": "int",
+      "value": 0,
+      "units": "event channel; 0 disables the listener"
+    },
+    "draw_pipe": {
+      "type": "bool",
+      "value": true
+    },
+    "channel_vx": {
+      "type": "float",
+      "value": 0,
+      "units": "pixels/frame after linked event"
+    },
+    "channel_vy": {
+      "type": "float",
+      "value": 0,
+      "units": "pixels/frame after linked event"
     }
   },
   "recipes": {
@@ -1174,7 +1223,12 @@
         "visual_metatile",
         "visual_palette",
         "vx",
-        "vy"
+        "vy",
+        "trigger_channel",
+        "listen_channel",
+        "trigger_delay",
+        "channel_vx",
+        "channel_vy"
       ],
       "defaults": {},
       "description": "Moving platform that wraps vertically."
@@ -1196,6 +1250,20 @@
       ],
       "defaults": {},
       "description": "Strong upward launch; pair with a separate Kill Zone."
+    },
+    "Fragile Coin Block": {
+      "family": "Question Block",
+      "subtype": "question_fragile_coin",
+      "properties": [
+        "visual_metatile",
+        "visual_palette",
+        "collision",
+        "hidden",
+        "spent_metatile",
+        "trigger_channel"
+      ],
+      "defaults": {},
+      "description": "Reveals a spent block and a coin when bumped; breaks immediately on landing."
     }
   }
 }

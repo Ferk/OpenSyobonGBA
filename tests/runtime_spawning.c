@@ -10,6 +10,7 @@ uint16_t test_sprite_gfx[16384];
 uint16_t test_sprite_palette[256];
 uint16_t test_keys;
 static int sounds, notices;
+static const char *last_notice;
 
 void audio_play_block_hit(void) { sounds++; }
 void audio_play_trap_trigger(void) { sounds++; }
@@ -17,12 +18,16 @@ void audio_play_brick_break(void) { sounds++; }
 void audio_stop_bgm(void) {}
 void audio_play_goal(void) { sounds++; }
 void messages_show_text(const char *text, fix16_t x, fix16_t y, uint8_t frames)
-{ (void)text; (void)x; (void)y; (void)frames; notices++; }
+{ last_notice = text; (void)x; (void)y; (void)frames; notices++; }
+void messages_show_banner(const char *text) { last_notice = text; notices++; }
 void messages_show_modal_text(const char *text, fix16_t x, fix16_t y)
 { (void)text; (void)x; (void)y; notices++; }
 void messages_show(MessageId id, fix16_t x, fix16_t y, uint8_t frames)
 { (void)id; (void)x; (void)y; (void)frames; notices++; }
 void player_kill(Player *player) { player->alive = 0; }
+void player_set_supported(Player *player) { player->on_ground = 1; }
+int level_camera_min_y_px(const Level *level) { (void)level; return -80; }
+int level_camera_max_y_px(const Level *level) { (void)level; return 32; }
 void player_set_checkpoint_flag(Player *p, fix16_t x, fix16_t y, fix16_t sx, fix16_t sy)
 { (void)p; (void)x; (void)y; (void)sx; (void)sy; }
 void player_begin_goal(Player *p, fix16_t x, uint16_t frames)
@@ -148,10 +153,117 @@ static void test_traps(void)
     assert(trap->timer == 0 && trap->spawn_count == 1);
 }
 
+static void test_entrance_and_underground(void)
+{
+    static TrapManager manager;
+    static Level level;
+    Player player = {0};
+    level.width = 160;
+    level.height = 17;
+    memset(&manager, 0, sizeof(manager));
+    memset(&enemy_current, 0, sizeof(enemy_current));
+    manager.trap_count = 2;
+    Trap *block = &manager.traps[0];
+    Trap *shot = &manager.traps[1];
+    block->kind = TRAP_QUESTION_BLOCK;
+    block->subtype = QUESTION_HIDDEN_POISON;
+    block->trigger_channel = 31;
+    block->spent_metatile = 255;
+    shot->kind = TRAP_STAGE_SPAWNER;
+    shot->disable_channel = 31;
+    shot->spawn_enemy_kind = ENEMY_PIPE_SHOT;
+    shot->spawn_enemy_count = 1;
+    shot->spawn_limit = 1;
+    trigger_question_block(&manager, block, &level, &player);
+    assert(shot->state == TRAP_SPENT);
+    trigger_stage_spawner(&manager, shot, &level, &player);
+    assert(enemy_current.count == 0);
+    shot->state = TRAP_IDLE;
+    trigger_stage_spawner(&manager, shot, &level, &player);
+    assert(enemy_current.count == 1);
+    emit_trap_channel(&manager, &level, &player, 31);
+    assert(shot->state == TRAP_SPENT && enemy_current.count == 1);
+
+    memset(&manager, 0, sizeof(manager));
+    manager.trap_count = 1;
+    block = &manager.traps[0];
+    block->kind = TRAP_QUESTION_BLOCK;
+    block->subtype = QUESTION_FRAGILE_COIN;
+    block->spent_metatile = 255;
+    block->hidden = 1;
+    block->visual_palette = 1;
+    trigger_question_block(&manager, block, &level, &player);
+    assert(block->kind == TRAP_BREAKING_PLATFORM && block->state == TRAP_IDLE);
+    assert(!block->hidden && block->visual_metatile == METATILE_SOLID);
+    assert(manager.dynamic_collider_count == 1);
+    assert(manager.entities[0].kind == TRAP_ENTITY_COIN_POPUP);
+    assert(level.metatiles[0][0] == METATILE_SOLID);
+    player.alive = 1;
+    player.y = FIX16_FROM_INT(-PLAYER_HEIGHT_PX);
+    player.x = 0;
+    player.vy = 0;
+    block->w = block->h = FIX16_FROM_INT(16);
+    player.on_ground = 1;
+    update_breaking_platform(&manager, block, &level, &player);
+    assert(block->state == TRAP_SPENT && level.metatiles[0][0] == METATILE_EMPTY);
+
+    memset(&manager, 0, sizeof(manager));
+    shot = &manager.traps[0];
+    manager.trap_count = 1;
+    shot->kind = TRAP_STAGE_SPAWNER;
+    shot->spawn_enemy_kind = ENEMY_KUMA;
+    shot->spawn_enemy_count = 1;
+    shot->spawn_limit = 1;
+    shot->activation_limit = 2;
+    shot->repeat_rearm_offset_x = -FIX16_ONE;
+    trigger_stage_spawner(&manager, shot, &level, &player);
+    assert(shot->spawn_count == 1 && shot->state == TRAP_ACTIVE);
+    shot->state = TRAP_IDLE;
+    trigger_stage_spawner(&manager, shot, &level, &player);
+    assert(shot->spawn_count == 2 && shot->state == TRAP_SPENT);
+    shot->state = TRAP_IDLE;
+    trigger_stage_spawner(&manager, shot, &level, &player);
+    assert(shot->spawn_count == 2 && shot->state == TRAP_SPENT);
+
+    memset(&manager, 0, sizeof(manager));
+    manager.trap_count = 2;
+    for (int i = 0; i < 2; i++) {
+        Trap *lift = &manager.traps[i];
+        lift->kind = TRAP_MOVING_PLATFORM;
+        lift->listen_channel = lift->trigger_channel = 32;
+        lift->vy = FIX16_ONE;
+        lift->channel_vy = 3 * FIX16_ONE;
+        lift->w = FIX16_FROM_INT(48);
+        lift->h = FIX16_FROM_INT(16);
+    }
+    player.y = FIX16_FROM_INT(-PLAYER_HEIGHT_PX);
+    player.on_ground = 1;
+    update_moving_platform(&manager, &manager.traps[0], &level, &player);
+    assert(manager.traps[0].vy == 3 * FIX16_ONE);
+    assert(manager.traps[1].vy == 3 * FIX16_ONE);
+
+    for (int subtype = PIPE_FIREWORKS; subtype <= PIPE_OWATA; subtype += 3) {
+        Trap pipe = {0};
+        pipe.state = TRAP_ACTIVE;
+        pipe.subtype = subtype;
+        pipe.timer = 18;
+        pipe.w = FIX16_FROM_INT(32);
+        player.alive = 1;
+        update_enter_pipe(&manager, &pipe, &player);
+        assert(player.alive && pipe.timer == 19);
+        update_enter_pipe(&manager, &pipe, &player);
+        assert(!player.alive && pipe.state == TRAP_SPENT && !player.hidden);
+        assert(strcmp(last_notice, subtype == PIPE_FIREWORKS
+                                       ? TXT_MSG_FIREWORKS : TXT_MSG_DONE_FOR) == 0);
+        assert(!manager.stage_transition_requested);
+    }
+}
+
 int main(void)
 {
     test_reuse();
     test_traps();
+    test_entrance_and_underground();
     puts("runtime spawning checks passed");
     return 0;
 }

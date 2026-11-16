@@ -13,7 +13,8 @@
 #define MESSAGE_GLYPH_TILE_BASE (MESSAGE_TILE_BASE + 2)
 #define MESSAGE_MAX_LINES 7
 #define MESSAGE_MAX_LINE_CHARS 30
-#define MESSAGE_MAX_TILES ((MESSAGE_MAX_LINE_CHARS + 1) / 2 * MESSAGE_MAX_LINES)
+#define MESSAGE_MAX_BANNER_CHARS 48
+#define MESSAGE_MAX_TILES ((MESSAGE_MAX_BANNER_CHARS + 1) / 2 * MESSAGE_MAX_LINES)
 #define MESSAGE_SCREENBLOCK 30
 #define MESSAGE_COLOR_TEXT 15
 #define MESSAGE_COLOR_BOX 14
@@ -39,9 +40,11 @@ typedef struct ActiveMessage {
     uint8_t old_box_h;
     uint8_t needs_redraw;
     uint8_t modal;
+    uint8_t screen_fixed;
 } ActiveMessage;
 
 static ActiveMessage active_message;
+static const char *banner_text;
 static uint8_t taunt_index;
 
 static const char *const enemy_taunts[] = {
@@ -148,6 +151,7 @@ static void build_text_tile(uint8_t tile_offset, const char *text, uint8_t char_
 
 void messages_init(void)
 {
+    banner_text = 0;
     memset(&active_message, 0, sizeof(active_message));
     memset(&((uint32_t *)CHAR_BASE_BLOCK(0))[MESSAGE_BLANK_TILE * 8],
            0, 8 * sizeof(uint32_t));
@@ -172,8 +176,11 @@ void messages_init(void)
 
 void messages_update(void)
 {
-    if (!active_message.modal && active_message.timer > 0) {
+    if (!active_message.modal && !active_message.screen_fixed && active_message.timer > 0) {
         active_message.timer--;
+    }
+    if (active_message.timer == 0 && banner_text) {
+        messages_show_banner(banner_text);
     }
 }
 
@@ -183,7 +190,7 @@ void messages_show(MessageId id, fix16_t x, fix16_t y, uint8_t frames)
 }
 
 static void messages_show_text_mode(const char *text, fix16_t x, fix16_t y,
-                                    uint8_t frames, uint8_t modal)
+                                    uint8_t frames, uint8_t modal, uint8_t screen_fixed)
 {
     if (!text) {
         text = "";
@@ -194,6 +201,7 @@ static void messages_show_text_mode(const char *text, fix16_t x, fix16_t y,
     active_message.y = y;
     active_message.timer = frames;
     active_message.modal = modal;
+    active_message.screen_fixed = screen_fixed;
     active_message.line_count = 0;
     memset(active_message.line_len, 0, sizeof(active_message.line_len));
     memset(active_message.line_start, 0, sizeof(active_message.line_start));
@@ -223,7 +231,7 @@ static void messages_show_text_mode(const char *text, fix16_t x, fix16_t y,
             continue;
         }
 
-        if (line_len < MESSAGE_MAX_LINE_CHARS) {
+        if (line_len < (screen_fixed ? MESSAGE_MAX_BANNER_CHARS : MESSAGE_MAX_LINE_CHARS)) {
             line_len++;
         }
     }
@@ -257,12 +265,21 @@ static void messages_show_text_mode(const char *text, fix16_t x, fix16_t y,
 
 void messages_show_text(const char *text, fix16_t x, fix16_t y, uint8_t frames)
 {
-    messages_show_text_mode(text, x, y, frames, 0);
+    messages_show_text_mode(text, x, y, frames, 0, 0);
 }
 
 void messages_show_modal_text(const char *text, fix16_t x, fix16_t y)
 {
-    messages_show_text_mode(text, x, y, 1, 1);
+    messages_show_text_mode(text, x, y, 1, 1, 0);
+}
+
+void messages_show_banner(const char *text)
+{
+    banner_text = text;
+    if (active_message.modal) {
+        return;
+    }
+    messages_show_text_mode(text, 0, 0, 1, 0, 1);
 }
 
 uint8_t messages_is_modal(void)
@@ -304,6 +321,10 @@ void messages_draw(const struct Camera *camera)
         int tile_x = screen_x / 8;
         int tile_y = screen_y / 8 + line;
         uint8_t tile_len = (uint8_t)((active_message.line_len[line] + 1) / 2);
+        if (active_message.screen_fixed) {
+            tile_x = (30 - tile_len) / 2;
+            tile_y = 4 + line;
+        }
 
         if (tile_x < 0) {
             tile_x = 0;
@@ -403,7 +424,8 @@ void messages_draw(const struct Camera *camera)
 
     for (uint8_t line = 0; line < active_message.line_count; ++line) {
         uint8_t tile_base = active_message.line_tile_offset[line];
-        uint16_t palette = active_message.modal ? MESSAGE_SE_PALBANK : 0;
+        uint16_t palette = active_message.modal || active_message.screen_fixed
+                               ? MESSAGE_SE_PALBANK : 0;
 
         for (uint8_t i = 0; i < new_len[line]; ++i) {
             map[new_y[line] * 32 + new_x[line] + i] =

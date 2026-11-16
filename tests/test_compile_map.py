@@ -345,6 +345,39 @@ class CompilerValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(compiler.MapValidationError, "other.*trigger_channel.*cycle"):
             self.compile()
 
+    def test_platform_landing_channel_does_not_make_a_recursive_event(self):
+        self.obj["type"] = "Moving Platform"
+        self.set_property("listen_channel", 32)
+        self.set_property("trigger_channel", 32)
+        self.set_property("channel_vy", 2.5)
+        self.assertIn(".channel_vy = 163840", self.compile())
+
+    def test_underground_fixes_are_authored(self):
+        def read(name):
+            data = json.loads((ROOT / "levels" / name).read_text())
+            objects = {o["id"]: o for l in data["layers"] for o in l.get("objects", [])}
+            return data, {oid: {p["name"]: p["value"] for p in o.get("properties", [])}
+                          for oid, o in objects.items()}
+        _, entrance = read("level1_2.tmj")
+        self.assertEqual(entrance[4]["trigger_channel"], entrance[8]["disable_channel"])
+        data, objects = read("level1_2u.tmj")
+        self.assertEqual(data["width"], 160)
+        self.assertEqual(objects[42]["subtype"], "question_fragile_coin")
+        self.assertEqual(objects[47]["activation_limit"], 2)
+        self.assertEqual(objects[47]["subtype"], "stage_upward_hazard")
+        self.assertFalse(objects[43]["draw_pipe"])
+        for oid in (54, 55):
+            self.assertEqual(objects[oid]["trigger_channel"], objects[oid]["listen_channel"])
+            self.assertAlmostEqual(objects[oid]["channel_vy"], objects[oid]["vy"] * 3, places=5)
+        pipes = [p["subtype"] for p in objects.values() if p.get("subtype") in ("pipe_fireworks", "pipe_owata")]
+        self.assertEqual(pipes.count("pipe_fireworks"), 1)
+        self.assertEqual(pipes.count("pipe_owata"), 3)
+        self.assertEqual(objects[48]["subtype"], "stage_banner")
+        self.assertTrue(objects[48]["hint_text"].startswith("WELCOME TO OWATA ZONE"))
+        layer = next(l for l in data["layers"] if l["name"] == "Background")
+        self.assertEqual(layer["data"][160 + 154:160 + 157], [1, 1, 1])
+        self.assertEqual(layer["data"][2 * 160 + 157], 2)
+
     def test_runtime_only_question_subtype_is_not_authorable(self):
         self.set_property("subtype", "question_generator_active_internal")
         with self.assertRaisesRegex(compiler.MapValidationError, "subtype.*unknown"):

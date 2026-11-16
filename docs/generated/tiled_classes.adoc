@@ -7,7 +7,7 @@ Recipe classes are separate Tiled classes, not native inheritance. They fix the 
 
 Runtime kind: `question_block`.
 
-Subtypes: `none`, `question_enemy`, `question_good_mushroom`, `question_bad_mushroom`, `question_star`, `question_bad_flower`, `question_poison_generator`, `question_coin_generator`, `question_hidden_poison`.
+Subtypes: `none`, `question_enemy`, `question_good_mushroom`, `question_bad_mushroom`, `question_star`, `question_bad_flower`, `question_poison_generator`, `question_coin_generator`, `question_hidden_poison`, `question_fragile_coin`.
 
 [cols="2,1,2,3",options="header"]
 |===
@@ -33,7 +33,7 @@ Subtypes: `none`, `question_enemy`, `question_good_mushroom`, `question_bad_mush
 
 Runtime kind: `stage_spawner`.
 
-Subtypes: `none`, `stage_pipe_shot`, `stage_flying_enemy`, `stage_walker_swarm`, `stage_upward_hazard`, `stage_upward_hazard_toggle`, `stage_upward_hazard_left`, `stage_hint_message`, `stage_pipe_hazard`.
+Subtypes: `none`, `stage_pipe_shot`, `stage_flying_enemy`, `stage_walker_swarm`, `stage_upward_hazard`, `stage_upward_hazard_toggle`, `stage_upward_hazard_left`, `stage_hint_message`, `stage_pipe_hazard`, `stage_banner`.
 
 [cols="2,1,2,3",options="header"]
 |===
@@ -64,19 +64,23 @@ Subtypes: `none`, `stage_pipe_shot`, `stage_flying_enemy`, `stage_walker_swarm`,
 |`channel_spawn_interval` |`int` |`0` |frames
 |`trigger_delay` |`int` |`0` |frames
 |`hint_text` |`string` |`""` |-
+|`activation_limit` |`int` |`0` |successful activations; 0 is unlimited
+|`disable_channel` |`int` |`0` |event channel; 0 disables the listener
+|`draw_pipe` |`bool` |`true` |-
 |===
 
 ==== Enter Pipe
 
 Runtime kind: `enter_pipe`.
 
-Subtypes: `none`, `pipe_fake_kill`, `pipe_to_underground`.
+Subtypes: `none`, `pipe_fake_kill`, `pipe_to_underground`, `pipe_fireworks`, `pipe_owata`.
 
 [cols="2,1,2,3",options="header"]
 |===
 |Property |Type |Editor Default |Units
 |`stage_destination` |`StageDestination` |`"none"` |-
 |`entry_id` |`int` |`0` |-
+|`draw_pipe` |`bool` |`true` |-
 |===
 
 ==== Side Pipe
@@ -122,6 +126,11 @@ Subtypes: `none`, `platform_conveyor`, `platform_vertical_wrap`, `platform_bounc
 |`visual_palette` |`BgPalette` |`"normal"` |-
 |`vx` |`float` |`0` |pixels/frame
 |`vy` |`float` |`0` |pixels/frame
+|`trigger_channel` |`int` |`0` |-
+|`listen_channel` |`int` |`0` |-
+|`trigger_delay` |`int` |`0` |frames
+|`channel_vx` |`float` |`0` |pixels/frame after linked event
+|`channel_vy` |`float` |`0` |pixels/frame after linked event
 |===
 
 ==== Goal
@@ -558,6 +567,11 @@ Moving platform that wraps vertically.
 |`visual_palette` |`BgPalette` |`"normal"` |-
 |`vx` |`float` |`0` |pixels/frame
 |`vy` |`float` |`0` |pixels/frame
+|`trigger_channel` |`int` |`0` |-
+|`listen_channel` |`int` |`0` |-
+|`trigger_delay` |`int` |`0` |frames
+|`channel_vx` |`float` |`0` |pixels/frame after linked event
+|`channel_vy` |`float` |`0` |pixels/frame after linked event
 |===
 
 ==== Warp Pad
@@ -582,4 +596,21 @@ Strong upward launch; pair with a separate Kill Zone.
 |===
 |Property |Type |Editor Default |Units
 |`hidden` |`bool` |`false` |-
+|===
+
+==== Fragile Coin Block
+
+Family: `Question Block`. Fixed subtype: `question_fragile_coin`.
+
+Reveals a spent block and a coin when bumped; breaks immediately on landing.
+
+[cols="2,1,2,3",options="header"]
+|===
+|Property |Type |Editor Default |Units
+|`visual_metatile` |`VisualMetatile` |`"inherit"` |-
+|`visual_palette` |`BgPalette` |`"normal"` |-
+|`collision` |`LevelCollision` |`255` |-
+|`hidden` |`bool` |`false` |-
+|`spent_metatile` |`SpentMetatile` |`"default_spent"` |-
+|`trigger_channel` |`int` |`0` |-
 |===

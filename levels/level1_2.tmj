@@ -407,6 +407,11 @@
        "type": "string",
        "value": "empty",
        "propertytype": "VisualMetatile"
+      },
+      {
+       "name": "trigger_channel",
+       "type": "int",
+       "value": 31
       }
      ],
      "rotation": 0,
@@ -573,6 +578,11 @@
        "propertytype": "Stage Spawner Subtype",
        "type": "string",
        "value": "stage_pipe_shot"
+      },
+      {
+       "name": "disable_channel",
+       "type": "int",
+       "value": 31
       }
      ],
      "rotation": 0,

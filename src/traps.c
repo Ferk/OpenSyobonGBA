@@ -113,6 +113,10 @@
 #define QUESTION_POISON_GENERATOR 110
 #define QUESTION_COIN_GENERATOR 112
 #define QUESTION_HIDDEN_POISON 114
+#define QUESTION_FRAGILE_COIN 115
+#define STAGE_BANNER 189
+#define PIPE_FIREWORKS 2
+#define PIPE_OWATA 5
 #define QUESTION_GENERATOR_ACTIVE 200
 #define QUESTION_COIN_LIMIT 20
 #define QUESTION_COIN_INTERVAL 3
@@ -387,6 +391,9 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spent_metatile = 255;
     trap->spawn_interval = 0;
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
+    trap->activation_limit = 0;
+    trap->disable_channel = 0;
+    trap->draw_pipe = 1;
     trap->item_variant = 0;
     trap->spawn_enemy_kind = ENEMY_NONE;
     trap->spawn_enemy_sprite = ENEMY_SPRITE_WALKER;
@@ -410,6 +417,8 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->repeat_rearm_offset_y = 0;
     trap->move_offset_x = 0;
     trap->move_offset_y = 0;
+    trap->channel_vx = 0;
+    trap->channel_vy = 0;
     trap->goal_walk_frames = 0;
     trap->hint_text = 0;
     trap->spawn_count = 0;
@@ -614,6 +623,9 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spent_metatile = trigger->spent_metatile;
     trap->spawn_interval = trigger->spawn_interval;
     trap->spawn_limit = trigger->spawn_limit;
+    trap->activation_limit = trigger->activation_limit;
+    trap->disable_channel = trigger->disable_channel;
+    trap->draw_pipe = trigger->draw_pipe;
     trap->item_variant = trigger->item_variant;
     trap->spawn_enemy_kind = trigger->spawn_enemy_kind;
     trap->spawn_enemy_sprite = trigger->spawn_enemy_sprite;
@@ -637,6 +649,8 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->repeat_rearm_offset_y = trigger->repeat_rearm_offset_y;
     trap->move_offset_x = trigger->move_offset_x;
     trap->move_offset_y = trigger->move_offset_y;
+    trap->channel_vx = trigger->channel_vx;
+    trap->channel_vy = trigger->channel_vy;
     trap->goal_walk_frames = trigger->goal_walk_frames;
     trap->hint_text = trigger->hint_text;
     trap->spawn_count = 0;
@@ -1308,6 +1322,16 @@ static void trigger_question_block(TrapManager *manager, Trap *trap, Level *leve
         spawn_block_item(manager, trap, TRAP_ENTITY_BAD_ITEM, ITEM_FAST_SPEED);
         spend_question_block(manager, trap, level);
         break;
+    case QUESTION_FRAGILE_COIN:
+        spawn_coin_popup(manager, trap);
+        spend_question_block(manager, trap, level);
+        trap->kind = TRAP_BREAKING_PLATFORM;
+        trap->state = TRAP_IDLE;
+        trap->trigger_delay = 0;
+        trap->visual_metatile = trap->spent_metatile == 255
+                                    ? METATILE_SOLID : trap->spent_metatile;
+        add_dynamic_collider(manager, trap);
+        break;
     case QUESTION_COIN_GENERATOR:
         trap->state = TRAP_ACTIVE;
         trap->timer = 0;
@@ -1475,8 +1499,10 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
     }
     uint8_t has_rearm_offset = trap_has_repeat_rearm_offset(trap);
 
-    if (!has_rearm_offset && trap_spawn_limit_reached(trap)) {
+    if ((!has_rearm_offset && trap_spawn_limit_reached(trap)) ||
+        (trap->activation_limit && trap->spawn_count >= trap->activation_limit)) {
         trap->state = TRAP_SPENT;
+        trap->trigger_pending = 0;
         return;
     }
 
@@ -1498,9 +1524,12 @@ static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level
     } else if (trap->subtype == STAGE_HINT_MESSAGE) {
         messages_show_modal_text(trap->hint_text ? trap->hint_text : TXT_HINT_STAGE_1,
                                  trap->x, trap->y);
+    } else if (trap->subtype == STAGE_BANNER) {
+        messages_show_banner(trap->hint_text);
     }
 
     trap->state = has_rearm_offset && trap->spawn_enemy_kind != ENEMY_NONE
+                      && (!trap->activation_limit || trap->spawn_count < trap->activation_limit)
                       ? TRAP_ACTIVE : TRAP_SPENT;
     trap->trigger_pending = 0;
     emit_trap_channel(manager, level, player, trap->trigger_channel);
@@ -1701,6 +1730,11 @@ static void activate_linked_trap(TrapManager *manager, Level *level,
     case TRAP_MOVING_BLOCK:
         trigger_moving_block(manager, trap, level, player);
         break;
+    case TRAP_MOVING_PLATFORM:
+        trap->vx = trap->channel_vx;
+        trap->vy = trap->channel_vy;
+        trap->trigger_pending = 0;
+        break;
     default:
         break;
     }
@@ -1715,6 +1749,12 @@ static void emit_trap_channel(TrapManager *manager, Level *level,
 
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *listener = &manager->traps[i];
+
+        if (listener->disable_channel == channel) {
+            listener->state = TRAP_SPENT;
+            listener->trigger_pending = 0;
+            continue;
+        }
 
         if (listener->listen_channel != channel ||
             listener->trigger_pending) {
@@ -1846,6 +1886,20 @@ static void update_enter_pipe(TrapManager *manager, Trap *trap, struct Player *p
 
     if (trap->timer <= PIPE_PLAYER_SINK_FRAMES) {
         player->y += PIPE_PLAYER_SINK_SPEED;
+    }
+
+    if (trap->subtype == PIPE_FIREWORKS || trap->subtype == PIPE_OWATA) {
+        if (trap->timer == 19) {
+            player->hidden = 0;
+            messages_show_text(trap->subtype == PIPE_FIREWORKS
+                                  ? TXT_MSG_FIREWORKS : TXT_MSG_DONE_FOR,
+                               player->x, player->y, 60);
+            player_kill(player);
+            trap->state = TRAP_SPENT;
+        } else {
+            trap->timer++;
+        }
+        return;
     }
 
     if (trap->subtype == 1) {
@@ -2251,7 +2305,8 @@ static uint8_t player_can_stand_on_platform(const Trap *trap, const Player *play
            player_bottom <= old_platform_y + 10;
 }
 
-static void update_moving_platform(Trap *trap, const Level *level, Player *player)
+static void update_moving_platform(TrapManager *manager, Trap *trap, Level *level,
+                                   Player *player)
 {
     fix16_t old_x = trap->x;
     fix16_t old_y = trap->y;
@@ -2286,6 +2341,10 @@ static void update_moving_platform(Trap *trap, const Level *level, Player *playe
 
     player->x += trap->x - old_x;
     player->y = trap->y - FIX16_FROM_INT(PLAYER_HEIGHT_PX);
+    if (trap->trigger_channel && trap->spawn_count == 0) {
+        trap->spawn_count = 1;
+        emit_trap_channel(manager, level, player, trap->trigger_channel);
+    }
     if (trap->subtype == PLATFORM_BOUNCE) {
         player->vy = REF_VEL_TO_FIX(-800);
         player->on_ground = 0;
@@ -2528,7 +2587,7 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
         } else if (trap->kind == TRAP_TRANSITION_ZONE) {
             update_transition_zone(manager, trap, player);
         } else if (trap->kind == TRAP_MOVING_PLATFORM) {
-            update_moving_platform(trap, level, player);
+            update_moving_platform(manager, trap, level, player);
         } else if (trap->kind == TRAP_BREAKING_PLATFORM) {
             update_breaking_platform(manager, trap, level, player);
         } else if (trap->kind == TRAP_CHECKPOINT && trap->state == TRAP_IDLE) {
@@ -2802,6 +2861,11 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
         fix16_t cull_y = trap->y;
         int cull_w = FIX16_TO_INT(trap->w);
         int cull_h = FIX16_TO_INT(trap->h);
+
+        if (!trap->draw_pipe && (trap->kind == TRAP_ENTER_PIPE ||
+                                 trap->kind == TRAP_SIDE_PIPE || is_stage_pipe_hazard(trap))) {
+            continue;
+        }
 
         if (is_stage_pipe_hazard(trap)) {
             cull_x = CELL_WORLD_X(trap->source_x > 0 ? trap->source_x - 1 : 0);

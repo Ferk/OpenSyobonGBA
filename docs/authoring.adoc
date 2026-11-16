@@ -307,6 +307,7 @@ their subtype through their class; family templates can still select a subtype.
 |===
 |Template |Class |Initial Settings
 |`hidden_coin_block.tx` |`Question Block` |Hidden single-coin block; empty backing cell until revealed.
+|`fragile_coin_block.tx` |`Fragile Coin Block` |Hidden coin block that reveals a spent tile and breaks on the first landing.
 |`star_block.tx` |`Star Block` |Visible question block producing one star.
 |`poison_generator.tx` |`Poison Generator` |Unlimited poisonous mushrooms, 16 frames between spawns.
 |`coin_generator.tx` |`Coin Generator` |20 coin spawns, 3 frames apart.
@@ -408,6 +409,7 @@ A block hit from below that pays out an item, enemy, or repeated generator.
 ** `question_poison_generator`: Repeatedly produces poisonous mushrooms.
 ** `question_coin_generator`: Repeatedly produces coins.
 ** `question_hidden_poison`: Produces a fast poisonous mushroom.
+** `question_fragile_coin`: Produces one coin and reveals the selected spent tile. That tile becomes a zero-delay breaking platform: it stays intact until landed on, then breaks with debris and sound. It never produces a mushroom.
 
 [cols="1,1,3",options="header"]
 |===
@@ -417,7 +419,7 @@ A block hit from below that pays out an item, enemy, or repeated generator.
 |`visual_palette` |`BgPalette` |Initial block palette.
 |`collision` |`LevelCollision` |Initial block collision. Use `empty` with `hidden = true` for a hidden block.
 |`hidden` |bool |Hides the initial backing cell without disabling its bump trigger. A hidden single-coin block uses `subtype = none`, `visual_metatile = empty`, and `collision = empty`.
-|`spent_metatile` |`SpentMetatile` |Tile after use. `default_spent` selects the normal solid spent block.
+|`spent_metatile` |`SpentMetatile` |Tile after use. `default_spent` selects the normal solid spent block. For `question_fragile_coin`, also determines the revealed fragile block and its debris.
 |`spawn_dir` |`TrapSpawnDirection` |Direction for `question_enemy`: `auto`, `left`, or `right`.
 |`spawn_enemy_kind` |`EnemyKind` |Optional behavior override for `question_enemy`; omitting it keeps the walker.
 |`spawn_enemy_sprite` |`EnemySprite` |Graphic for the configured question-block enemy.
@@ -462,6 +464,11 @@ A rectangular trigger with a data-driven enemy recipe, hint message, or recurrin
 ** `stage_upward_hazard_left`: Leftward upward-launch variant.
 ** `stage_hint_message`: Displays `hint_text` instead of spawning an enemy.
 ** `stage_pipe_hazard`: Repeating, proximity-driven pipe hazard.
+** `stage_banner`: Displays `hint_text` as a persistent, centered screen-space banner without pausing gameplay. Use `spawn_enemy_kind = none`. The banner is cleared on map reload; transient messages or a modal may temporarily replace it, after which it returns.
+
+Banner text supports up to seven lines of 48 characters, centered per line.
+Ordinary hints and transient messages retain their 30-character line limit.
+Use actual newlines or escaped `\n` in `hint_text`.
 
 [cols="1,1,3",options="header"]
 |===
@@ -480,25 +487,39 @@ A rectangular trigger with a data-driven enemy recipe, hint message, or recurrin
 |`spawn_random_vx`, `spawn_random_vy` |number |Map-pixel randomized velocity range around the initial velocity.
 |`spawn_spacing_x`, `spawn_spacing_y` |number |Per-enemy map-pixel offset for multi-spawns.
 |`spawn_interval` |int |Frames between `stage_pipe_hazard` spawns.
-|`spawn_limit` |int |Maximum spawns; `0` means unlimited.
+|`spawn_limit` |int |Successful recipe activations for one-shot/periodic spawners; `0` means unlimited. A trigger with a rearm offset uses `activation_limit` to limit its repeated overlap activations instead.
+|`activation_limit` |int |Maximum successful enemy activations for an overlap/linked trigger, including rearmed activations. `0` is unlimited. Counts activations, not individual enemies; `spawn_enemy_count` still controls enemies per activation. Does not change periodic pipe-hazard limits.
 |`move_offset_x`, `move_offset_y` |number |Map-pixel relocation applied by `stage_upward_hazard_toggle` before its subsequent activation.
 |`repeat_rearm_offset_x`, `repeat_rearm_offset_y` |number |Map-pixel shifted rectangle that re-arms a trigger.
 |`trigger_channel` |int |Channel emitted after activation.
 |`listen_channel` |int |Channel that activates this spawner.
+|`disable_channel` |int |Channel that permanently disables this spawner for the current attempt, cancelling pending retries. `0` means no listener. Disabling takes priority if the activation and disable channels match. Existing spawned enemies are not removed.
 |`channel_spawn_interval` |int |Spawn interval override after a linked activation.
+|`draw_pipe` |bool |For `stage_pipe_hazard`, render the runtime pipe overlay. Default `true`. Set `false` when a separate pipe object or authored terrain supplies its presentation.
 |`trigger_delay` |int |Frames to wait after linked activation.
 |`hint_text` |string |Modal text for `stage_hint_message`; supports `\n`. With an enemy recipe, optional non-modal activation text shown for 20 frames at the spawn position, only after a successful spawn.
 |===
+
+For a two-use enemy trigger, set a rearm offset and `activation_limit = 2`.
+It fires at the original rectangle, rearms at the shifted rectangle, then fires
+once more at the original rectangle and stays spent. The number of enemies in
+each activation is still controlled independently by `spawn_enemy_count`.
+
+For a conditional shot, give its source block `trigger_channel = 31` and the
+spawner `disable_channel = 31`. Spending the block suppresses an unfired shot
+without hardcoded source object indices.
 
 === `enter_pipe`
 
 Tiled class: `Enter Pipe`.
 
-A vertical pipe entered by holding Down. Pipe art remains on `Background`.
+A vertical pipe entered by holding Down. Paint the pipe on `Background` for editor visibility. Its runtime overlay can cover emerging enemy sprites, or be disabled for a static background-only pipe.
 
 * Subtypes:
 ** `pipe_fake_kill`: Sinks the player, then performs the fake-pipe kill sequence.
 ** `pipe_to_underground`: Sinks the player, then loads the selected destination map.
+** `pipe_fireworks`: Sinks the player and kills at animation frame 19 with the fireworks message; no map transition or flying-pipe animation.
+** `pipe_owata`: Sinks the player and kills at animation frame 19 with the OWATA/done-for message; no map transition or flying-pipe animation.
 
 [cols="1,1,3",options="header"]
 |===
@@ -508,6 +529,7 @@ A vertical pipe entered by holding Down. Pipe art remains on `Background`.
 
 |`stage_destination` |`StageDestination` |Map loaded after a successful pipe transition. Select the destination explicitly, for example `1-3u`.
 |`entry_id` |int |Destination entry route. Match this to a `Pipe Exit` in the destination map; defaults to `0`.
+|`draw_pipe` |bool |Render the foreground pipe overlay; default `true`. Set `false` for a static pipe whose art is entirely on `Background`. Collision and entry behavior remain enabled.
 |===
 
 === `side_pipe`
@@ -715,7 +737,17 @@ A sprite-rendered solid platform that moves continuously and carries the player.
 |`visual_metatile` |`VisualMetatile` |OBJ metatile graphic. `inherit` samples the backing map cell at the object position, including its palette; use an explicit metatile to override it.
 |`visual_palette` |`BgPalette` |Palette for an explicit `visual_metatile`; ignored when `visual_metatile` is `inherit`.
 |`vx`, `vy` |number |Constant horizontal and vertical speed in GBA pixels per frame. For `platform_conveyor`, `vx` is the player-carry speed and the platform itself remains still; `vy` is ignored. Both are ignored by `platform_bounce`.
+|`trigger_channel` |int |Emitted on the first player landing during this attempt; `0` disables it.
+|`listen_channel` |int |Applies `channel_vx` and `channel_vy` when this event is received. Does not emit another channel or consume the platform.
+|`channel_vx`, `channel_vy` |number |Signed replacement velocity in pixels/frame after a linked event. Explicit zero stops that axis. No effect until the listen event arrives.
+|`trigger_delay` |int |Frames to wait after the listen event before applying the replacement velocity.
 |===
+
+Linked accelerating lifts can share the same `trigger_channel` and
+`listen_channel`, an initial `vy`, and a faster `channel_vy`. Landing on either
+changes both. Self-listening is valid because the channel action only changes
+velocity; it does not emit another event. The 1-2U downward pair uses channel
+`32` and triples its speed. The upward pair is independent.
 
 === `pickup_item`
 

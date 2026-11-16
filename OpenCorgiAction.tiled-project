@@ -431,7 +431,8 @@
     "question_bad_flower",
     "question_poison_generator",
     "question_coin_generator",
-    "question_hidden_poison"
+    "question_hidden_poison",
+    "question_fragile_coin"
    ]
   },
   {
@@ -549,7 +550,8 @@
     "stage_upward_hazard_toggle",
     "stage_upward_hazard_left",
     "stage_hint_message",
-    "stage_pipe_hazard"
+    "stage_pipe_hazard",
+    "stage_banner"
    ]
   },
   {
@@ -700,6 +702,21 @@
      "name": "hint_text",
      "type": "string",
      "value": ""
+    },
+    {
+     "name": "activation_limit",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "disable_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "draw_pipe",
+     "type": "bool",
+     "value": true
     }
    ]
   },
@@ -712,7 +729,9 @@
    "values": [
     "none",
     "pipe_fake_kill",
-    "pipe_to_underground"
+    "pipe_to_underground",
+    "pipe_fireworks",
+    "pipe_owata"
    ]
   },
   {
@@ -741,6 +760,11 @@
      "name": "entry_id",
      "type": "int",
      "value": 0
+    },
+    {
+     "name": "draw_pipe",
+     "type": "bool",
+     "value": true
     }
    ]
   },
@@ -895,6 +919,31 @@
     },
     {
      "name": "vy",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "channel_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "channel_vy",
      "type": "float",
      "value": 0
     }
@@ -2186,6 +2235,31 @@
      "name": "vy",
      "type": "float",
      "value": 0
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "listen_channel",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "trigger_delay",
+     "type": "int",
+     "value": 0
+    },
+    {
+     "name": "channel_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "channel_vy",
+     "type": "float",
+     "value": 0
     }
    ]
   },
@@ -2220,6 +2294,52 @@
      "name": "hidden",
      "type": "bool",
      "value": false
+    }
+   ]
+  },
+  {
+   "id": 73,
+   "name": "Fragile Coin Block",
+   "type": "class",
+   "color": "#ffff7070",
+   "drawFill": true,
+   "useAs": [
+    "object"
+   ],
+   "members": [
+    {
+     "name": "visual_metatile",
+     "type": "string",
+     "value": "inherit",
+     "propertyType": "VisualMetatile"
+    },
+    {
+     "name": "visual_palette",
+     "type": "string",
+     "propertyType": "BgPalette",
+     "value": "normal"
+    },
+    {
+     "name": "collision",
+     "type": "int",
+     "propertyType": "LevelCollision",
+     "value": 255
+    },
+    {
+     "name": "hidden",
+     "type": "bool",
+     "value": false
+    },
+    {
+     "name": "spent_metatile",
+     "type": "string",
+     "value": "default_spent",
+     "propertyType": "SpentMetatile"
+    },
+    {
+     "name": "trigger_channel",
+     "type": "int",
+     "value": 0
     }
    ]
   }

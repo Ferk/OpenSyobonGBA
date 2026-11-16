@@ -27,6 +27,7 @@ void messages_update(void);
 void messages_show(MessageId id, fix16_t x, fix16_t y, uint8_t frames);
 void messages_show_text(const char *text, fix16_t x, fix16_t y, uint8_t frames);
 void messages_show_modal_text(const char *text, fix16_t x, fix16_t y);
+void messages_show_banner(const char *text);
 uint8_t messages_is_modal(void);
 void messages_dismiss(void);
 void messages_draw(const struct Camera *camera);
