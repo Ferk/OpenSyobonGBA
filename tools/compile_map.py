@@ -755,12 +755,27 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                 continue
 
             if trap or layer_name.lower().startswith("trap"):
+                velocity_text = prop_value(props, "spawn_velocities", tile_prop.get("spawn_velocities", "[]"))
+                try:
+                    velocities = json.loads(velocity_text)
+                except (ValueError, TypeError):
+                    raise map_error("expected a JSON array of [vx, vy] pairs", "spawn_velocities")
+                if not isinstance(velocities, list) or len(velocities) > MAX_ACTIVE_ENEMIES:
+                    raise map_error("expected at most 32 velocity pairs", "spawn_velocities")
+                velocity_pairs = []
+                for pair in velocities:
+                    if not isinstance(pair, list) or len(pair) != 2 or any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in pair):
+                        raise map_error("each entry must be a numeric [vx, vy] pair", "spawn_velocities")
+                    velocity_pairs.append((fixed(pair[0], "spawn_velocities"), fixed(pair[1], "spawn_velocities")))
+                if velocity_pairs:
+                    spawn_enemy_count = len(velocity_pairs)
                 if trap is None:
                     raise map_error(f"unknown trap class {name!r}; select one of {', '.join(sorted(AUTHORING_CLASSES))}", "class")
                 if len(traps) >= MAX_TRAPS:
                     raise map_error(f"exceeds the limit of {MAX_TRAPS} traps")
                 if (trap in {"TRAP_ENTER_PIPE", "TRAP_SIDE_PIPE", "TRAP_EVASIVE_BLOCK", "TRAP_MOVING_PLATFORM", "TRAP_BREAKING_PLATFORM", "TRAP_MOVING_BLOCK"} or
                     (trap == "TRAP_QUESTION_BLOCK" and subtype == 115) or
+                    (trap == "TRAP_HINT_BLOCK" and (prop_value(props, "channel_vx", tile_prop.get("channel_vx", 0)) or prop_value(props, "channel_vy", tile_prop.get("channel_vy", 0)))) or
                     (trap == "TRAP_JUMP_PAD" and subtype == 0)):
                     dynamic_colliders += 1
                     if dynamic_colliders > MAX_DYNAMIC_COLLIDERS:
@@ -815,6 +830,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "spawn_limit": bounded(spawn_limit, "spawn_limit", 0, 255),
                     "activation_limit": bounded(prop_value(props, "activation_limit", tile_prop.get("activation_limit", 0)), "activation_limit", 0, 255),
                     "disable_channel": bounded(prop_value(props, "disable_channel", tile_prop.get("disable_channel", 0)), "disable_channel", 0, 255),
+                    "enable_channel": bounded(prop_value(props, "enable_channel", tile_prop.get("enable_channel", 0)), "enable_channel", 0, 255),
                     "draw_pipe": bounded(prop_value(props, "draw_pipe", tile_prop.get("draw_pipe", 1)), "draw_pipe", 0, 1),
                     "item_variant": bounded(item_variant, "item_variant", 0, 255),
                     "spawn_enemy_kind": spawn_enemy_kind,
@@ -822,6 +838,7 @@ def parse_object_layers(map_data, tile_props, metatile_count=85, map_path=None):
                     "spawn_enemy_palette": enemy_palette_value(spawn_enemy_palette, "spawn_enemy_palette"),
                     "spawn_enemy_param": bounded(spawn_enemy_param, "spawn_enemy_param", 0, 255),
                     "spawn_enemy_count": bounded(spawn_enemy_count, "spawn_enemy_count", 0, MAX_ACTIVE_ENEMIES),
+                    "spawn_velocities": velocity_pairs,
                     "spawn_sound": bounded(spawn_sound, "spawn_sound", 0, 1),
                     "trigger_channel": bounded(trigger_channel, "trigger_channel", 0, 255),
                     "listen_channel": bounded(listen_channel, "listen_channel", 0, 255),
@@ -1200,16 +1217,23 @@ extern const uint16_t {prefix}_trap_count;
         "};",
         f"const uint16_t {prefix}_enemy_spawn_count = {len(enemy_spawns)};",
         "",
-        f"const TrapTrigger {prefix}_traps[{max(1, len(traps))}] = {{",
     ])
+    for index, trap in enumerate(traps):
+        if trap["spawn_velocities"]:
+            lines.append(f"static const TrapSpawnVelocity {prefix}_velocities_{index}[] = {{")
+            lines.extend(f"    {{ {vx}, {vy} }}," for vx, vy in trap["spawn_velocities"])
+            lines.append("};")
+    lines.append(f"const TrapTrigger {prefix}_traps[{max(1, len(traps))}] = {{")
     if traps:
-        for trap in traps:
+        for index, trap in enumerate(traps):
             lines.extend([
                 "    {",
+                f"        .spawn_velocities = {prefix + '_velocities_' + str(index) if trap['spawn_velocities'] else '0'},",
                 f"        .kind = {trap['kind']}, .subtype = {trap['subtype']}, .destination = {trap['destination']}, .entry_id = {trap['entry_id']}, .spawn_dir = {trap['spawn_dir']},",
                 f"        .visual_palette = {trap['visual_palette']}, .spawn_interval = {trap['spawn_interval']},",
                 f"        .spawn_limit = {trap['spawn_limit']}, .item_variant = {trap['item_variant']},",
                 f"        .activation_limit = {trap['activation_limit']}, .disable_channel = {trap['disable_channel']}, .draw_pipe = {trap['draw_pipe']},",
+                f"        .enable_channel = {trap['enable_channel']},",
                 f"        .spawn_enemy_kind = {trap['spawn_enemy_kind']}, .spawn_enemy_sprite = {trap['spawn_enemy_sprite']},",
                 f"        .spawn_enemy_palette = {trap['spawn_enemy_palette']}, .spawn_enemy_param = {trap['spawn_enemy_param']},",
                 f"        .spawn_enemy_count = {trap['spawn_enemy_count']}, .spawn_sound = {trap['spawn_sound']},",

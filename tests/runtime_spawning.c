@@ -259,11 +259,80 @@ static void test_entrance_and_underground(void)
     }
 }
 
+static void test_question_ball_heights(void)
+{
+    static TrapManager first, second;
+    Trap trap = {0};
+    Player player = {0};
+    trap.x = FIX16_FROM_INT(1000);
+    trap.y = FIX16_FROM_INT(50);
+    spawn_question_ball_burst(&first, &trap, &player);
+    trap.y = FIX16_FROM_INT(150);
+    spawn_question_ball_burst(&second, &trap, &player);
+    static const int heights[] = {-12000, -3000, -6000, -9000, -12000, -6000, -7000};
+    for (unsigned i = 0; i < 7; ++i) {
+        assert(first.entities[i].active && second.entities[i].active);
+        assert(first.entities[i].y == REF_STAGE_Y_TO_FIX(heights[i]));
+        assert(first.entities[i].y == second.entities[i].y);
+    }
+}
+
 int main(void)
 {
+    {
+        static const TrapSpawnVelocity velocities[] = {
+            {-4 * FIX16_ONE, 0}, {-3 * FIX16_ONE, -FIX16_ONE},
+            {-3 * FIX16_ONE, FIX16_ONE}, {-2 * FIX16_ONE, -2 * FIX16_ONE},
+            {-2 * FIX16_ONE, 2 * FIX16_ONE}
+        };
+        Trap fan = {0};
+        Player player = {0};
+        memset(&enemy_current, 0, sizeof(enemy_current));
+        fan.spawn_enemy_kind = ENEMY_LASER;
+        fan.spawn_enemy_sprite = ENEMY_SPRITE_LASER;
+        fan.spawn_enemy_count = 5;
+        fan.spawn_velocities = velocities;
+        fan.spawn_dir = -1;
+        assert(spawn_trap_enemy_recipe(&fan, &player));
+        for (unsigned i = 0; i < 5; ++i) {
+            assert(enemy_current.enemies[i].kind == ENEMY_LASER);
+            assert(enemy_current.enemies[i].vx == velocities[i].vx);
+            assert(enemy_current.enemies[i].vy == velocities[i].vy);
+            assert(enemy_current.enemies[i].x == fan.x);
+            assert(enemy_current.enemies[i].y == fan.y);
+        }
+    }
+    {
+        static TrapManager manager;
+        static Level level;
+        Player player = {0};
+        manager.trap_count = 2;
+        Trap *laser = &manager.traps[0];
+        Trap *hint = &manager.traps[1];
+        laser->kind = TRAP_STAGE_SPAWNER;
+        laser->enable_channel = 41;
+        laser->trigger_channel = 42;
+        hint->kind = TRAP_HINT_BLOCK;
+        hint->listen_channel = 42;
+        hint->trigger_delay = 20;
+        hint->channel_vx = -FIX16_ONE;
+        trigger_stage_spawner(&manager, laser, &level, &player);
+        assert(laser->state == TRAP_IDLE && !hint->trigger_pending);
+        emit_trap_channel(&manager, &level, &player, 41);
+        assert(laser->enabled && laser->state == TRAP_IDLE);
+        trigger_stage_spawner(&manager, laser, &level, &player);
+        assert(laser->state == TRAP_SPENT && hint->trigger_pending);
+        for (int i = 0; i < 20; ++i) {
+            update_linked_traps(&manager, &level, &player);
+            assert(hint->state == TRAP_IDLE);
+        }
+        update_linked_traps(&manager, &level, &player);
+        assert(hint->state == TRAP_ACTIVE && hint->vx == -FIX16_ONE);
+    }
     test_reuse();
     test_traps();
     test_entrance_and_underground();
+    test_question_ball_heights();
     puts("runtime spawning checks passed");
     return 0;
 }

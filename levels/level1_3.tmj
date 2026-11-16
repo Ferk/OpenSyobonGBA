@@ -3592,6 +3592,11 @@
        "type": "string",
        "value": "empty",
        "propertytype": "VisualMetatile"
+      },
+      {
+       "name": "trigger_channel",
+       "type": "int",
+       "value": 41
       }
      ],
      "rotation": 0,
@@ -3620,7 +3625,7 @@
       {
        "name": "hint_text",
        "type": "string",
-       "value": "The block above is bad news."
+       "value": "A ? IS REQUIRED.\n\n\nM9(^D^)"
       },
       {
        "name": "subtype",
@@ -3700,7 +3705,7 @@
       {
        "name": "hint_text",
        "type": "string",
-       "value": "The next trick breaks blocks."
+       "value": "THERE ARE HIDDEN BLOCKS AHEAD.\n\nBE CAREFUL!!"
       },
       {
        "name": "subtype",
@@ -3712,6 +3717,26 @@
        "type": "string",
        "value": "hint_block",
        "propertytype": "VisualMetatile"
+      },
+      {
+       "name": "listen_channel",
+       "type": "int",
+       "value": 42
+      },
+      {
+       "name": "trigger_delay",
+       "type": "int",
+       "value": 20
+      },
+      {
+       "name": "channel_vx",
+       "type": "float",
+       "value": -1.379310344827586
+      },
+      {
+       "name": "channel_vy",
+       "type": "float",
+       "value": 0.0
       }
      ],
      "rotation": 0,
@@ -4041,6 +4066,16 @@
        "name": "subtype",
        "type": "string",
        "value": "stage_upward_hazard_left"
+      },
+      {
+       "name": "enable_channel",
+       "type": "int",
+       "value": 41
+      },
+      {
+       "name": "trigger_channel",
+       "type": "int",
+       "value": 42
       }
      ],
      "rotation": 0,
@@ -4133,12 +4168,12 @@
       {
        "name": "spawn_enemy_kind",
        "type": "string",
-       "value": "pipe_shot"
+       "value": "laser"
       },
       {
        "name": "spawn_enemy_sprite",
        "type": "string",
-       "value": "fire_projectile"
+       "value": "laser"
       },
       {
        "name": "spawn_limit",
@@ -4153,12 +4188,27 @@
       {
        "name": "spawn_vy",
        "type": "float",
-       "value": -2.206896551724
+       "value": 0.0
       },
       {
        "name": "subtype",
        "type": "string",
        "value": "stage_upward_hazard"
+      },
+      {
+       "name": "spawn_offset_x",
+       "type": "float",
+       "value": 66.20689655172414
+      },
+      {
+       "name": "spawn_offset_y",
+       "type": "float",
+       "value": 27.586206896551722
+      },
+      {
+       "name": "spawn_velocities",
+       "type": "string",
+       "value": "[[-4.413793103448276, 0], [-3.310344827586207, -0.5517241379310345], [-3.310344827586207, 0.5517241379310345], [-2.4827586206896552, -1.6551724137931034], [-2.4827586206896552, 1.6551724137931034]]"
       }
      ],
      "rotation": 0,
@@ -4322,24 +4372,19 @@
      "opacity": 1,
      "properties": [
       {
-       "name": "subtype",
-       "type": "string",
-       "value": "platform_vertical_wrap"
-      },
-      {
        "name": "visual_metatile",
        "type": "string",
        "value": "white_platform",
        "propertytype": "VisualMetatile"
       },
       {
-       "name": "vy",
+       "name": "gravity",
        "type": "float",
-       "value": -0.827586
+       "value": 0.033103
       }
      ],
      "rotation": 0,
-     "type": "Moving Platform",
+     "type": "Falling Floor",
      "visible": true,
      "width": 48,
      "x": 1872,

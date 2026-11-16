@@ -65,6 +65,8 @@ Subtypes: `none`, `stage_pipe_shot`, `stage_flying_enemy`, `stage_walker_swarm`,
 |`trigger_delay` |`int` |`0` |frames
 |`hint_text` |`string` |`""` |-
 |`activation_limit` |`int` |`0` |successful activations; 0 is unlimited
+|`spawn_velocities` |`string` |`"[]"` |-
+|`enable_channel` |`int` |`0` |-
 |`disable_channel` |`int` |`0` |event channel; 0 disables the listener
 |`draw_pipe` |`bool` |`true` |-
 |===
@@ -210,6 +212,8 @@ Subtypes: `none`, `hint_stage_1`.
 |`visual_palette` |`BgPalette` |`"normal"` |-
 |`collision` |`LevelCollision` |`255` |-
 |`hint_text` |`string` |`""` |-
+|`channel_vx` |`float` |`0` |pixels/frame after linked event
+|`channel_vy` |`float` |`0` |pixels/frame after linked event
 |`trigger_channel` |`int` |`0` |-
 |`listen_channel` |`int` |`0` |-
 |`trigger_delay` |`int` |`0` |frames

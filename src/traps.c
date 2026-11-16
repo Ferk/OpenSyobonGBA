@@ -393,6 +393,9 @@ static Trap *add_world_trap(TrapManager *manager, TrapKind kind,
     trap->spawn_limit = QUESTION_DEFAULT_SPAWN_LIMIT;
     trap->activation_limit = 0;
     trap->disable_channel = 0;
+    trap->spawn_velocities = 0;
+    trap->enable_channel = 0;
+    trap->enabled = 1;
     trap->draw_pipe = 1;
     trap->item_variant = 0;
     trap->spawn_enemy_kind = ENEMY_NONE;
@@ -625,6 +628,9 @@ static void add_generated_trap(TrapManager *manager, Level *level,
     trap->spawn_limit = trigger->spawn_limit;
     trap->activation_limit = trigger->activation_limit;
     trap->disable_channel = trigger->disable_channel;
+    trap->spawn_velocities = trigger->spawn_velocities;
+    trap->enable_channel = trigger->enable_channel;
+    trap->enabled = trigger->enable_channel == 0;
     trap->draw_pipe = trigger->draw_pipe;
     trap->item_variant = trigger->item_variant;
     trap->spawn_enemy_kind = trigger->spawn_enemy_kind;
@@ -676,7 +682,9 @@ static void add_generated_trap(TrapManager *manager, Level *level,
         (trigger->kind == TRAP_JUMP_PAD && trigger->subtype == 0) ||
         trigger->kind == TRAP_MOVING_PLATFORM ||
         trigger->kind == TRAP_BREAKING_PLATFORM ||
-        trigger->kind == TRAP_MOVING_BLOCK) {
+        trigger->kind == TRAP_MOVING_BLOCK ||
+        (trigger->kind == TRAP_HINT_BLOCK &&
+         (trigger->channel_vx || trigger->channel_vy))) {
         add_dynamic_collider(manager, trap);
     }
 
@@ -1117,7 +1125,7 @@ static void spawn_question_ball_burst(TrapManager *manager, const Trap *trap,
     for (uint8_t i = 0; i < sizeof(burst_offsets) / sizeof(burst_offsets[0]); ++i) {
         spawn_question_ball_star(manager,
                                  trap->x + REF_POS_TO_FIX(burst_offsets[i][0]),
-                                 trap->y + REF_POS_TO_FIX(burst_offsets[i][1]),
+                                 REF_STAGE_Y_TO_FIX(burst_offsets[i][1]),
                                  player);
     }
 }
@@ -1449,8 +1457,8 @@ static uint8_t spawn_trap_enemy_recipe(Trap *trap, const Player *player)
     }
 
     for (uint8_t i = 0; i < trap->spawn_enemy_count; ++i) {
-        fix16_t vx = trap->spawn_vx;
-        fix16_t vy = trap->spawn_vy;
+        fix16_t vx = trap->spawn_velocities ? trap->spawn_velocities[i].vx : trap->spawn_vx;
+        fix16_t vy = trap->spawn_velocities ? trap->spawn_velocities[i].vy : trap->spawn_vy;
 
         if (trap->spawn_random_vx > 0) {
             vx += random_fixed_centered(trap->spawn_random_vx);
@@ -1486,7 +1494,7 @@ static uint8_t spawn_trap_enemy_recipe(Trap *trap, const Player *player)
 static void trigger_stage_spawner(TrapManager *manager, Trap *trap, Level *level,
                                   Player *player)
 {
-    if (trap->state != TRAP_IDLE) {
+    if (trap->state != TRAP_IDLE || (trap->enable_channel && !trap->enabled)) {
         return;
     }
 
@@ -1720,7 +1728,16 @@ static void activate_linked_trap(TrapManager *manager, Level *level,
         }
         break;
     case TRAP_HINT_BLOCK:
-        trigger_hint_block(manager, trap, level, player);
+        if (trap->channel_vx || trap->channel_vy) {
+            set_trap_metatile_cell(level, trap, trap->source_x, trap->source_y, METATILE_EMPTY);
+            set_cell_collision(manager, trap->source_x, trap->source_y, LEVEL_COLLISION_EMPTY, 0);
+            trap->state = TRAP_ACTIVE;
+            trap->trigger_pending = 0;
+            trap->vx = trap->channel_vx;
+            trap->vy = trap->channel_vy;
+        } else {
+            trigger_hint_block(manager, trap, level, player);
+        }
         break;
     case TRAP_PICKUP_ITEM:
         if (player) {
@@ -1749,6 +1766,10 @@ static void emit_trap_channel(TrapManager *manager, Level *level,
 
     for (uint8_t i = 0; i < manager->trap_count; ++i) {
         Trap *listener = &manager->traps[i];
+
+        if (listener->enable_channel == channel) {
+            listener->enabled = 1;
+        }
 
         if (listener->disable_channel == channel) {
             listener->state = TRAP_SPENT;
@@ -2536,6 +2557,9 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
                        player_y + PLAYER_HEIGHT_PX <= trap_y + 4) {
                 trigger_falling_floor(manager, trap, level, player);
             }
+        } else if (trap->kind == TRAP_HINT_BLOCK && trap->state == TRAP_ACTIVE) {
+            trap->x += trap->vx;
+            trap->y += trap->vy;
         } else if (trap->kind == TRAP_STAGE_SPAWNER && trap->state == TRAP_IDLE) {
             int trap_x = FIX16_TO_INT(trap->x);
             int trap_y = FIX16_TO_INT(trap->y);
@@ -2732,7 +2756,8 @@ void traps_update(TrapManager *manager, Level *level, struct Player *player)
         }
 
         int offscreen_top = entity->kind == TRAP_ENTITY_FALLING_TILE ? -192 : -96;
-        if (entity_y > level_death_y_px(level) + 64 || entity_y < offscreen_top) {
+        if (entity_y > level_death_y_px(level) + 64 ||
+            (entity_y < offscreen_top && entity->kind != TRAP_ENTITY_STAR_ITEM)) {
             entity->active = 0;
             continue;
         }
@@ -3049,7 +3074,8 @@ void traps_draw(TrapManager *manager, const struct Camera *camera)
                     (trap->kind == TRAP_BREAKING_PLATFORM &&
                      trap->state != TRAP_SPENT) ||
                    (trap->kind == TRAP_MOVING_BLOCK &&
-                    trap->state == TRAP_ACTIVE)) {
+                    trap->state == TRAP_ACTIVE) ||
+                   (trap->kind == TRAP_HINT_BLOCK && trap->state == TRAP_ACTIVE)) {
             int base_x = camera_world_to_screen_x(camera, trap->x);
             int base_y = camera_world_to_screen_y(camera, trap->y);
             int cols = (FIX16_TO_INT(trap->w) + LEVEL_METATILE_SIZE - 1) /
@@ -3201,7 +3227,8 @@ LevelCollision traps_collision_at(const TrapManager *manager, int world_x_px, in
             return LEVEL_COLLISION_PASS_THROUGH;
         }
 
-        if (trap->kind == TRAP_MOVING_BLOCK) {
+        if (trap->kind == TRAP_MOVING_BLOCK ||
+            (trap->kind == TRAP_HINT_BLOCK && trap->state == TRAP_ACTIVE)) {
             return LEVEL_COLLISION_SOLID;
         }
     }
@@ -3244,7 +3271,8 @@ uint8_t traps_on_player_bump(TrapManager *manager, Level *level, const Player *p
             triggered = 1;
         } else if (trap->kind == TRAP_EVASIVE_BLOCK) {
             bump_evasive_block(trap, world_x_px, world_y_px);
-        } else if (trap->kind == TRAP_HINT_BLOCK) {
+        } else if (trap->kind == TRAP_HINT_BLOCK && trap->state == TRAP_IDLE &&
+                   !trap->trigger_pending) {
             trigger_hint_block(manager, trap, level, (Player *)player);
             triggered = 1;
         } else if (trap->kind == TRAP_BREAKABLE_BLOCK &&

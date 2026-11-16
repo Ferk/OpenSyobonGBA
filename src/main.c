@@ -51,6 +51,7 @@ typedef enum StageId {
 typedef enum GameState {
     GAME_STATE_LIVES = 0,
     GAME_STATE_PLAYING,
+    GAME_STATE_CONTENT_END,
 } GameState;
 
 static uint16_t modal_previous_keys;
@@ -263,6 +264,28 @@ static void show_lives_screen(StageId stage, Player *player,
     draw_lives_screen(stage, 2 - (int)player->death_count);
     *lives_timer = RESTART_SCREEN_FRAMES;
     *game_state = GAME_STATE_LIVES;
+}
+
+static void draw_content_end_screen(void)
+{
+    static const char text[] = "END OF CURRENT CONTENT";
+    static const char restart[] = "PRESS START TO RESTART";
+    uint16_t *map = (uint16_t *)SCREEN_BASE_BLOCK(30);
+
+    draw_lives_screen(STAGE_ID_1_3, 0);
+    clear_oam();
+    for (uint16_t i = 0; i < 32 * 32; ++i) {
+        map[i] = LIFE_TEXT_BLANK_TILE;
+    }
+    for (uint8_t tile = 0; tile < (sizeof(text) - 1 + 1) / 2; ++tile) {
+        draw_life_text_tile(tile, text, (uint8_t)(tile * 2));
+        map[10 * 32 + 10 + tile] = (uint16_t)(LIFE_TEXT_GLYPH_TILE_BASE + tile);
+    }
+    for (uint8_t tile = 0; tile < (sizeof(restart) - 1 + 1) / 2; ++tile) {
+        uint8_t offset = (uint8_t)(11 + tile);
+        draw_life_text_tile(offset, restart, (uint8_t)(tile * 2));
+        map[13 * 32 + 10 + tile] = (uint16_t)(LIFE_TEXT_GLYPH_TILE_BASE + offset);
+    }
 }
 
 static void apply_camera_left_limit(Player *player, const Camera *camera)
@@ -499,6 +522,21 @@ int main(void)
     draw_lives_screen(current_stage, 2);
 
     while (1) {
+        if (game_state == GAME_STATE_CONTENT_END) {
+            uint16_t keys = keys_held();
+            if (modal_input_armed && (keys & KEY_START_MASK) &&
+                !(modal_previous_keys & KEY_START_MASK)) {
+                current_stage = STAGE_ID_1_1;
+                memset(&player, 0, sizeof(player));
+                show_lives_screen(current_stage, &player, &lives_timer, &game_state);
+                camera_init(&camera);
+            }
+            modal_input_armed = 1;
+            modal_previous_keys = keys;
+            VBlankIntrWait();
+            audio_update();
+            continue;
+        }
         if (game_state == GAME_STATE_LIVES) {
 #ifdef DEBUG_STAGE_SELECT
             uint16_t keys = keys_held();
@@ -618,6 +656,13 @@ int main(void)
             uint16_t death_count = player_death_count(&player);
 
             traps_ack_stage_clear(&traps_current);
+            if (current_stage == STAGE_ID_1_3) {
+                audio_stop_bgm();
+                draw_content_end_screen();
+                modal_input_armed = 0;
+                game_state = GAME_STATE_CONTENT_END;
+                continue;
+            }
             if (current_stage == STAGE_ID_1_1) {
                 current_stage = STAGE_ID_1_2;
             } else if (current_stage == STAGE_ID_1_2B) {

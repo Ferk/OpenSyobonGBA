@@ -709,6 +709,20 @@
      "value": 0
     },
     {
+     "name": "spawn_velocities",
+     "type": "string",
+     "value": "[]",
+     "description": "JSON array of [vx, vy] pairs in pixels/frame; overrides spawn count and base velocities."
+    },
+    {
+     "name": "enable_channel",
+     "type": "int",
+     "value": 0,
+     "min": 0,
+     "max": 255,
+     "description": "Nonzero: spawner waits for this channel before overlap can activate it."
+    },
+    {
      "name": "disable_channel",
      "type": "int",
      "value": 0
@@ -1206,6 +1220,16 @@
      "name": "hint_text",
      "type": "string",
      "value": ""
+    },
+    {
+     "name": "channel_vx",
+     "type": "float",
+     "value": 0
+    },
+    {
+     "name": "channel_vy",
+     "type": "float",
+     "value": 0
     },
     {
      "name": "trigger_channel",

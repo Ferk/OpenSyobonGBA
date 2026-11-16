@@ -59,7 +59,13 @@ typedef enum TrapEntityKind {
     TRAP_ENTITY_P_SWITCH,
 } TrapEntityKind;
 
+typedef struct TrapSpawnVelocity {
+    fix16_t vx;
+    fix16_t vy;
+} TrapSpawnVelocity;
+
 typedef struct Trap {
+    const TrapSpawnVelocity *spawn_velocities;
     TrapKind kind;
     TrapState state;
     uint16_t source_x;
@@ -83,6 +89,8 @@ typedef struct Trap {
     uint8_t spawn_limit;
     uint8_t activation_limit;
     uint8_t disable_channel;
+    uint8_t enable_channel;
+    uint8_t enabled;
     uint8_t draw_pipe;
     uint8_t item_variant;
     uint8_t spawn_enemy_kind;
@@ -134,6 +142,7 @@ typedef struct TrapEntity {
 } TrapEntity;
 
 typedef struct TrapTrigger {
+    const TrapSpawnVelocity *spawn_velocities;
     TrapKind kind;
     uint8_t subtype;
     int8_t spawn_dir;
@@ -144,6 +153,7 @@ typedef struct TrapTrigger {
     uint8_t spawn_limit;
     uint8_t activation_limit;
     uint8_t disable_channel;
+    uint8_t enable_channel;
     uint8_t draw_pipe;
     uint8_t item_variant;
     uint8_t spawn_enemy_kind;

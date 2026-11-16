@@ -586,6 +586,8 @@
         "trigger_delay",
         "hint_text",
         "activation_limit",
+        "spawn_velocities",
+        "enable_channel",
         "disable_channel",
         "draw_pipe"
       ]
@@ -718,6 +720,8 @@
         "visual_palette",
         "collision",
         "hint_text",
+        "channel_vx",
+        "channel_vy",
         "trigger_channel",
         "listen_channel",
         "trigger_delay"
@@ -849,6 +853,18 @@
     }
   },
   "properties": {
+    "spawn_velocities": {
+      "type": "string",
+      "value": "[]",
+      "description": "JSON array of [vx, vy] pairs in pixels/frame; overrides spawn count and base velocities."
+    },
+    "enable_channel": {
+      "type": "int",
+      "value": 0,
+      "min": 0,
+      "max": 255,
+      "description": "Nonzero: spawner waits for this channel before overlap can activate it."
+    },
     "spawn_dir": {
       "type": "string",
       "propertyType": "TrapSpawnDirection",

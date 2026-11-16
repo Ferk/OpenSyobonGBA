@@ -353,6 +353,33 @@ The sections below use internal kind names; the generated catalog at the end of
 this reference lists their Tiled classes and settings. Each rectangle is the
 trigger or body described in its section.
 
+=== Channel-Armed Spawners And Moving Hints
+
+Stage Spawners also accept `spawn_velocities`, a string containing a JSON array
+of `[vx, vy]` pairs in pixels/frame. For example, `[[-4, 0], [-3, -1], [-3, 1]]`
+spawns three enemies with different velocities. A nonempty list determines the
+spawn count and replaces the base `spawn_vx`/`spawn_vy` for each enemy. Existing
+position offsets, spacing and random velocity additions still apply. `[]`
+retains the ordinary count and velocity settings. At most 32 pairs are allowed;
+the entire group waits if the enemy pool has insufficient free slots.
+
+Stage Spawners accept `enable_channel` (integer, default `0`). A nonzero value
+starts the spawner unarmed. Receiving that channel arms it without spawning;
+its normal overlap trigger must still be satisfied. Arming is retained until
+the map is reloaded. `disable_channel` still spends the spawner.
+
+Hint Blocks accept `channel_vx` and `channel_vy` in pixels/frame. When either
+is nonzero, receiving `listen_channel` starts movement after `trigger_delay`
+frames instead of displaying a modal. The backing tile is removed when movement
+starts, and the hint graphic and solid collision body move together. The hint
+cannot display its normal message while this movement is pending or active.
+With both velocities zero, channel activation retains the normal modal behavior.
+Movement continues offscreen; it does not wrap.
+
+For the 1-3 sequence, the hidden block emits channel 41, which arms the laser.
+The successful laser activation emits channel 42; the hint listens on 42 with
+`trigger_delay = 20` and `channel_vx = -1.379310344827586`.
+
 === `falling_floor`
 
 Tiled class: `Falling Floor`.
